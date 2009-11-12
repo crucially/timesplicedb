@@ -49,7 +49,7 @@ struct NGR_metric_t * NGR_create(char *host, char *metric, time_t created_time, 
   char buffer[8];
   int   fd, write_len;
   int   size = sizeof(int);
-
+  int version = 1;
 
   if(!created_time)
     created_time = time(NULL);
@@ -66,6 +66,8 @@ struct NGR_metric_t * NGR_create(char *host, char *metric, time_t created_time, 
 
   
   write_len = write(fd, &size, 4);
+  assert(write_len == 4);
+  write_len = write(fd, &version, 4);
   assert(write_len == 4);
   write_len = write(fd, &resolution, 4);
   assert(write_len == 4);
@@ -92,14 +94,23 @@ struct NGR_metric_t * NGR_open(char *host, char *metric) {
 
   obj->fd = open(path, O_RDWR);
 
+  obj->base = 4;
   read_len = read(obj->fd, width_buf, 4);
   assert(read_len == 4);
   obj->width = *width_buf;
 
+  obj->base += 4;
+  read_len = read(obj->fd, &obj->version, 4);
+  assert(read_len == 4);
+
+  obj->base += 4;
+  read_len = read(obj->fd, &obj->resolution, 4);
+  assert(read_len == 4);
+  
+
+  obj->base += obj->width;
   read_len = read(obj->fd, &obj->created, obj->width);
-
   assert(read_len == obj->width);
-
   free(path);
 
   return obj;
@@ -112,7 +123,7 @@ int NGR_insert (struct NGR_metric_t *obj, time_t timestamp, int value) {
     timestamp = time(NULL);
 
   entry  = ((timestamp - obj->created) / 60);
-  offset = (4 + obj->width + ( entry * obj->width ) );
+  offset = (obj->base + ( entry * obj->width ) );
   lseek(obj->fd, offset, SEEK_SET);
   write_len = write(obj->fd, &value, obj->width);
   assert(write_len == obj->width);
@@ -129,15 +140,15 @@ struct NGR_range_t * NGR_range (struct NGR_metric_t *obj, int start, int end) {
   fstat(obj->fd, file);
 
   /* if the range goes byond the file, map that as well */
-  if ((end * obj->width + 4 + obj->width) > file->st_size)
-    range->len = (end * obj->width + 4 + obj->width);
+  if ((end * obj->width + obj->base) > file->st_size)
+    range->len = (end * obj->width + obj->base);
   else
     range->len = file->st_size;
 
   free(file);
   range->area = mmap(0, range->len, PROT_READ, MAP_SHARED| MAP_FILE, obj->fd, 0);
   assert(range->area != (void*)-1);
-  range->entry = (range->area + 4 + obj->width + (obj->width * start));
+  range->entry = (range->area + obj->base + (obj->width * start));
   range->items = end - start;
   range->mmap = 1;
   range->agg = 0;
@@ -167,16 +178,18 @@ struct NGR_range_t * NGR_timespan (struct NGR_metric_t *obj, time_t start, time_
 
 
 int NGR_last_entry_idx (struct NGR_metric_t *obj) {
-  off_t offset;
+  int offset;
   offset = lseek(obj->fd, 0 - obj->width, SEEK_END);
-  return (((int)offset - 4 - obj->width) / obj->width);
+  if(offset < obj->base)
+    return 0;
+  return (((int)offset - obj->base) / obj->width);
 }
 
 int NGR_entry (struct NGR_metric_t *obj, int idx) {
   char *buf;
   int rv, read_len, offset;
   
-  offset = (4 + obj->width + (idx * obj->width));
+  offset = (obj->width + (idx * obj->width));
 
   buf = malloc(obj->width);
   assert(sizeof(rv) == obj->width);
