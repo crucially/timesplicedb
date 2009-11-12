@@ -13,7 +13,7 @@ extern char *optarg;
 int main(int argc, char * const *argv) {
   int o, resolution;
   time_t created_time;
-  char *collection, *item;
+  char *collection, *metric_s;
 
   created_time = resolution = 0;
 
@@ -25,9 +25,9 @@ int main(int argc, char * const *argv) {
       collection = malloc(strlen(optarg+1));
       memcpy(collection, optarg, strlen(optarg)+1);
       break;
-    case 'i':
-      item = malloc(strlen(optarg+1));
-      memcpy(item, optarg, strlen(optarg)+1);
+    case 'm':
+      metric_s = malloc(strlen(optarg+1));
+      memcpy(metric_s, optarg, strlen(optarg)+1);
       break;
     }
 
@@ -36,11 +36,11 @@ int main(int argc, char * const *argv) {
   }
   
   assert(collection);
-  assert(item);
+  assert(metric_s);
 
-  printf("%s %s %d %d\n", collection, item, created_time, resolution);
+  printf("%s %s %d %d\n", collection, metric_s, created_time, resolution);
 
-  struct NGR_metric_t *metric = NGR_create(collection, item, created_time, resolution);
+  struct NGR_metric_t *metric = NGR_create(collection, metric_s, created_time, resolution);
 
   time_t last_entry = (metric->created + (NGR_last_entry_idx(metric) * 60));
 
