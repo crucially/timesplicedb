@@ -61,7 +61,8 @@ struct NGR_metric_t * NGR_create(char *collection, char *metric, time_t created_
 
   fd = open(path, O_CREAT | O_RDWR | O_EXCL, 0755);
 
-
+  if(fd == -1)
+    printf("Cannot open %s (%s)\n", path, strerror(errno));
   assert(fd != -1);
 
   

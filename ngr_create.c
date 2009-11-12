@@ -38,8 +38,6 @@ int main(int argc, char * const *argv) {
   assert(collection);
   assert(metric_s);
 
-  printf("%s %s %d %d\n", collection, metric_s, created_time, resolution);
-
   struct NGR_metric_t *metric = NGR_create(collection, metric_s, created_time, resolution);
 
   time_t last_entry = (metric->created + (NGR_last_entry_idx(metric) * 60));
