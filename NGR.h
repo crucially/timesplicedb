@@ -13,7 +13,9 @@ struct NGR_metric_t {
   u_int32_t  width;
   int        fd;
   int        base;
-  signed int        created;
+  time_t     created;
+  int        resolution;
+  int        version;
 };
 
 struct NGR_range_t {
@@ -32,7 +34,7 @@ struct NGR_agg_entry_t {
   int stddev;
 };
 
-struct NGR_metric_t * NGR_create(char *host, char *metric, time_t create_time);
+struct NGR_metric_t * NGR_create(char *host, char *metric, time_t create_time, int resolution);
 
 struct NGR_metric_t * NGR_open(char *host, char *metric);
 
