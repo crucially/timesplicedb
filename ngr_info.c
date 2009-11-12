@@ -5,7 +5,7 @@
 #include <time.h>;
 
 int main() {
-  struct NGR_metric_t *metric = NGR_open("host", "metric_year");
+  struct NGR_metric_t *metric = NGR_open("foo", "data1");
   time_t last_entry = (metric->created + (NGR_last_entry_idx(metric) * 60));
 
   printf("Starting time: %s", ctime(&(metric->created)));
