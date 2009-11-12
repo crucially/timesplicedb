@@ -70,8 +70,7 @@ int main() {
 
 struct NGR_metric_t * NGR_open(char *host, char *metric) {
   char *path;
-  size_t read_len;
-  size_t path_len;
+  size_t read_len, path_len;
   char width_buf[4];
   struct NGR_metric_t *obj;
 
@@ -98,10 +97,7 @@ struct NGR_metric_t * NGR_open(char *host, char *metric) {
 }
 
 struct NGR_range_t * NGR_range (struct NGR_metric_t *obj, int start, int end) {
-  int items;
-  int *area;
-  int *entry;
-  int len;
+  int items, len, *area, *entry;
   struct NGR_range_t *range;
   struct stat *file;
 
@@ -155,9 +151,9 @@ int NGR_last_entry_idx (struct NGR_metric_t *obj) {
 
 int NGR_entry (struct NGR_metric_t *obj, int idx) {
   char *buf;
-  int rv;
-  int offset = (4 + obj->width + (idx * obj->width));
-  int read_len;
+  int rv, read_len, offset;
+  
+  offset = (4 + obj->width + (idx * obj->width));
 
   buf = malloc(obj->width);
   assert(sizeof(rv) == obj->width);
@@ -174,10 +170,14 @@ int NGR_entry (struct NGR_metric_t *obj, int idx) {
 
 struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int data_type) {
   struct NGR_range_t *aggregate;
-  int src_items = range->items;
-  int trg_items = 0;
-  int items_seen = 0;
-  int curr_item = 0;
+  int src_items, trg_items, items_seen, curr_item, sum, sum_sqr, min, max;
+  
+
+  src_items = range->items;
+  max = sum_sqr = sum = curr_item = items_seen = trg_items = 0;
+  min = 2147483647; /** broken on 64bit, i know, and I haven't how to deal with signed or unsigned yet probably counters
+			are unsigned and gauge signed?**/
+
   /* figure out how many buckets we need */
   int buckets = (range->items / (interval / 60));
   printf("need %d buckets\n", buckets);
@@ -188,11 +188,6 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
   aggregate->items = buckets;
   aggregate->entry = aggregate->area;
 
-  int sum = 0;
-  int sum_sqr = 0;
-  int max = 0;
-  int min = 2147483647; /** broken on 64bit, i know, and I haven't how to deal with signed or unsigned yet probably counters
-			 are unsigned and gauge signed?**/
   while(src_items--) {
     int value;
     if (data_type == NGR_GAUGE || curr_item == 0)
@@ -214,11 +209,8 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
       aggregate->agg[trg_items].min = min;
       aggregate->agg[trg_items].stddev = ((sum_sqr - (sum * (sum / items_seen)))/(items_seen-1));
       aggregate->agg[trg_items++].avg = sum / items_seen;
-      sum_sqr = 0;
-      items_seen = 0;
-      max = 0;
+      sum_sqr = max = sum = items_seen = 0;
       min = 2147483647;
-      sum = 0; 
     }
     curr_item++;
   }
