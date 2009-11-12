@@ -42,7 +42,7 @@ int main() {
     items = aggregate->items;
     i = 0;
     while(items--) {
-      printf("AVG: %d      MAX: %d      MIN: %d      STDDEV: %d\n", aggregate->agg[i].avg, aggregate->agg[i].max, aggregate->agg[i].min, aggregate->agg[i].stddev);
+      //      printf("AVG: %d      MAX: %d      MIN: %d      STDDEV: %d\n", aggregate->agg[i].avg, aggregate->agg[i].max, aggregate->agg[i].min, aggregate->agg[i].stddev);
       i++;
     }
 
@@ -110,11 +110,11 @@ struct NGR_range_t * NGR_range (struct NGR_metric_t *obj, int start, int end) {
   fstat(obj->fd, file);
 
   /* if the range goes byond the file, map that as well */
-  if ((end * obj->width + 4 + obj->width) > file->st_size) {
+  if ((end * obj->width + 4 + obj->width) > file->st_size)
     range->len = (end * obj->width + 4 + obj->width);
-  } else {
+  else
     range->len = file->st_size;
-  }
+
   free(file);
   range->area = mmap(0, range->len, PROT_READ, MAP_SHARED| MAP_FILE, obj->fd, 0);
   assert(range->area != (void*)-1);
@@ -126,12 +126,15 @@ struct NGR_range_t * NGR_range (struct NGR_metric_t *obj, int start, int end) {
 }
 
 void NGR_range_free (struct NGR_range_t * range) {
-  if (range->mmap == 1) {
+
+  if (range->mmap == 1)
     munmap(range->area, range->len);
-  } else {
+  else
     free(range->area);
-  }
-  if(range->agg) { free(range->agg); }
+
+  if(range->agg)
+    free(range->agg);
+
   free(range);
 }
 
@@ -192,16 +195,19 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
 			 are unsigned and gauge signed?**/
   while(src_items--) {
     int value;
-    if (data_type == NGR_GAUGE || curr_item == 0) {
+    if (data_type == NGR_GAUGE || curr_item == 0)
       value = range->entry[curr_item];
-    } else {
+    else 
       value = range->entry[curr_item] - range->entry[curr_item-1];
-    }
+    
     sum += value;
     sum_sqr += value*value;
 
-    if (min > value) { min = value; }
-    if (max < value) { max = value; }
+    if (min > value)
+      min = value;
+    if (max < value)
+      max = value;
+
     if(items_seen++ == (interval/60)) {
       aggregate->entry[trg_items] = sum / items_seen;
       aggregate->agg[trg_items].max = max;
