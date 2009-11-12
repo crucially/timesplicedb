@@ -123,6 +123,10 @@ int NGR_insert (struct NGR_metric_t *obj, time_t timestamp, int value) {
   if (!timestamp)
     timestamp = time(NULL);
 
+  assert( timestamp > obj->created );
+
+  assert (timestamp <= time(NULL) );
+
   entry  = ((timestamp - obj->created) / obj->resolution);
   offset = (obj->base + ( entry * obj->width ) );
   lseek(obj->fd, offset, SEEK_SET);
