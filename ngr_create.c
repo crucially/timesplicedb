@@ -18,7 +18,7 @@ int main(int argc, char * const *argv) {
   created_time = resolution = 0;
 
   while ((o = getopt(argc, argv,
-		     "i:c:")) != -1) {
+		     "c:m:")) != -1) {
 
     switch(o) {
     case 'c':
