@@ -32,7 +32,7 @@ struct NGR_agg_entry_t {
   int stddev;
 };
 
-struct NGR_metric_t * NGR_create(char host, char metric, int create_time);
+struct NGR_metric_t * NGR_create(char *host, char *metric, time_t create_time);
 
 struct NGR_metric_t * NGR_open(char *host, char *metric);
 
@@ -48,3 +48,7 @@ void NGR_range_free (struct NGR_range_t *range);
 struct NGR_range_t * NGR_timespan (struct NGR_metric_t *obj, time_t start, time_t end);
 
 struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int data_type);
+
+char * NGR_make_path (char *host, char *metric);
+
+int NGR_insert (struct NGR_metric_t *obj, time_t timestmp, int value);

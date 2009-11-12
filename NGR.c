@@ -17,11 +17,17 @@
 #include <time.h>
 #include <sys/time.h>
 
+
+
+
 int main() {
   struct timeval how_fast_start;
   struct timeval how_fast_stop;
     
-  struct NGR_metric_t *metric = NGR_open("host", "metric_year");
+  struct NGR_metric_t *metric= NGR_create("host", "metric_c", time(NULL) - 3600);
+
+  return;
+  //  struct NGR_metric_t *metric = NGR_open("host", "metric_year");
   printf("width: %d; created: %d\n", metric->width, metric->created);
   int idx = NGR_last_entry_idx(metric);
   printf("entry: %d\n", NGR_entry(metric,NGR_last_entry_idx(metric)));
@@ -68,32 +74,88 @@ int main() {
 
 }
 
+char * NGR_make_path (char *host, char *metric) {
+  size_t path_len;
+  char *path;
+
+
+  path_len = strlen(host) + strlen(metric) + 12;  
+  path = malloc(path_len);
+  snprintf(path, path_len, "data/%s/%s.data", host, metric);
+
+  return path;
+  
+}
+
+struct NGR_metric_t * NGR_create(char *host, char *metric, time_t created_time) {
+  char *path;
+  char buffer[8];
+  int   fd;
+  int   size = sizeof(int);
+
+
+  if(!created_time)
+    created_time = time(NULL);
+  
+  path = NGR_make_path(host, metric);
+
+  fd = open(path, O_CREAT | O_RDWR | O_EXCL, 0755);
+
+
+  assert(fd != -1);
+
+  
+  int write_len = write(fd, &size, 4);
+
+  assert(write_len == 4);
+  write_len = write(fd, &created_time, size);
+  assert(write_len == size);
+  close(fd);
+
+  free(path);
+  return NGR_open(host, metric);
+}
+
 struct NGR_metric_t * NGR_open(char *host, char *metric) {
   char *path;
-  size_t read_len, path_len;
+  size_t read_len;
   char width_buf[4];
   struct NGR_metric_t *obj;
 
   obj = malloc(sizeof(struct NGR_metric_t));
 
-  path_len = strlen(host) + strlen(metric) + 12;
 
+  path = NGR_make_path(host, metric);
 
-  path = malloc(path_len);
-  snprintf(path, path_len, "data/%s/%s.data", host, metric);
+  printf("%s\n", path);
 
   obj->fd = open(path, O_RDWR);
 
   read_len = read(obj->fd, width_buf, 4);
   assert(read_len == 4);
   obj->width = *width_buf;
-  
+
   read_len = read(obj->fd, &obj->created, obj->width);
+
   assert(read_len == obj->width);
 
   free(path);
 
   return obj;
+}
+
+int NGR_insert (struct NGR_metric_t *obj, time_t timestamp, int value) {
+  int  entry, offset, write_len;
+  
+  if (!timestamp)
+    timestamp = time(NULL);
+
+  entry  = ((timestamp - obj->created) / 60);
+  offset = (4 + obj->width + ( entry * obj->width ) );
+  lseek(obj->fd, offset, SEEK_SET);
+  write_len = write(obj->fd, &value, obj->width);
+  assert(write_len == obj->width);
+  return entry;
 }
 
 struct NGR_range_t * NGR_range (struct NGR_metric_t *obj, int start, int end) {
