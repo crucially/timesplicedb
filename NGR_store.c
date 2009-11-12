@@ -21,14 +21,14 @@
 
 
 
-char * NGR_make_path (char *host, char *metric) {
+char * NGR_make_path (char *collection, char *metric) {
   size_t path_len;
   char *path;
 
 
-  path_len = strlen(host) + strlen(metric) + 12;  
+  path_len = strlen(collection) + strlen(metric) + 12;  
   path = malloc(path_len);
-  snprintf(path, path_len, "data/%s/%s.data", host, metric);
+  snprintf(path, path_len, "data/%s/%s.data", collection, metric);
 
   return path;
   
@@ -44,7 +44,7 @@ char * NGR_make_path (char *host, char *metric) {
 
 
 
-struct NGR_metric_t * NGR_create(char *host, char *metric, time_t created_time, int resolution) {
+struct NGR_metric_t * NGR_create(char *collection, char *metric, time_t created_time, int resolution) {
   char *path;
   char buffer[8];
   int   fd, write_len;
@@ -57,7 +57,7 @@ struct NGR_metric_t * NGR_create(char *host, char *metric, time_t created_time, 
   if(!resolution)
     resolution = 60;
   
-  path = NGR_make_path(host, metric);
+  path = NGR_make_path(collection, metric);
 
   fd = open(path, O_CREAT | O_RDWR | O_EXCL, 0755);
 
@@ -76,10 +76,10 @@ struct NGR_metric_t * NGR_create(char *host, char *metric, time_t created_time, 
   close(fd);
 
   free(path);
-  return NGR_open(host, metric);
+  return NGR_open(collection, metric);
 }
 
-struct NGR_metric_t * NGR_open(char *host, char *metric) {
+struct NGR_metric_t * NGR_open(char *collection, char *metric) {
   char *path;
   size_t read_len;
   char width_buf[4];
@@ -88,7 +88,7 @@ struct NGR_metric_t * NGR_open(char *host, char *metric) {
   obj = malloc(sizeof(struct NGR_metric_t));
 
 
-  path = NGR_make_path(host, metric);
+  path = NGR_make_path(collection, metric);
 
   printf("%s\n", path);
 

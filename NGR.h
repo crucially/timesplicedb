@@ -8,7 +8,7 @@
 #define NGR_COUNTER 1
 
 struct NGR_metric_t {
-  char       host[255];
+  char       collection[255];
   char       metric[255];
   u_int32_t  width;
   int        fd;
@@ -34,9 +34,9 @@ struct NGR_agg_entry_t {
   int stddev;
 };
 
-struct NGR_metric_t * NGR_create(char *host, char *metric, time_t create_time, int resolution);
+struct NGR_metric_t * NGR_create(char *collection, char *metric, time_t create_time, int resolution);
 
-struct NGR_metric_t * NGR_open(char *host, char *metric);
+struct NGR_metric_t * NGR_open(char *collection, char *metric);
 
 
 int NGR_last_entry_idx (struct NGR_metric_t *obj);
@@ -51,6 +51,6 @@ struct NGR_range_t * NGR_timespan (struct NGR_metric_t *obj, time_t start, time_
 
 struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int data_type);
 
-char * NGR_make_path (char *host, char *metric);
+char * NGR_make_path (char *collection, char *metric);
 
 int NGR_insert (struct NGR_metric_t *obj, time_t timestmp, int value);
