@@ -18,7 +18,7 @@ int main(int argc, char * const *argv) {
   created_time = resolution = 0;
 
   while ((o = getopt(argc, argv,
-		     "c:m:")) != -1) {
+		     "c:m:r:s:")) != -1) {
 
     switch(o) {
     case 'c':
@@ -29,9 +29,12 @@ int main(int argc, char * const *argv) {
       metric_s = malloc(strlen(optarg+1));
       memcpy(metric_s, optarg, strlen(optarg)+1);
       break;
+    case 'r':
+      resolution = atoi(optarg);
+      break;
+    case 's':
+      created_time = atoi(optarg);
     }
-
-
 
   }
   
