@@ -123,7 +123,7 @@ int NGR_insert (struct NGR_metric_t *obj, time_t timestamp, int value) {
   if (!timestamp)
     timestamp = time(NULL);
 
-  entry  = ((timestamp - obj->created) / 60);
+  entry  = ((timestamp - obj->created) / obj->resolution);
   offset = (obj->base + ( entry * obj->width ) );
   lseek(obj->fd, offset, SEEK_SET);
   write_len = write(obj->fd, &value, obj->width);
@@ -153,6 +153,7 @@ struct NGR_range_t * NGR_range (struct NGR_metric_t *obj, int start, int end) {
   range->items = end - start;
   range->mmap = 1;
   range->agg = 0;
+  range->resolution = obj->resolution;
   return range;
 }
 
@@ -172,8 +173,8 @@ void NGR_range_free (struct NGR_range_t * range) {
 struct NGR_range_t * NGR_timespan (struct NGR_metric_t *obj, time_t start, time_t end) {
   int start_offset, end_offset;
 
-  start_offset = ((start - obj->created + 60) / 60);
-  end_offset = ((end - obj->created + 60) / 60);
+  start_offset = ((start - obj->created + obj->resolution) / obj->resolution);
+  end_offset = ((end - obj->created + obj->resolution) / obj->resolution);
   return NGR_range(obj, start_offset, end_offset);
 }
 
@@ -216,7 +217,7 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
 			are unsigned and gauge signed?**/
 
   /* figure out how many buckets we need */
-  int buckets = (range->items / (interval / 60));
+  int buckets = (range->items / (interval / range->resolution));
   printf("need %d buckets\n", buckets);
   aggregate = malloc(sizeof(struct NGR_range_t));
   aggregate->area = malloc(sizeof(int) * buckets);
@@ -240,7 +241,7 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
     if (max < value)
       max = value;
 
-    if(items_seen++ == (interval/60)) {
+    if(items_seen++ == (interval/range->resolution)) {
       aggregate->entry[trg_items] = sum / items_seen;
       aggregate->agg[trg_items].max = max;
       aggregate->agg[trg_items].min = min;
@@ -256,6 +257,7 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
   aggregate->agg[trg_items].min = min;
   aggregate->agg[trg_items].stddev = ((sum_sqr - (sum * (sum / items_seen)))/(items_seen-1));
   aggregate->entry[trg_items++] = sum / items_seen;
+  /* XXX SSHOULD SET THE RESOLUTION ON AGGREGATE */
   return aggregate;
 }
 
