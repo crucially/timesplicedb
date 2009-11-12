@@ -22,11 +22,11 @@ int main(int argc, char * const *argv) {
 
     switch(o) {
     case 'c':
-      collection = malloc(strlen(optarg+1));
+      collection = malloc(strlen(optarg)+1);
       memcpy(collection, optarg, strlen(optarg)+1);
       break;
     case 'm':
-      metric_s = malloc(strlen(optarg+1));
+      metric_s = malloc(strlen(optarg)+1);
       memcpy(metric_s, optarg, strlen(optarg)+1);
       break;
     case 'r':
