@@ -24,6 +24,7 @@ struct NGR_range_t {
   int items;
   size_t len;
   int mmap;
+  int resolution;
   struct NGR_agg_entry_t *agg;
 };
 
