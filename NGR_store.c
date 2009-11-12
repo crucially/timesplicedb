@@ -188,7 +188,7 @@ int NGR_last_entry_idx (struct NGR_metric_t *obj) {
   offset = lseek(obj->fd, 0 - obj->width, SEEK_END);
   if(offset < obj->base)
     return 0;
-  return (((int)offset - obj->base) / obj->width);
+  return (((int)offset - obj->base) / obj->width + 1); /** is this really supposed to be please +1 **/
 }
 
 int NGR_entry (struct NGR_metric_t *obj, int idx) {
