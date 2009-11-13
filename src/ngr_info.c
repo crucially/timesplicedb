@@ -11,12 +11,20 @@
 
 extern char *optarg;
 
+
+int usage () {
+  printf("Usage:\n");
+  printf(" -f filename  db to get info about\n");
+  printf(" -h this help\n");
+  return 1;
+}
+
 int main(int argc, char * const *argv) {
   int o;
   char *filename;
-
+  filename = 0;
   while ((o = getopt(argc, argv,
-		     "f:")) != -1) {
+		     "f:h")) != -1) {
 
     switch(o) {
     case 'f':
@@ -26,7 +34,8 @@ int main(int argc, char * const *argv) {
     }
   }
   
-  assert(filename);
+  if (!filename)
+    return usage();
 
   struct NGR_metric_t *metric = NGR_open(filename);
   time_t last_entry = (metric->created + (NGR_last_entry_idx(metric, 0) * metric->resolution));
