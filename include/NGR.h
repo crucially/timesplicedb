@@ -68,6 +68,7 @@ struct NGR_agg_entry_t {
   int max;    /* max value seen in interval */
   int min;    /* minimum value seen -- flag determines if 0 is considered minium or undefined value */
   int stddev; /* calculated stddev -- no idea if this is correct -- probably isn't */
+  int items_averaged; /* how many items went into this */
 };
 
 struct NGR_metric_t * NGR_create(const char *filename, time_t create_time, int resolution, int columns);

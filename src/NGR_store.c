@@ -310,6 +310,7 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
       max = value;
 
     if(items_seen++ == (interval/range->resolution)) {
+      aggregate->agg[trg_items].items_averaged = items_seen;
       aggregate->entry[trg_items] = sum / items_seen;
       aggregate->agg[trg_items].max = max;
       aggregate->agg[trg_items].min = min;
