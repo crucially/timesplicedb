@@ -195,7 +195,7 @@ struct NGR_range_t * NGR_range (struct NGR_metric_t *obj, int column, int start,
   range->area = mmap(0, range->len, PROT_READ, MAP_SHARED| MAP_FILE, obj->fd, 0);
   assert(range->area != (void*)-1);
   range->entry = (range->area + obj->base + (obj->width * start));
-  range->items = end - start;
+  range->items = end - start + 1;
   range->mmap = 1;
   range->agg = 0; 
   range->resolution = obj->resolution;
