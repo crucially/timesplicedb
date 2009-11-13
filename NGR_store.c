@@ -21,19 +21,6 @@
 
 
 
-char * NGR_make_path (char *collection, char *metric) {
-  size_t path_len;
-  char *path;
-
-
-  path_len = strlen(collection) + strlen(metric) + 12;  
-  path = malloc(path_len);
-  snprintf(path, path_len, "data/%s/%s.data", collection, metric);
-
-  return path;
-  
-}
-
 /* file format is pretty simple
    4 bytes for the width of the fields (32/64)
    4 bytes for the version number of format
@@ -45,8 +32,7 @@ char * NGR_make_path (char *collection, char *metric) {
 
 
 
-struct NGR_metric_t * NGR_create(char *collection, char *metric, time_t created_time, int resolution, int columns) {
-  char *path;
+struct NGR_metric_t * NGR_create(char *filename, time_t created_time, int resolution, int columns) {
   int   fd, write_len;
   int   size = sizeof(int);
   int   version = 1;
@@ -58,12 +44,10 @@ struct NGR_metric_t * NGR_create(char *collection, char *metric, time_t created_
   if(!resolution)
     resolution = 60;
   
-  path = NGR_make_path(collection, metric);
-
-  fd = open(path, O_CREAT | O_RDWR | O_EXCL, 0755);
+  fd = open(filename, O_CREAT | O_RDWR | O_EXCL, 0755);
 
   if(fd == -1)
-    printf("Cannot open %s (%s)\n", path, strerror(errno));
+    printf("Cannot open %s (%s)\n", filename, strerror(errno));
   assert(fd != -1);
 
   
@@ -79,12 +63,10 @@ struct NGR_metric_t * NGR_create(char *collection, char *metric, time_t created_
   assert(write_len == size);
   close(fd);
 
-  free(path);
-  return NGR_open(collection, metric);
+  return NGR_open(filename);
 }
 
-struct NGR_metric_t * NGR_open(char *collection, char *metric) {
-  char *path;
+struct NGR_metric_t * NGR_open(char *filename) {
   size_t read_len;
   char width_buf[4];
   struct NGR_metric_t *obj;
@@ -92,11 +74,11 @@ struct NGR_metric_t * NGR_open(char *collection, char *metric) {
   obj = malloc(sizeof(struct NGR_metric_t));
 
 
-  path = NGR_make_path(collection, metric);
+  obj->fd = open(filename, O_RDWR);
 
-  printf("%s\n", path);
-
-  obj->fd = open(path, O_RDWR);
+  if(obj->fd == -1)
+    printf("Cannot open %s (%s)\n", filename, strerror(errno));
+  assert(obj->fd != -1);
 
   obj->base = 4;
   read_len = read(obj->fd, width_buf, 4);
@@ -119,7 +101,6 @@ struct NGR_metric_t * NGR_open(char *collection, char *metric) {
   obj->base += obj->width;
   read_len = read(obj->fd, &obj->created, obj->width);
   assert(read_len == obj->width);
-  free(path);
 
   return obj;
 }

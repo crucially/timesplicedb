@@ -14,21 +14,17 @@ extern char *optarg;
 
 int main(int argc, char * const *argv) {
   int o, start, end, interval;
-  char *collection, *metric_s;
+  char *filename;
   
   start = end = interval = 0;
 
   while ((o = getopt(argc, argv,
-		     "c:m:s:e:i:")) != -1) {
+		     "f:")) != -1) {
 
     switch(o) {
-    case 'c':
-      collection = malloc(strlen(optarg)+1);
-      memcpy(collection, optarg, strlen(optarg)+1);
-      break;
-    case 'm':
-      metric_s = malloc(strlen(optarg)+1);
-      memcpy(metric_s, optarg, strlen(optarg)+1);
+    case 'f':
+      filename = malloc(strlen(optarg)+1);
+      memcpy(filename, optarg, strlen(optarg)+1);
       break;
     case 's':
       start = atoi(optarg);
@@ -42,14 +38,13 @@ int main(int argc, char * const *argv) {
     }
   }
   
-  assert(collection);
-  assert(metric_s);
+  assert(filename);
   assert(start);
   assert(end);
   assert(interval);
 
 
-  struct NGR_metric_t *metric    = NGR_open(collection, metric_s);
+  struct NGR_metric_t *metric    = NGR_open(filename);
   struct NGR_range_t  *range     = NGR_timespan(metric, 0, start, end);
   struct NGR_range_t  *aggregate = NGR_aggregate(range, interval, NGR_GAUGE);
 

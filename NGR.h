@@ -36,9 +36,9 @@ struct NGR_agg_entry_t {
   int stddev;
 };
 
-struct NGR_metric_t * NGR_create(char *collection, char *metric, time_t create_time, int resolution, int columns);
+struct NGR_metric_t * NGR_create(char *filename, time_t create_time, int resolution, int columns);
 
-struct NGR_metric_t * NGR_open(char *collection, char *metric);
+struct NGR_metric_t * NGR_open(char *filename);
 
 
 int NGR_last_entry_idx (struct NGR_metric_t *obj, int column);
