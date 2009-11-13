@@ -326,6 +326,7 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
   }
 
   if (items_seen) {
+    aggregate->agg[trg_items].items_averaged = items_seen;
     aggregate->agg[trg_items].avg = (double)sum / (double)items_seen;
     aggregate->agg[trg_items].max = max;
     aggregate->agg[trg_items].min = min;
