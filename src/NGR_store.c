@@ -105,6 +105,13 @@ struct NGR_metric_t * NGR_open(char *filename) {
   return obj;
 }
 
+
+/* 
+   column     which column to write in
+   timestamp  which timestamp this is for, defaults to now if not set
+   value      value to store
+*/
+
 int NGR_insert (struct NGR_metric_t *obj, int column, time_t timestamp, int value) {
   int  entry, offset, write_len;
   
@@ -112,10 +119,12 @@ int NGR_insert (struct NGR_metric_t *obj, int column, time_t timestamp, int valu
     timestamp = time(NULL);
 
   assert (column <= obj->columns - 1);
-  
   assert( timestamp > obj->created );
-
   assert (timestamp <= time(NULL) );
+
+  /* We have to transform the timestamp to a entry index and then into a byte offset
+     This is rather trivial because we know the value that it was created by, and we can 
+     calculate the difference, and then turn that into a byte offset */
 
   entry  = ((timestamp - obj->created) / obj->resolution);
   offset = (obj->base + ( entry * obj->width ) );
@@ -124,6 +133,13 @@ int NGR_insert (struct NGR_metric_t *obj, int column, time_t timestamp, int valu
   assert(write_len == obj->width);
   return entry;
 }
+
+
+/*
+  column    which column to retrieve
+  start     which entry to start with, indexed from 0
+  end       what entry to stop at
+*/
 
 struct NGR_range_t * NGR_range (struct NGR_metric_t *obj, int column, int start, int end) {
   struct NGR_range_t *range;
@@ -141,16 +157,30 @@ struct NGR_range_t * NGR_range (struct NGR_metric_t *obj, int column, int start,
   else
     range->len = file->st_size;
 
+  /* Ideally we would only map the region we need
+     byt I haven't gotten around to write the correct
+     page alignment code for that.
+     We would need to align to the page, and then recalculate
+     the offset in the first page.
+  */
+
   free(file);
   range->area = mmap(0, range->len, PROT_READ, MAP_SHARED| MAP_FILE, obj->fd, 0);
   assert(range->area != (void*)-1);
   range->entry = (range->area + obj->base + (obj->width * start));
   range->items = end - start;
   range->mmap = 1;
-  range->agg = 0;
+  range->agg = 0; 
   range->resolution = obj->resolution;
   return range;
 }
+
+
+/*
+  frees a given range
+  if it is mmaped then free the are
+  aggregates are not mmaped, pure ranges are
+*/
 
 void NGR_range_free (struct NGR_range_t * range) {
 
@@ -165,11 +195,20 @@ void NGR_range_free (struct NGR_range_t * range) {
   free(range);
 }
 
+
+/* 
+   column    which column
+   start     what time this starts from
+   stop      and last time we want
+*/
 struct NGR_range_t * NGR_timespan (struct NGR_metric_t *obj, int column, time_t start, time_t end) {
   int start_offset, end_offset;
 
   assert (column <= obj->columns - 1);
+  /* XXX should check we don't overflow */
 
+
+  /* this just converts the timestamp into an offset that the range function takes */
   start_offset = ((start - obj->created + obj->resolution) / obj->resolution);
   end_offset = ((end - obj->created + obj->resolution) / obj->resolution);
   return NGR_range(obj, column, start_offset, end_offset);
@@ -184,6 +223,7 @@ int NGR_last_entry_idx (struct NGR_metric_t *obj, int column) {
     return 0;
   return (((int)offset - obj->base) / obj->width + 1); /** is this really supposed to be please +1 **/
 }
+
 
 int NGR_entry (struct NGR_metric_t *obj, int column, int idx) {
   char *buf;
