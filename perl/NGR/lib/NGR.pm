@@ -131,12 +131,12 @@ sub entry {
     my %options = @_;
 
     return {
-	idx   => $options{idx},
-	time  => 0,  # XXX calculate the time offset
-	avg   => NGR::C::range_entry_avg($self->{ctx}, $options{idx}, $options{column}),
-	min   => NGR::C::range_entry_min($self->{ctx}, $options{idx}, $options{column}),
-	max   => NGR::C::range_entry_max($self->{ctx}, $options{idx}, $options{column}),
-	stdev => NGR::C::range_entry_stdev($self->{ctx}, $options{idx}, $options{column}),
+	idx    => $options{idx},
+	time   => 0,  # XXX calculate the time offset
+	value  => NGR::C::range_entry_value($self->{ctx}, $options{column}, $options{idx}),
+	min    => NGR::C::range_entry_min($self->{ctx}, $options{column}, $options{idx}),
+	max    => NGR::C::range_entry_max($self->{ctx}, $options{column}, $options{idx}),
+	stddev => NGR::C::range_entry_stddev($self->{ctx}, $options{column}, $options{idx}),
     };
 }
 

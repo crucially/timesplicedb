@@ -107,3 +107,55 @@ NGR_timespan(obj, column, start, end)
 	int	column
 	time_t	start
 	time_t	end
+
+int
+range_entry_value(obj, column, idx)
+	struct NGR_range_t *	obj
+	int	column
+	int	idx
+	CODE:
+	RETVAL = obj->entry[idx];
+	OUTPUT:
+	RETVAL
+
+int
+range_entry_min(obj, column, idx)
+	struct NGR_range_t *	obj
+	int	column
+	int	idx
+	CODE:
+	if(obj->agg) {
+	  RETVAL = obj->agg[idx].min;
+	} else {
+	  RETVAL = obj->entry[idx];
+	}
+	OUTPUT:
+	RETVAL
+
+int
+range_entry_max(obj, column, idx)
+	struct NGR_range_t *	obj
+	int	column
+	int	idx
+	CODE:
+	if(obj->agg) {
+	  RETVAL = obj->agg[idx].max;
+	} else {
+	  RETVAL = obj->entry[idx];
+	}
+	OUTPUT:
+	RETVAL
+
+int
+range_entry_stddev(obj, column, idx)
+	struct NGR_range_t *	obj
+	int	column
+	int	idx
+	CODE:
+	if(obj->agg) {
+	  RETVAL = obj->agg[idx].stddev;
+	} else {
+	  RETVAL = 0; // should be undef
+	}
+	OUTPUT:
+	RETVAL
