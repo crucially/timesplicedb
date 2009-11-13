@@ -102,6 +102,8 @@ struct NGR_metric_t * NGR_open(char *filename) {
   read_len = read(obj->fd, &obj->created, obj->width);
   assert(read_len == obj->width);
 
+  assert(obj->width == 4 || obj->width == 8);
+
   return obj;
 }
 
@@ -119,7 +121,7 @@ int NGR_insert (struct NGR_metric_t *obj, int column, time_t timestamp, int valu
     timestamp = time(NULL);
 
   assert (column <= obj->columns - 1);
-  assert( timestamp > obj->created );
+  assert( timestamp >= obj->created );
   assert (timestamp <= time(NULL) );
 
   /* We have to transform the timestamp to a entry index and then into a byte offset
