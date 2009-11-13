@@ -10,5 +10,7 @@ cc   ngr_create.c -L. -lNGR_store -o ngrcreate
 
 cc   ngr_insert.c -L. -lNGR_store -o ngrinsert
 
+cc   ngr_dump.c -L. -lNGR_store -o ngrdump
+
 
 
