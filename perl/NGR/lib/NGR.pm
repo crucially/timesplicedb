@@ -129,7 +129,7 @@ If you have a web site set up for your module, mention it here.
 
 =head1 AUTHOR
 
-Artur Bergman, E<lt>sky@localE<gt>
+Artur Bergman, E<lt>sky@crucially.netE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
