@@ -13,4 +13,7 @@ cc   ngr_insert.c -L. -lNGR_store -o ngrinsert
 cc   ngr_dump.c -L. -lNGR_store -o ngrdump
 
 
+cc   ngr_agg.c -L. -lNGR_store -o ngragg
+
+
 
