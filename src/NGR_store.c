@@ -102,6 +102,8 @@ struct NGR_metric_t * NGR_open(char *filename) {
   read_len = read(obj->fd, &obj->created, obj->width);
   assert(read_len == obj->width);
 
+  assert(obj->width == 4 || obj->width == 8);
+
   return obj;
 }
 
