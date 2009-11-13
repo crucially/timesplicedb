@@ -126,7 +126,18 @@ sub aggregate {
     return NGR::Range->new(NGR::C::aggregate($self->{ctx}, $options{interval}, 0));
 }
 
+sub entry {
+    my $self = shift;
+    my %options = @_;
 
-
+    return {
+	idx   => $options{idx},
+	time  => 0,  # XXX calculate the time offset
+	avg   => NGR::C::range_entry_avg($self->{ctx}, $options{idx}, $options{column}),
+	min   => NGR::C::range_entry_min($self->{ctx}, $options{idx}, $options{column}),
+	max   => NGR::C::range_entry_max($self->{ctx}, $options{idx}, $options{column}),
+	stdev => NGR::C::range_entry_stdev($self->{ctx}, $options{idx}, $options{column}),
+    };
+}
 
 1;
