@@ -134,6 +134,7 @@ sub entry {
 	idx    => $options{idx},
 	time   => 0,  # XXX calculate the time offset
 	value  => NGR::C::range_entry_value($self->{ctx}, $options{column}, $options{idx}),
+	avg    => NGR::C::range_entry_avg($self->{ctx}, $options{column}, $options{idx}),
 	min    => NGR::C::range_entry_min($self->{ctx}, $options{column}, $options{idx}),
 	max    => NGR::C::range_entry_max($self->{ctx}, $options{column}, $options{idx}),
 	stddev => NGR::C::range_entry_stddev($self->{ctx}, $options{column}, $options{idx}),

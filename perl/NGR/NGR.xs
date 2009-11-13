@@ -118,6 +118,20 @@ range_entry_value(obj, column, idx)
 	OUTPUT:
 	RETVAL
 
+double
+range_entry_avg(obj, column, idx)
+	struct NGR_range_t *	obj
+	int	column
+	int	idx
+	CODE:
+	if(obj->agg) {
+	  RETVAL = obj->agg[idx].avg;
+	} else {
+	  RETVAL = obj->entry[idx];
+	}
+	OUTPUT:
+	RETVAL
+
 int
 range_entry_min(obj, column, idx)
 	struct NGR_range_t *	obj
