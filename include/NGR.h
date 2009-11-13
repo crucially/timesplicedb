@@ -70,9 +70,9 @@ struct NGR_agg_entry_t {
   int stddev; /* calculated stddev -- no idea if this is correct -- probably isn't */
 };
 
-struct NGR_metric_t * NGR_create(char *filename, time_t create_time, int resolution, int columns);
+struct NGR_metric_t * NGR_create(const char *filename, time_t create_time, int resolution, int columns);
 
-struct NGR_metric_t * NGR_open(char *filename);
+struct NGR_metric_t * NGR_open(const char *filename);
 
 
 int NGR_last_entry_idx (struct NGR_metric_t *obj, int column);
