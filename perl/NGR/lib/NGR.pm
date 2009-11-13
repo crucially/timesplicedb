@@ -93,3 +93,40 @@ sub last_updated {
     my $self = shift;
     return ($self->created + ($self->last_entry_idx(column => 0) * $self->resolution));
 }
+
+sub timespan {
+    my $self = shift;
+    my %options = @_;
+    return NGR::Range->new(NGR::C::timespan($self->{ctx}, $options{column}, $options{start}, $options{end}));
+}
+
+
+package NGR::Range;
+
+use strict;
+use warnings;
+
+sub new {
+    my $class = shift;
+    my $self = bless {};
+    $self->{ctx} = shift;
+    $self->{iter} = 0;
+    return $self;
+}
+
+sub items {
+    my $self = shift;
+    NGR::C::range_items($self->{ctx});
+}
+
+sub aggregate {
+    my $self = shift;
+    my %options = @_; 
+    
+    return NGR::Range->new(NGR::C::aggregate($self->{ctx}, $options{interval}, 0));
+}
+
+
+
+
+1;

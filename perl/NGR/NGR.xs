@@ -47,6 +47,13 @@ int metric_columns(obj);
 	OUTPUT:
 	RETVAL
 
+int range_items(obj);
+    	struct NGR_range_t *	obj
+	CODE:
+	RETVAL = obj->items;
+	OUTPUT:
+	RETVAL
+
 
 struct NGR_range_t *
 NGR_aggregate(range, interval, data_type)
