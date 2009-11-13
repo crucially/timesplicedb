@@ -6,7 +6,7 @@
 # change 'tests => 2' to 'tests => last_test_to_print';
 
 use Test::More tests => 2;
-BEGIN { use_ok('NGR') };
+BEGIN { use_ok('NGR::C') };
 
 
 my $fail = 0;
