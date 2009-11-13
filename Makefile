@@ -17,5 +17,5 @@ ${EXECUTABLES}: NGR_store
 	${CC} ${CFLAGS} ${INCLUDES} ${LIBS} $@.c -o $@
 
 clean:
-	rm -f *.o core *.core *.a ${EXECUTABLES}
+	rm -f *.o core *.core *.a ${EXECUTABLES} 
 
