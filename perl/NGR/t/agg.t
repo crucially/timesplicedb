@@ -25,8 +25,7 @@ foreach(1..9) {
 
 is($ngr->items, 9);
 
-my $range = $ngr->timespan(column => 0,
-			   start  => $ct,
+my $range = $ngr->timespan(start  => $ct,
 			   end    => $it - 60,
 			  );
 

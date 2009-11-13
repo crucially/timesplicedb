@@ -15,7 +15,7 @@ for(1..60) {
 }
 ok(1);
 
-my $range = NGR::C::timespan($ngr, 0, $ts, time);
+my $range = NGR::C::timespan($ngr, $ts, time);
 
 my $agg = NGR::C::aggregate($range, 600, 0);
 

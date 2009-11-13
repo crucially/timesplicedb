@@ -97,7 +97,7 @@ sub last_updated {
 sub timespan {
     my $self = shift;
     my %options = @_;
-    return NGR::Range->new(NGR::C::timespan($self->{ctx}, $options{column}, $options{start}, $options{end}));
+    return NGR::Range->new(NGR::C::timespan($self->{ctx}, $options{start}, $options{end}));
 }
 
 

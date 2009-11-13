@@ -91,9 +91,8 @@ NGR_open(filename)
 	char *	filename
 
 struct NGR_range_t *
-NGR_range(obj, column, start, end)
+NGR_range(obj, start, end)
 	struct NGR_metric_t *	obj
-	int	column
 	int	start
 	int	end
 
@@ -102,9 +101,8 @@ NGR_range_free(range)
 	struct NGR_range_t *	range
 
 struct NGR_range_t *
-NGR_timespan(obj, column, start, end)
+NGR_timespan(obj, start, end)
 	struct NGR_metric_t *	obj
-	int	column
 	time_t	start
 	time_t	end
 
