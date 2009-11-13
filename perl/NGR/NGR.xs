@@ -159,3 +159,17 @@ range_entry_stddev(obj, column, idx)
 	}
 	OUTPUT:
 	RETVAL
+
+int
+range_entry_items_averaged(obj, column, idx)
+	struct NGR_range_t *	obj
+	int	column
+	int	idx
+	CODE:
+	if(obj->agg) {
+	  RETVAL = obj->agg[idx].items_averaged;
+	} else {
+	  RETVAL = 0; // none
+	}
+	OUTPUT:
+	RETVAL

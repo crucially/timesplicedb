@@ -43,6 +43,7 @@ for(1..9) {
 		     max    => $_,
 		     idx    => $_-1,
 		     time   => 0,
+		     items_averaged => 0,
 		    }, "entry, this is not aggregated");
 }
 
@@ -59,6 +60,7 @@ is($agg->items, 5);
     local $TODO = "broken in libngr";
     is($entry->{max}, 2, "highest we have seen");
     is($entry->{avg}, 1.5 , "between 1 and 2");
+    is($entry->{items_averaged}, 2, "this bucket should have two entries!");
   }
   use Data::Dumper;
 #  print Dumper ($entry);

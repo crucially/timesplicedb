@@ -137,6 +137,7 @@ sub entry {
 	min    => NGR::C::range_entry_min($self->{ctx}, $options{column}, $options{idx}),
 	max    => NGR::C::range_entry_max($self->{ctx}, $options{column}, $options{idx}),
 	stddev => NGR::C::range_entry_stddev($self->{ctx}, $options{column}, $options{idx}),
+	items_averaged => NGR::C::range_entry_items_averaged($self->{ctx}, $options{column}, $options{idx}),
     };
 }
 
