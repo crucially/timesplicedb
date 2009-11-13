@@ -168,11 +168,9 @@ int NGR_insert (struct NGR_metric_t *obj, int column, time_t timestamp, int valu
   end       what entry to stop at
 */
 
-struct NGR_range_t * NGR_range (struct NGR_metric_t *obj, int column, int start, int end) {
+struct NGR_range_t * NGR_range (struct NGR_metric_t *obj, int start, int end) {
   struct NGR_range_t *range;
   struct stat *file;
-
-  assert (column <= obj->columns - 1);
 
   range = malloc(sizeof(struct NGR_range_t));
   file = malloc(sizeof(struct stat));
@@ -199,6 +197,7 @@ struct NGR_range_t * NGR_range (struct NGR_metric_t *obj, int column, int start,
   range->mmap = 1;
   range->agg = 0; 
   range->resolution = obj->resolution;
+  range->columns = obj->columns;
   return range;
 }
 
@@ -228,17 +227,14 @@ void NGR_range_free (struct NGR_range_t * range) {
    start     what time this starts from
    stop      and last time we want
 */
-struct NGR_range_t * NGR_timespan (struct NGR_metric_t *obj, int column, time_t start, time_t end) {
+struct NGR_range_t * NGR_timespan (struct NGR_metric_t *obj, time_t start, time_t end) {
   int start_offset, end_offset;
-
-  assert (column <= obj->columns - 1);
-  /* XXX should check we don't overflow */
 
 
   /* this just converts the timestamp into an offset that the range function takes */
   start_offset = ((start - obj->created) / obj->resolution);
   end_offset = ((end - obj->created) / obj->resolution);
-  return NGR_range(obj, column, start_offset, end_offset);
+  return NGR_range(obj, start_offset, end_offset);
 }
 
 
@@ -293,7 +289,7 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
   aggregate->mmap = 0;
   aggregate->items = buckets;
   aggregate->entry = aggregate->area;
-
+  aggregate->columns = range->columns;
   int items_per_bucket = ((interval/range->resolution) - 1);
 
   while(src_items--) {
