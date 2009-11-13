@@ -1,0 +1,2 @@
+struct NGR_metric_t *				T_PTROBJ
+struct NGR_range_t *				T_PTROBJ

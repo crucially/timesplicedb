@@ -1,0 +1,25 @@
+
+NGR is a storage engine for timeseries data
+
+It is similar to rrdtool in that, but with some key differences:
+
+   * Never throw away data
+    
+   * Never mangle data on insert
+
+Instead it stores all data at the resolution you specified when you created the file. Then you can request ranges and apply aggregation functions on them on the fly. Retrieval of a range is O(1), aggregation of a range is O(n) where n is the requested objects. Insertion is O(1).
+
+On my macbook pro, with a full year worth of data it takes around 3 ms to aggregate it into any given number of buckets.
+
+To pick up a random hour and aggregate it into 10 minute chunks takes less than 0.1 ms
+
+****
+WARNING
+****
+
+None of the aggregation functions have been tested extensively, getting floating point exceptions and bad data back is still very possible
+
+****
+
+I hange out on freenode #ngr
+
