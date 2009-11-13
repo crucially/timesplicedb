@@ -53,6 +53,4 @@ struct NGR_range_t * NGR_timespan (struct NGR_metric_t *obj, int column, time_t 
 
 struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int data_type);
 
-char * NGR_make_path (char *collection, char *metric);
-
 int NGR_insert (struct NGR_metric_t *obj, int column, time_t timestmp, int value);
