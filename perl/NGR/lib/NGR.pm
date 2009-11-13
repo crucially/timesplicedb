@@ -42,11 +42,12 @@ sub insert {
 sub info {
     my $self = shift;
     return {
-	created    => $self->created,
-	resolution => $self->resolution,
-	version    => $self->version,
-	columns    => $self->columns,
-	items      => $self->items,
+	created      => $self->created,
+	resolution   => $self->resolution,
+	version      => $self->version,
+	columns      => $self->columns,
+	items        => $self->items,
+	last_updated => $self->last_updated,
     };
 }
 

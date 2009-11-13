@@ -60,12 +60,13 @@ $ngr->insert(column    => 0,
 my $info = $ngr->info();
 
 is_deeply($info, {
-    items      => 720,
-    created    => $ct,
-    columns    => 1,
-    resolution => 120,
-    version    => 1,
-    columns    => 1,
+    items        => 720,
+    created      => $ct,
+    columns      => 1,
+    resolution   => 120,
+    version      => 1,
+    columns      => 1,
+    last_updated => $it - 120,
 	});
 
 is($ngr->last_updated, $it - 120, "Last modified is the value of the idx");
