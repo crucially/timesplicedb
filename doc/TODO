@@ -4,4 +4,5 @@
 
 * store db name and column name in the header of the file
 
+* support millisecond resolution?
 
