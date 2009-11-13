@@ -8,7 +8,7 @@
 
 #include "const-c.inc"
 
-MODULE = NGR		PACKAGE = NGR		
+MODULE = NGR		PACKAGE = NGR::C	PREFIX=NGR_
 
 INCLUDE: const-xs.inc
 

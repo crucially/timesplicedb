@@ -1,4 +1,4 @@
-package NGR;
+package NGR::C;
 
 use 5.008009;
 use strict;
@@ -20,16 +20,15 @@ our @ISA = qw(Exporter);
 our %EXPORT_TAGS = ( 'all' => [ qw(
 	NGR_COUNTER
 	NGR_GAUGE
-	NGR_aggregate
-	NGR_create
-	NGR_entry
-	NGR_insert
-	NGR_last_entry_idx
-	NGR_make_path
-	NGR_open
-	NGR_range
-	NGR_range_free
-	NGR_timespan
+	aggregate
+	create
+	entry
+	insert
+	last_entry_idx
+	open
+	range
+	range_free
+	timespan
 ) ] );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
