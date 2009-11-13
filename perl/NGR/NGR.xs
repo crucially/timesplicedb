@@ -12,6 +12,42 @@ MODULE = NGR		PACKAGE = NGR::C	PREFIX=NGR_
 
 INCLUDE: const-xs.inc
 
+int metric_created(obj);
+    	struct NGR_metric_t *	obj
+	CODE:
+	RETVAL = obj->created;
+	OUTPUT:
+	RETVAL
+
+int metric_width(obj);
+    	struct NGR_metric_t *	obj
+	CODE:
+	RETVAL = obj->created;
+	OUTPUT:
+	RETVAL
+
+int metric_resolution(obj);
+    	struct NGR_metric_t *	obj
+	CODE:
+	RETVAL = obj->resolution;
+	OUTPUT:
+	RETVAL
+
+int metric_version(obj);
+    	struct NGR_metric_t *	obj
+	CODE:
+	RETVAL = obj->version;
+	OUTPUT:
+	RETVAL
+
+int metric_columns(obj);
+    	struct NGR_metric_t *	obj
+	CODE:
+	RETVAL = obj->columns;
+	OUTPUT:
+	RETVAL
+
+
 struct NGR_range_t *
 NGR_aggregate(range, interval, data_type)
 	struct NGR_range_t *	range
