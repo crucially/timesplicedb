@@ -95,7 +95,6 @@ struct NGR_metric_t * NGR_create(const char *filename, time_t created_time, int 
 
 struct NGR_metric_t * NGR_open(const char *filename) {
   size_t read_len;
-  char width_buf[4];
   struct NGR_metric_t *obj;
 
   obj = malloc(sizeof(struct NGR_metric_t));
@@ -108,9 +107,8 @@ struct NGR_metric_t * NGR_open(const char *filename) {
   assert(obj->fd != -1);
 
   obj->base = 4;
-  read_len = read(obj->fd, width_buf, 4);
+  read_len = read(obj->fd, &obj->width, 4);
   assert(read_len == 4);
-  obj->width = *width_buf;
 
   obj->base += 4;
   read_len = read(obj->fd, &obj->version, 4);
