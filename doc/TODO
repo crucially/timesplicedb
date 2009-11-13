@@ -8,3 +8,5 @@
 
 * floating point support
 
+* switch to pread and pwrite
+
