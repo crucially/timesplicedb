@@ -121,7 +121,7 @@ int NGR_insert (struct NGR_metric_t *obj, int column, time_t timestamp, int valu
     timestamp = time(NULL);
 
   assert (column <= obj->columns - 1);
-  assert( timestamp > obj->created );
+  assert( timestamp >= obj->created );
   assert (timestamp <= time(NULL) );
 
   /* We have to transform the timestamp to a entry index and then into a byte offset
