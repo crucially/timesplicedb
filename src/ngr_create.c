@@ -26,7 +26,7 @@ int usage () {
 int main(int argc, char * const *argv) {
   int o, resolution;
   time_t created_time;
-  char *filename = 0
+  char *filename = 0;
 
   created_time = resolution = 0;
 
