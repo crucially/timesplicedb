@@ -5,7 +5,7 @@ It is similar to rrdtool in that, but with some key differences:
 
    * Never throw away data
     
-   * Mangle data on insert
+   * Never mangle data on insert
 
 Instead it stores all data at the resolution you specified when you created the file. Then you can request ranges and apply aggregation functions on them on the fly. Retrieval of a range is O(1), aggregation of a range is O(n) where n is the requested objects. Insertion is O(1).
 
