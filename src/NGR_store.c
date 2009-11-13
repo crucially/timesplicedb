@@ -256,16 +256,20 @@ int NGR_entry (struct NGR_metric_t *obj, int column, int idx) {
   char *buf;
   int rv, read_len, offset;
   assert (column <= obj->columns - 1);
-  offset = (obj->width + (idx * obj->width));
+  offset = (obj->base + (idx * obj->width));
 
   buf = malloc(obj->width);
   assert(sizeof(rv) == obj->width);
   lseek(obj->fd, offset, SEEK_SET);
 
   read_len = read(obj->fd, buf, obj->width);
-  assert(read_len == obj->width);
-
-  memcpy(&rv, buf, obj->width);
+  if (read_len == 0) {
+    /* we are outside the length of the file
+       should really check if this is the case XXX */
+    rv = 0;
+  } else {
+    memcpy(&rv, buf, obj->width);
+  }
   free(buf);
   return rv;
 }
