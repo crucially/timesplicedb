@@ -236,8 +236,8 @@ struct NGR_range_t * NGR_timespan (struct NGR_metric_t *obj, int column, time_t 
 
 
   /* this just converts the timestamp into an offset that the range function takes */
-  start_offset = ((start - obj->created + obj->resolution) / obj->resolution);
-  end_offset = ((end - obj->created + obj->resolution) / obj->resolution);
+  start_offset = ((start - obj->created) / obj->resolution);
+  end_offset = ((end - obj->created) / obj->resolution);
   return NGR_range(obj, column, start_offset, end_offset);
 }
 
