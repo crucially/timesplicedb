@@ -43,13 +43,13 @@ int main(int argc, char * const *argv) {
   assert(collection);
   assert(metric_s);
 
-  struct NGR_metric_t *metric = NGR_create(collection, metric_s, created_time, resolution);
+  struct NGR_metric_t *metric = NGR_create(collection, metric_s, created_time, resolution, 0);
 
-  time_t last_entry = (metric->created + (NGR_last_entry_idx(metric) * 60));
+  time_t last_entry = (metric->created + (NGR_last_entry_idx(metric, 0) * 60));
 
   printf("Starting time: %s", ctime(&(metric->created)));
   printf("Last entry:    %s", ctime(&last_entry)); 
-  printf("Items:         %d\n", NGR_last_entry_idx(metric));
+  printf("Items:         %d\n", NGR_last_entry_idx(metric, 0));
   printf("Resolution:    %d seconds\n", metric->resolution);
   printf("Verison:       %d\n", metric->version);
   if (metric->width == 8) {

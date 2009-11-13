@@ -50,7 +50,7 @@ int main(int argc, char * const *argv) {
 
 
   struct NGR_metric_t *metric    = NGR_open(collection, metric_s);
-  struct NGR_range_t  *range     = NGR_timespan(metric, start, end);
+  struct NGR_range_t  *range     = NGR_timespan(metric, 0, start, end);
   struct NGR_range_t  *aggregate = NGR_aggregate(range, interval, NGR_GAUGE);
 
   int items = aggregate->items;

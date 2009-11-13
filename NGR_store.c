@@ -37,18 +37,20 @@ char * NGR_make_path (char *collection, char *metric) {
 /* file format is pretty simple
    4 bytes for the width of the fields (32/64)
    4 bytes for the version number of format
-   4 bytes for the interval in seconds (interval is not changeable once a file is created
+   4 bytes for the resolution in seconds (resolution is not changeable once a file is created
+   4 bytes for the number of columns
    $width create_timestamp unix_time when the series start
    list of items, indexed of the time-create_time/interval
 */
 
 
 
-struct NGR_metric_t * NGR_create(char *collection, char *metric, time_t created_time, int resolution) {
+struct NGR_metric_t * NGR_create(char *collection, char *metric, time_t created_time, int resolution, int columns) {
   char *path;
   int   fd, write_len;
   int   size = sizeof(int);
   int   version = 1;
+  columns = 1; // only support one for now
 
   if(!created_time)
     created_time = time(NULL);
@@ -70,6 +72,8 @@ struct NGR_metric_t * NGR_create(char *collection, char *metric, time_t created_
   write_len = write(fd, &version, 4);
   assert(write_len == 4);
   write_len = write(fd, &resolution, 4);
+  assert(write_len == 4);
+  write_len = write(fd, &columns, 4);
   assert(write_len == 4);
   write_len = write(fd, &created_time, size);
   assert(write_len == size);
@@ -106,6 +110,10 @@ struct NGR_metric_t * NGR_open(char *collection, char *metric) {
   obj->base += 4;
   read_len = read(obj->fd, &obj->resolution, 4);
   assert(read_len == 4);
+
+  obj->base += 4;
+  read_len = read(obj->fd, &obj->columns, 4);
+  assert(read_len == 4);
   
 
   obj->base += obj->width;
@@ -116,12 +124,14 @@ struct NGR_metric_t * NGR_open(char *collection, char *metric) {
   return obj;
 }
 
-int NGR_insert (struct NGR_metric_t *obj, time_t timestamp, int value) {
+int NGR_insert (struct NGR_metric_t *obj, int column, time_t timestamp, int value) {
   int  entry, offset, write_len;
   
   if (!timestamp)
     timestamp = time(NULL);
 
+  assert (column <= obj->columns - 1);
+  
   assert( timestamp > obj->created );
 
   assert (timestamp <= time(NULL) );
@@ -134,9 +144,11 @@ int NGR_insert (struct NGR_metric_t *obj, time_t timestamp, int value) {
   return entry;
 }
 
-struct NGR_range_t * NGR_range (struct NGR_metric_t *obj, int start, int end) {
+struct NGR_range_t * NGR_range (struct NGR_metric_t *obj, int column, int start, int end) {
   struct NGR_range_t *range;
   struct stat *file;
+
+  assert (column <= obj->columns - 1);
 
   range = malloc(sizeof(struct NGR_range_t));
   file = malloc(sizeof(struct stat));
@@ -172,27 +184,30 @@ void NGR_range_free (struct NGR_range_t * range) {
   free(range);
 }
 
-struct NGR_range_t * NGR_timespan (struct NGR_metric_t *obj, time_t start, time_t end) {
+struct NGR_range_t * NGR_timespan (struct NGR_metric_t *obj, int column, time_t start, time_t end) {
   int start_offset, end_offset;
+
+  assert (column <= obj->columns - 1);
 
   start_offset = ((start - obj->created + obj->resolution) / obj->resolution);
   end_offset = ((end - obj->created + obj->resolution) / obj->resolution);
-  return NGR_range(obj, start_offset, end_offset);
+  return NGR_range(obj, column, start_offset, end_offset);
 }
 
 
-int NGR_last_entry_idx (struct NGR_metric_t *obj) {
+int NGR_last_entry_idx (struct NGR_metric_t *obj, int column) {
   int offset;
+  assert (column <= obj->columns - 1);
   offset = lseek(obj->fd, 0 - obj->width, SEEK_END);
   if(offset < obj->base)
     return 0;
   return (((int)offset - obj->base) / obj->width + 1); /** is this really supposed to be please +1 **/
 }
 
-int NGR_entry (struct NGR_metric_t *obj, int idx) {
+int NGR_entry (struct NGR_metric_t *obj, int column, int idx) {
   char *buf;
   int rv, read_len, offset;
-  
+  assert (column <= obj->columns - 1);
   offset = (obj->width + (idx * obj->width));
 
   buf = malloc(obj->width);

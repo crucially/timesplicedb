@@ -44,7 +44,7 @@ int main(int argc, char * const *argv) {
 
   struct NGR_metric_t *metric = NGR_open(collection, metric_s);
 
-  NGR_insert(metric,insert_time, value);
+  NGR_insert(metric, 0, insert_time, value);
 
   return 0;
 }

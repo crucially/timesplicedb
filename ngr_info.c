@@ -34,11 +34,11 @@ int main(int argc, char * const *argv) {
   assert(metric_s);
 
   struct NGR_metric_t *metric = NGR_open(collection, metric_s);
-  time_t last_entry = (metric->created + (NGR_last_entry_idx(metric) * metric->resolution));
+  time_t last_entry = (metric->created + (NGR_last_entry_idx(metric, 0) * metric->resolution));
 
   printf("Starting time: %s", ctime(&(metric->created)));
   printf("Last entry:    %s", ctime(&last_entry)); 
-  printf("Items:         %d\n", NGR_last_entry_idx(metric));
+  printf("Items:         %d\n", NGR_last_entry_idx(metric, 0));
   printf("Resolution:    %d seconds\n", metric->resolution);
   printf("Verison:       %d\n", metric->version);
   if (metric->width == 8) {
