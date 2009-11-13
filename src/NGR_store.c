@@ -59,7 +59,7 @@
 
 
 
-struct NGR_metric_t * NGR_create(char *filename, time_t created_time, int resolution, int columns) {
+struct NGR_metric_t * NGR_create(const char *filename, time_t created_time, int resolution, int columns) {
   int   fd, write_len;
   int   size = sizeof(int);
   int   version = 1;
@@ -93,7 +93,7 @@ struct NGR_metric_t * NGR_create(char *filename, time_t created_time, int resolu
   return NGR_open(filename);
 }
 
-struct NGR_metric_t * NGR_open(char *filename) {
+struct NGR_metric_t * NGR_open(const char *filename) {
   size_t read_len;
   char width_buf[4];
   struct NGR_metric_t *obj;
