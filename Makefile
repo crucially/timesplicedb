@@ -1,19 +1,21 @@
-#/bin/bash
-
-gcc -c NGR_store.c -o NGR_store.o
-ar rcs libNGR_store.a NGR_store.o
-
-#cc   ngr.c -L. -lNGR_store -o ngr
-cc   ngr_info.c -L. -lNGR_store -o ngrinfo
-
-cc   ngr_create.c -L. -lNGR_store -o ngrcreate
-
-cc   ngr_insert.c -L. -lNGR_store -o ngrinsert
-
-cc   ngr_dump.c -L. -lNGR_store -o ngrdump
+CC          = gcc
+AR          = ar
+CFLAGS      = -Wall -g
+INCLUDES    = 
+LIBS        = -L. -lNGR_store -lc
+EXECUTABLES = ngr_info ngr_insert ngr_create ngr_dump ngr_agg
+SOURCES     = ${EXECUTABLES:=.c}
 
 
-cc   ngr_agg.c -L. -lNGR_store -o ngragg
+all: ${EXECUTABLES}
 
+NGR_store: 
+	${CC} -c ${CFLAGS} ${INCLUDES} NGR_store.c -o NGR_store.o
+	${AR} rcs libNGR_store.a NGR_store.o
 
+${EXECUTABLES}: NGR_store
+	${CC} ${CFLAGS} ${INCLUDES} ${LIBS} $@.c -o $@
+
+clean:
+	rm -f *.o core *.core *.a ${EXECUTABLES}
 
