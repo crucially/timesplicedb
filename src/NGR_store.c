@@ -287,7 +287,6 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
 
   /* figure out how many buckets we need, switch to floating point and then round up */
   int buckets = rint(ceil(((double)range->items / ((double)interval / (double)range->resolution))));
-  printf("need %d buckets\n", buckets);
   aggregate = malloc(sizeof(struct NGR_range_t));
   aggregate->area = malloc(sizeof(int) * buckets);
   aggregate->agg = malloc(sizeof(struct NGR_agg_entry_t) * buckets);
