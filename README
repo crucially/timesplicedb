@@ -13,3 +13,10 @@ On my macbook pro, with a full year worth of data it takes around 3 ms to aggreg
 
 To pick up a random hour and aggregate it into 10 minute chunks takes less than 0.1 ms
 
+****
+WARNIGN
+****
+
+None of the aggregation functions have been tested extensively, getting floating point exceptions and bad data back is still very possible
+
+****
