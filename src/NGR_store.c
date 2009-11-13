@@ -318,7 +318,7 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
       aggregate->agg[trg_items].max = max;
       aggregate->agg[trg_items].min = min;
       aggregate->agg[trg_items].stddev = ((sum_sqr - (sum * (sum / items_seen)))/(items_seen-1));
-      aggregate->agg[trg_items++].avg = sum / items_seen;
+      aggregate->agg[trg_items++].avg = (double)sum / (double)items_seen;
       sum_sqr = max = sum = items_seen = 0;
       min = 2147483647;
     }
@@ -326,7 +326,7 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
   }
 
   if (items_seen) {
-    aggregate->agg[trg_items].avg = sum / items_seen;
+    aggregate->agg[trg_items].avg = (double)sum / (double)items_seen;
     aggregate->agg[trg_items].max = max;
     aggregate->agg[trg_items].min = min;
 

@@ -64,7 +64,7 @@ struct NGR_range_t {
 };
 
 struct NGR_agg_entry_t {
-  int avg;    /* average value in interval */
+  double avg;    /* average value in interval */
   int max;    /* max value seen in interval */
   int min;    /* minimum value seen -- flag determines if 0 is considered minium or undefined value */
   int stddev; /* calculated stddev -- no idea if this is correct -- probably isn't */
