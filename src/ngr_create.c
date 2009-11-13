@@ -43,6 +43,10 @@ int main(int argc, char * const *argv) {
       break;
     case 'c':
       created_time = atoi(optarg);
+      break;
+    case 'h':
+      return usage();
+      break;
     }
 
   }
