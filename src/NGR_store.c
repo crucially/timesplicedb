@@ -42,7 +42,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <time.h>
-
+#include <math.h>
 
 
 
@@ -285,8 +285,8 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
   min = 2147483647; /** broken on 64bit, i know, and I haven't how to deal with signed or unsigned yet probably counters
 			are unsigned and gauge signed?**/
 
-  /* figure out how many buckets we need */
-  int buckets = (range->items / (interval / range->resolution));
+  /* figure out how many buckets we need, switch to floating point and then round up */
+  int buckets = rint(ceil(((double)range->items / ((double)interval / (double)range->resolution))));
   printf("need %d buckets\n", buckets);
   aggregate = malloc(sizeof(struct NGR_range_t));
   aggregate->area = malloc(sizeof(int) * buckets);
@@ -321,12 +321,14 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
     }
     curr_item++;
   }
-  aggregate->agg[trg_items].avg = sum / items_seen;
-  aggregate->agg[trg_items].max = max;
-  aggregate->agg[trg_items].min = min;
-  aggregate->agg[trg_items].stddev = ((sum_sqr - (sum * (sum / items_seen)))/(items_seen-1));
-  aggregate->entry[trg_items++] = sum / items_seen;
-  /* XXX SSHOULD SET THE RESOLUTION ON AGGREGATE */
+  if (items_seen) {
+    aggregate->agg[trg_items].avg = sum / items_seen;
+    aggregate->agg[trg_items].max = max;
+    aggregate->agg[trg_items].min = min;
+    aggregate->agg[trg_items].stddev = ((sum_sqr - (sum * (sum / items_seen)))/(items_seen-1));
+    aggregate->entry[trg_items++] = sum / items_seen;
+    /* XXX SSHOULD SET THE RESOLUTION ON AGGREGATE */
+  }
   return aggregate;
 }
 
