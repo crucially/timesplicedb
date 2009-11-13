@@ -2,7 +2,6 @@ Changes
 Makefile.PL
 MANIFEST
 NGR.xs
-ppport.h
 README
 typemap
 t/NGR.t
