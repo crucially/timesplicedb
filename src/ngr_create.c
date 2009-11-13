@@ -65,8 +65,7 @@ int main(int argc, char * const *argv) {
 
     switch(o) {
     case 'f':
-      filename = malloc(strlen(optarg)+1);
-      memcpy(filename, optarg, strlen(optarg)+1);
+      filename = optarg;
       break;
     case 'r':
       resolution = atoi(optarg);
