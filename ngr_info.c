@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include <stdlib.h>;
+#include <unistd.h>
 
 extern char *optarg;
 
@@ -48,5 +49,5 @@ int main(int argc, char * const *argv) {
     printf("Format:        unknown!\n");
   }
 
-
+  return 0;
 }

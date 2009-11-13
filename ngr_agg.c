@@ -7,6 +7,8 @@
 #include <string.h>
 
 #include <stdlib.h>;
+#include <unistd.h>
+
 
 extern char *optarg;
 
@@ -57,5 +59,5 @@ int main(int argc, char * const *argv) {
       printf("AVG: %d      MAX: %d      MIN: %d      STDDEV: %d\n", aggregate->agg[i].avg, aggregate->agg[i].max, aggregate->agg[i].min, aggregate->agg[i].stddev);
       i++;
     }
-
+  return 0;
 }

@@ -46,10 +46,9 @@ char * NGR_make_path (char *collection, char *metric) {
 
 struct NGR_metric_t * NGR_create(char *collection, char *metric, time_t created_time, int resolution) {
   char *path;
-  char buffer[8];
   int   fd, write_len;
   int   size = sizeof(int);
-  int version = 1;
+  int   version = 1;
 
   if(!created_time)
     created_time = time(NULL);
@@ -136,7 +135,6 @@ int NGR_insert (struct NGR_metric_t *obj, time_t timestamp, int value) {
 }
 
 struct NGR_range_t * NGR_range (struct NGR_metric_t *obj, int start, int end) {
-  int items, len, *area, *entry;
   struct NGR_range_t *range;
   struct stat *file;
 

@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include <stdlib.h>;
+#include <unistd.h>
 
 extern char *optarg;
 
@@ -44,4 +45,6 @@ int main(int argc, char * const *argv) {
   struct NGR_metric_t *metric = NGR_open(collection, metric_s);
 
   NGR_insert(metric,insert_time, value);
+
+  return 0;
 }

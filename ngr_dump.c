@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include <stdlib.h>;
+#include <unistd.h>
 
 extern char *optarg;
 
@@ -40,5 +41,6 @@ int main(int argc, char * const *argv) {
     while(items--) {
       printf("%d\n", range->entry[i++]);
     }
-
+  
+  return 0;
 }
