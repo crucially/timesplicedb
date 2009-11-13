@@ -1,12 +1,12 @@
 
 #include "NGR.h"
 #include <sys/time.h>
-#include <stdio.h>;
-#include <time.h>;
-#include <assert.h>;
+#include <stdio.h>
+#include <time.h>
+#include <assert.h>
 #include <string.h>
 
-#include <stdlib.h>;
+#include <stdlib.h>
 #include <unistd.h>
 
 
