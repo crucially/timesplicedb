@@ -38,7 +38,7 @@
 #define NGR_GAUGE   0
 #define NGR_COUNTER 1
 
-#define NULL (0)
+#define NGR_NULL (0)
 #define WARN(args...) fprintf(stderr, ## args);
 #define strneq(s1, s2, n) (strncmp((s1), (s2), n) == 0)
 

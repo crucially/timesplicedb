@@ -42,7 +42,7 @@ int bench_main(int argc, char **argv) {
   struct timeval how_fast_stop;
     
 /*
-  struct NGR_metric_t *metric= NGR_create("host", "metric_c", time(NULL) - 3600, 1);
+  struct NGR_metric_t *metric= NGR_create("host", "metric_c", time(NGR_NULL) - 3600, 1);
 
   return;
   //  struct NGR_metric_t *metric = NGR_open("host", "metric_year");
@@ -53,12 +53,12 @@ int bench_main(int argc, char **argv) {
   {
 
     struct NGR_range_t *range = NGR_range(metric, 0, idx);
-    gettimeofday(&how_fast_start, NULL);
+    gettimeofday(&how_fast_start, NGR_NULL);
     int items = range->items;
     int i = 0;
     int total = 0;
     struct NGR_range_t *aggregate = NGR_aggregate(range, 86400,0);
-    gettimeofday(&how_fast_stop, NULL);
+    gettimeofday(&how_fast_stop, NGR_NULL);
     printf("Items:%d   Total: %d   Avg: %d\n", range->items, total, total/range->items);
     printf("%d.%d\n", how_fast_start.tv_sec, how_fast_start.tv_usec);
     printf("%d.%d\n", how_fast_stop.tv_sec, how_fast_stop.tv_usec);
@@ -73,15 +73,15 @@ int bench_main(int argc, char **argv) {
     NGR_range_free(range);
   }
   {
-    gettimeofday(&how_fast_start, NULL);
-    struct NGR_range_t *range = NGR_timespan(metric, time(NULL)-36000, time(NULL)-35000);
+    gettimeofday(&how_fast_start, NGR_NULL);
+    struct NGR_range_t *range = NGR_timespan(metric, time(NGR_NULL)-36000, time(NGR_NULL)-35000);
     int items = range->items;
     int i = 0;
     while(items--) {
       int foo = range->entry[i++];
       //      printf("%d\n", range->entry[i++]);
     }
-    gettimeofday(&how_fast_stop, NULL);
+    gettimeofday(&how_fast_stop, NGR_NULL);
     printf("%d.%d\n", how_fast_start.tv_sec, how_fast_start.tv_usec);
     printf("%d.%d\n", how_fast_stop.tv_sec, how_fast_stop.tv_usec);
     printf("entries: %d\n", range->items);

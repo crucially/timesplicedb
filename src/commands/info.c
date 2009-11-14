@@ -51,7 +51,7 @@ int info_usage () {
 int info_main(int argc, char **argv) {
   int o;
   char *filename;
-  filename = NULL;
+  filename = NGR_NULL;
 
   while ((o = getopt(argc, argv,
 		     "f:h")) != -1) {
