@@ -315,7 +315,10 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
       aggregate->entry[trg_items] = sum / items_seen;
       aggregate->agg[trg_items].max = max;
       aggregate->agg[trg_items].min = min;
-      aggregate->agg[trg_items].stddev = ((sum_sqr - sum * avg)/(items_seen-1));
+      if (items_seen == 1)
+	aggregate->agg[trg_items].stddev = 0;
+      else 
+	aggregate->agg[trg_items].stddev = ((sum_sqr - sum * avg)/(items_seen-1));
       aggregate->agg[trg_items++].avg = avg;
       sum_sqr = max = sum = items_seen = 0;
       min = 2147483647;
@@ -324,15 +327,16 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
   }
 
   if (items_seen) {
+    double avg = (double)sum / (double)items_seen;
     aggregate->agg[trg_items].items_averaged = items_seen;
-    aggregate->agg[trg_items].avg = (double)sum / (double)items_seen;
+    aggregate->agg[trg_items].avg = avg;
     aggregate->agg[trg_items].max = max;
     aggregate->agg[trg_items].min = min;
 
     if(items_seen == 1)
       aggregate->agg[trg_items].stddev = 0;
     else
-      aggregate->agg[trg_items].stddev = ((sum_sqr - (sum * (sum / items_seen)))/(items_seen-1));
+      aggregate->agg[trg_items].stddev = ((sum_sqr - sum * avg)/(items_seen-1));
 
     aggregate->entry[trg_items] = sum / items_seen;
     /* XXX SSHOULD SET THE RESOLUTION ON AGGREGATE */
