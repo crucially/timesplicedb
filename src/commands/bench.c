@@ -33,7 +33,7 @@
 #include <sys/time.h>
 #include <stdio.h>
 
-int bench_usage {
+int bench_usage() {
 	WARN("no options");
 }
 
@@ -41,7 +41,8 @@ int bench_main(int argc, char **argv) {
   struct timeval how_fast_start;
   struct timeval how_fast_stop;
     
-  struct NGR_metric_t *metric= NGR_create("host", "metric_c", time(NULL) - 3600);
+/*
+  struct NGR_metric_t *metric= NGR_create("host", "metric_c", time(NULL) - 3600, 1);
 
   return;
   //  struct NGR_metric_t *metric = NGR_open("host", "metric_year");
@@ -88,7 +89,8 @@ int bench_main(int argc, char **argv) {
 
     NGR_range_free(range);
   }
-
+*/
+  return 0;
 }
 
 

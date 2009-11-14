@@ -3,7 +3,7 @@ INCLUDES = -I$(top_srcdir)/include
 
 bin_PROGRAMS = ngr
 
-ngr_SOURCES  = ngr.c ngr_info.c ngr_insert.c ngr_create.c ngr_dump.c ngr_agg.c
+ngr_SOURCES  = ngr.c commands/agg.c commands/bench.c  commands/create.c commands/dump.c commands/info.c commands/insert.c
 
 lib_LTLIBRARIES = libNGR_store.la
 
