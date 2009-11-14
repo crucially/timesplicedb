@@ -83,15 +83,19 @@ int main(int argc, char **argv) {
  
   int ret = 0;
   if (strneq("help", argv[0], 4)) {
-    int  length = 7+strlen(argv[1]);
-	func_name   = malloc(length);
-	snprintf(func_name, length, "%s_usage", argv[1]);
-    func_t f  = (func_t) dlsym(handle, func_name);
-    if (!f) {
-		ret = usage("Couldn't find help for '%s'\n", argv[1]);
-    } else {
-		WARN_FMT("Usage: ngr %s [options]\n", argv[1]);
-	    ret = f();
+	if (argc<2) {
+		ret = usage(NULL);
+	} else {
+	    int  length = 7+strlen(argv[1]);
+		func_name   = malloc(length);
+		snprintf(func_name, length, "%s_usage", argv[1]);
+    	func_t f  = (func_t) dlsym(handle, func_name);
+    	if (!f) {
+			ret = usage("Couldn't find help for '%s'\n", argv[1]);
+    	} else {
+			WARN_FMT("Usage: ngr %s [options]\n", argv[1]);
+	    	ret = f();
+		}
 	}
   } else {
 	int length  = 6+strlen(argv[0]);
