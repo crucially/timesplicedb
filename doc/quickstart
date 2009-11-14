@@ -5,25 +5,25 @@
 export PATH=$PATH:.
 
 rm file.ngr
-ngr_create -f file.ngr -c 1258091219 -r 60
+ngr create -f file.ngr -c 1258091219 -r 60
 
 # insert multiple values
-ngr_insert -f file.ngr -t 1258091219 -v 1
-ngr_insert -f file.ngr -t 1258091279 -v 2
-ngr_insert -f file.ngr -t 1258091339 -v 3
-ngr_insert -f file.ngr -t 1258091399 -v 4
-ngr_insert -f file.ngr -t 1258091459 -v 5
-ngr_insert -f file.ngr -t 1258091519 -v 6
-ngr_insert -f file.ngr -t 1258091579 -v 7
-ngr_insert -f file.ngr -t 1258091639 -v 8
-ngr_insert -f file.ngr -t 1258091699 -v 9
+ngr insert -f file.ngr -t 1258091219 -v 1
+ngr insert -f file.ngr -t 1258091279 -v 2
+ngr insert -f file.ngr -t 1258091339 -v 3
+ngr insert -f file.ngr -t 1258091399 -v 4
+ngr insert -f file.ngr -t 1258091459 -v 5
+ngr insert -f file.ngr -t 1258091519 -v 6
+ngr insert -f file.ngr -t 1258091579 -v 7
+ngr insert -f file.ngr -t 1258091639 -v 8
+ngr insert -f file.ngr -t 1258091699 -v 9
 
 # see raw content
-ngr_dump -f file.ngr
+ngr dump -f file.ngr
 
 #see info 
-ngr_info -f file.ngr
+ngr info -f file.ngr
 
-ngr_agg -f file.ngr -s 1258091219 -e 1258091699 -i 120
+ngr agg -f file.ngr -s 1258091219 -e 1258091699 -i 120
 
 
