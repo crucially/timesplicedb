@@ -2,8 +2,6 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#include "ppport.h"
-
 #include <../../include/NGR.h>
 
 #include "const-c.inc"
