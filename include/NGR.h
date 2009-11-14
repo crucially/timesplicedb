@@ -61,6 +61,7 @@ struct NGR_range_t {
   size_t len;
   int mmap;                    /* if this is an mmaped range or not */
   int resolution;              /* resolution requested for this range  */
+  int columns;                 /* how many columns are present in this range */
   struct NGR_agg_entry_t *agg; /* If this is an aggregate range, this contains a pointer to extra data 
 				  calculated during aggregaton
 				  these are values we can get doing a single pass only
@@ -70,10 +71,11 @@ struct NGR_range_t {
 };
 
 struct NGR_agg_entry_t {
-  int avg;    /* average value in interval */
+  double avg;    /* average value in interval */
   int max;    /* max value seen in interval */
   int min;    /* minimum value seen -- flag determines if 0 is considered minium or undefined value */
   int stddev; /* calculated stddev -- no idea if this is correct -- probably isn't */
+  int items_averaged; /* how many items went into this */
 };
 
 struct NGR_metric_t * NGR_create(const char *filename, time_t create_time, int resolution, int columns);
@@ -85,11 +87,11 @@ int NGR_last_entry_idx (struct NGR_metric_t *obj, int column);
 
 int NGR_entry (struct NGR_metric_t *obj, int column, int idx);
 
-struct NGR_range_t * NGR_range (struct NGR_metric_t *obj, int column, int start, int end);
+struct NGR_range_t * NGR_range (struct NGR_metric_t *obj, int start, int end);
 
 void NGR_range_free (struct NGR_range_t *range);
 
-struct NGR_range_t * NGR_timespan (struct NGR_metric_t *obj, int column, time_t start, time_t end);
+struct NGR_range_t * NGR_timespan (struct NGR_metric_t *obj, time_t start, time_t end);
 
 struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int data_type);
 

@@ -1,143 +1,145 @@
+
 package NGR;
-
-use 5.008009;
 use strict;
-use warnings;
-use Carp;
+use version;
 
-require Exporter;
-use AutoLoader;
-
-our @ISA = qw(Exporter);
-
-# Items to export into callers namespace by default. Note: do not export
-# names by default without a very good reason. Use EXPORT_OK instead.
-# Do not simply export all your public functions/methods/constants.
-
-# This allows declaration	use NGR ':all';
-# If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
-# will save memory.
-our %EXPORT_TAGS = ( 'all' => [ qw(
-	NGR_COUNTER
-	NGR_GAUGE
-	NGR_aggregate
-	NGR_create
-	NGR_entry
-	NGR_insert
-	NGR_last_entry_idx
-	NGR_make_path
-	NGR_open
-	NGR_range
-	NGR_range_free
-	NGR_timespan
-) ] );
-
-our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
-
-our @EXPORT = qw(
-	NGR_COUNTER
-	NGR_GAUGE
-);
+use NGR::C qw();
 
 our $VERSION = '0.01';
 
-sub AUTOLOAD {
-    # This AUTOLOAD is used to 'autoload' constants from the constant()
-    # XS function.
 
-    my $constname;
-    our $AUTOLOAD;
-    ($constname = $AUTOLOAD) =~ s/.*:://;
-    croak "&NGR::constant not defined" if $constname eq 'constant';
-    my ($error, $val) = constant($constname);
-    if ($error) { croak $error; }
-    {
-	no strict 'refs';
-	# Fixed between 5.005_53 and 5.005_61
-#XXX	if ($] >= 5.00561) {
-#XXX	    *$AUTOLOAD = sub () { $val };
-#XXX	}
-#XXX	else {
-	    *$AUTOLOAD = sub { $val };
-#XXX	}
+sub new {
+    my $class = shift;
+    my %options = @_;
+
+    my $self = bless {}, $class;
+
+    
+    if($options{create}) {
+	$self->{ctx} = NGR::C::create( $options{filename},
+				       $options{create_time},
+				       $options{resolution},
+				       $options{columns} );
+    } else {
+	$self->{ctx} = NGR::C::create( $options{filename} );
     }
-    goto &$AUTOLOAD;
+
+    return $self;
+
 }
 
-require XSLoader;
-XSLoader::load('NGR', $VERSION);
+sub insert {
+    my $self = shift;
+    my %options = @_;
 
-# Preloaded methods go here.
+    NGR::C::insert( $self->{ctx},
+		    $options{column},
+		    $options{timestamp},
+		    $options{value} );
+    
+}
 
-# Autoload methods go after =cut, and are processed by the autosplit program.
+sub info {
+    my $self = shift;
+    return {
+	created      => $self->created,
+	resolution   => $self->resolution,
+	version      => $self->version,
+	columns      => $self->columns,
+	items        => $self->items,
+	last_updated => $self->last_updated,
+    };
+}
+
+
+sub created {
+    my $self = shift;
+    return NGR::C::metric_created($self->{ctx});
+}
+
+sub resolution {
+    my $self = shift;
+    return NGR::C::metric_resolution($self->{ctx});
+}
+
+sub version {
+    my $self = shift;
+    return NGR::C::metric_version($self->{ctx});
+}
+
+sub columns {
+    my $self = shift;
+    return NGR::C::metric_columns($self->{ctx});
+}
+
+
+sub items {
+    my $self = shift;
+    return NGR::C::last_entry_idx($self->{ctx}, 0) + 1;
+}
+
+sub last_entry_idx {
+    my $self = shift;
+    return NGR::C::last_entry_idx($self->{ctx}, 0);
+}
+
+sub entry {
+    my $self = shift;
+    my %options = @_;
+    return NGR::C::entry($self->{ctx}, $options{column}, $options{idx});
+}
+
+sub last_updated {
+    my $self = shift;
+    return ($self->created + ($self->last_entry_idx(column => 0) * $self->resolution));
+}
+
+sub timespan {
+    my $self = shift;
+    my %options = @_;
+    return NGR::Range->new(NGR::C::timespan($self->{ctx}, $options{start}, $options{end}));
+}
+
+
+package NGR::Range;
+
+use strict;
+use warnings;
+
+sub new {
+    my $class = shift;
+    my $self = bless {};
+    $self->{ctx} = shift;
+    $self->{iter} = 0;
+    return $self;
+}
+
+sub items {
+    my $self = shift;
+    NGR::C::range_items($self->{ctx});
+}
+
+sub aggregate {
+    my $self = shift;
+    my %options = @_; 
+    
+    return NGR::Range->new(NGR::C::aggregate($self->{ctx}, $options{interval}, 0));
+}
+
+sub entry {
+    my $self = shift;
+    my %options = @_;
+
+    return {
+	idx    => $options{idx},
+	time   => 0,  # XXX calculate the time offset
+	value  => NGR::C::range_entry_value($self->{ctx}, $options{column}, $options{idx}),
+	avg    => NGR::C::range_entry_avg($self->{ctx}, $options{column}, $options{idx}),
+	min    => NGR::C::range_entry_min($self->{ctx}, $options{column}, $options{idx}),
+	max    => NGR::C::range_entry_max($self->{ctx}, $options{column}, $options{idx}),
+	stddev => NGR::C::range_entry_stddev($self->{ctx}, $options{column}, $options{idx}),
+	items_averaged => NGR::C::range_entry_items_averaged($self->{ctx}, $options{column}, $options{idx}),
+    };
+}
 
 1;
-__END__
-# Below is stub documentation for your module. You'd better edit it!
-
-=head1 NAME
-
-NGR - Perl extension for blah blah blah
-
-=head1 SYNOPSIS
-
-  use NGR;
-  blah blah blah
-
-=head1 DESCRIPTION
-
-Stub documentation for NGR, created by h2xs. It looks like the
-author of the extension was negligent enough to leave the stub
-unedited.
-
-Blah blah blah.
-
-=head2 EXPORT
-
-None by default.
-
-=head2 Exportable constants
-
-  NGR_COUNTER
-  NGR_GAUGE
-
-=head2 Exportable functions
-
-  struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int data_type)
-  struct NGR_metric_t * NGR_create(char *filename, time_t create_time, int resolution, int columns)
-  int NGR_entry (struct NGR_metric_t *obj, int column, int idx)
-  int NGR_insert (struct NGR_metric_t *obj, int column, time_t timestmp, int value)
-  int NGR_last_entry_idx (struct NGR_metric_t *obj, int column)
-  char * NGR_make_path (char *collection, char *metric)
-  struct NGR_metric_t * NGR_open(char *filename)
-  struct NGR_range_t * NGR_range (struct NGR_metric_t *obj, int column, int start, int end)
-  void NGR_range_free (struct NGR_range_t *range)
-  struct NGR_range_t * NGR_timespan (struct NGR_metric_t *obj, int column, time_t start, time_t end)
-
-
-
-=head1 SEE ALSO
-
-Mention other useful documentation such as the documentation of
-related modules or operating system documentation (such as man pages
-in UNIX), or any relevant external documentation such as RFCs or
-standards.
-
-If you have a mailing list set up for your module, mention it here.
-
-If you have a web site set up for your module, mention it here.
-
-=head1 AUTHOR
-
-Artur Bergman, E<lt>sky@crucially.netE<gt>
-
-=head1 COPYRIGHT AND LICENSE
-
-Copyright (C) 2009 by Artur Bergman
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.9 or,
-at your option, any later version of Perl 5 you may have available.
-
-
-=cut

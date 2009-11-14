@@ -67,7 +67,7 @@ int dump_main(int argc, char * const *argv) {
 
 
   struct NGR_metric_t *metric = NGR_open(filename);
-  struct NGR_range_t *range = NGR_range(metric, 0, 0, NGR_last_entry_idx(metric, 0));
+  struct NGR_range_t *range = NGR_range(metric, 0, NGR_last_entry_idx(metric, 0));
 
   int items = range->items;
   int i = 0;

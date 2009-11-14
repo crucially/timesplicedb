@@ -84,13 +84,13 @@ int agg_main(int argc, char * const *argv) {
 
 
   struct NGR_metric_t *metric    = NGR_open(filename);
-  struct NGR_range_t  *range     = NGR_timespan(metric, 0, start, end);
+  struct NGR_range_t  *range     = NGR_timespan(metric, start, end);
   struct NGR_range_t  *aggregate = NGR_aggregate(range, interval, NGR_GAUGE);
 
   int items = aggregate->items;
   int i = 0;
     while(items--) {
-      printf("AVG: %d      MAX: %d      MIN: %d      STDDEV: %d\n", aggregate->agg[i].avg, aggregate->agg[i].max, aggregate->agg[i].min, aggregate->agg[i].stddev);
+      printf("AVG: %.4f      MAX: %d      MIN: %d      STDDEV: %d\n", aggregate->agg[i].avg, aggregate->agg[i].max, aggregate->agg[i].min, aggregate->agg[i].stddev);
       i++;
     }
   return 0;

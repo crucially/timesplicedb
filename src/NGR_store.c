@@ -42,7 +42,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <time.h>
-
+#include <math.h>
 
 
 
@@ -168,11 +168,9 @@ int NGR_insert (struct NGR_metric_t *obj, int column, time_t timestamp, int valu
   end       what entry to stop at
 */
 
-struct NGR_range_t * NGR_range (struct NGR_metric_t *obj, int column, int start, int end) {
+struct NGR_range_t * NGR_range (struct NGR_metric_t *obj, int start, int end) {
   struct NGR_range_t *range;
   struct stat *file;
-
-  assert (column <= obj->columns - 1);
 
   range = malloc(sizeof(struct NGR_range_t));
   file = malloc(sizeof(struct stat));
@@ -195,10 +193,11 @@ struct NGR_range_t * NGR_range (struct NGR_metric_t *obj, int column, int start,
   range->area = mmap(0, range->len, PROT_READ, MAP_SHARED| MAP_FILE, obj->fd, 0);
   assert(range->area != (void*)-1);
   range->entry = (range->area + obj->base + (obj->width * start));
-  range->items = end - start;
+  range->items = end - start + 1;
   range->mmap = 1;
   range->agg = 0; 
   range->resolution = obj->resolution;
+  range->columns = obj->columns;
   return range;
 }
 
@@ -228,17 +227,14 @@ void NGR_range_free (struct NGR_range_t * range) {
    start     what time this starts from
    stop      and last time we want
 */
-struct NGR_range_t * NGR_timespan (struct NGR_metric_t *obj, int column, time_t start, time_t end) {
+struct NGR_range_t * NGR_timespan (struct NGR_metric_t *obj, time_t start, time_t end) {
   int start_offset, end_offset;
-
-  assert (column <= obj->columns - 1);
-  /* XXX should check we don't overflow */
 
 
   /* this just converts the timestamp into an offset that the range function takes */
-  start_offset = ((start - obj->created + obj->resolution) / obj->resolution);
-  end_offset = ((end - obj->created + obj->resolution) / obj->resolution);
-  return NGR_range(obj, column, start_offset, end_offset);
+  start_offset = ((start - obj->created) / obj->resolution);
+  end_offset = ((end - obj->created) / obj->resolution);
+  return NGR_range(obj, start_offset, end_offset);
 }
 
 
@@ -247,8 +243,8 @@ int NGR_last_entry_idx (struct NGR_metric_t *obj, int column) {
   assert (column <= obj->columns - 1);
   offset = lseek(obj->fd, 0 - obj->width, SEEK_END);
   if(offset < obj->base)
-    return 0;
-  return (((int)offset - obj->base) / obj->width + 1); /** is this really supposed to be please +1 **/
+    return -1;
+  return (((int)offset - obj->base) / obj->width); /** is this really supposed to be please +1 **/
 }
 
 
@@ -256,16 +252,20 @@ int NGR_entry (struct NGR_metric_t *obj, int column, int idx) {
   char *buf;
   int rv, read_len, offset;
   assert (column <= obj->columns - 1);
-  offset = (obj->width + (idx * obj->width));
+  offset = (obj->base + (idx * obj->width));
 
   buf = malloc(obj->width);
   assert(sizeof(rv) == obj->width);
   lseek(obj->fd, offset, SEEK_SET);
 
   read_len = read(obj->fd, buf, obj->width);
-  assert(read_len == obj->width);
-
-  memcpy(&rv, buf, obj->width);
+  if (read_len == 0) {
+    /* we are outside the length of the file
+       should really check if this is the case XXX */
+    rv = 0;
+  } else {
+    memcpy(&rv, buf, obj->width);
+  }
   free(buf);
   return rv;
 }
@@ -281,18 +281,20 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
   min = 2147483647; /** broken on 64bit, i know, and I haven't how to deal with signed or unsigned yet probably counters
 			are unsigned and gauge signed?**/
 
-  /* figure out how many buckets we need */
-  int buckets = (range->items / (interval / range->resolution));
-  printf("need %d buckets\n", buckets);
+  /* figure out how many buckets we need, switch to floating point and then round up */
+  int buckets = rint(ceil(((double)range->items / ((double)interval / (double)range->resolution))));
   aggregate = malloc(sizeof(struct NGR_range_t));
   aggregate->area = malloc(sizeof(int) * buckets);
   aggregate->agg = malloc(sizeof(struct NGR_agg_entry_t) * buckets);
   aggregate->mmap = 0;
   aggregate->items = buckets;
   aggregate->entry = aggregate->area;
+  aggregate->columns = range->columns;
+  int items_per_bucket = ((interval/range->resolution) - 1);
 
   while(src_items--) {
     int value;
+   
     if (data_type == NGR_GAUGE || curr_item == 0)
       value = range->entry[curr_item];
     else 
@@ -306,23 +308,34 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
     if (max < value)
       max = value;
 
-    if(items_seen++ == (interval/range->resolution)) {
+    if(items_seen++ == items_per_bucket) {
+      aggregate->agg[trg_items].items_averaged = items_seen;
       aggregate->entry[trg_items] = sum / items_seen;
       aggregate->agg[trg_items].max = max;
       aggregate->agg[trg_items].min = min;
       aggregate->agg[trg_items].stddev = ((sum_sqr - (sum * (sum / items_seen)))/(items_seen-1));
-      aggregate->agg[trg_items++].avg = sum / items_seen;
+      aggregate->agg[trg_items++].avg = (double)sum / (double)items_seen;
       sum_sqr = max = sum = items_seen = 0;
       min = 2147483647;
     }
     curr_item++;
   }
-  aggregate->agg[trg_items].avg = sum / items_seen;
-  aggregate->agg[trg_items].max = max;
-  aggregate->agg[trg_items].min = min;
-  aggregate->agg[trg_items].stddev = ((sum_sqr - (sum * (sum / items_seen)))/(items_seen-1));
-  aggregate->entry[trg_items++] = sum / items_seen;
-  /* XXX SSHOULD SET THE RESOLUTION ON AGGREGATE */
+
+  if (items_seen) {
+    aggregate->agg[trg_items].items_averaged = items_seen;
+    aggregate->agg[trg_items].avg = (double)sum / (double)items_seen;
+    aggregate->agg[trg_items].max = max;
+    aggregate->agg[trg_items].min = min;
+
+    if(items_seen == 1)
+      aggregate->agg[trg_items].stddev = 0;
+    else
+      aggregate->agg[trg_items].stddev = ((sum_sqr - (sum * (sum / items_seen)))/(items_seen-1));
+
+    aggregate->entry[trg_items] = sum / items_seen;
+    /* XXX SSHOULD SET THE RESOLUTION ON AGGREGATE */
+  }
+
   return aggregate;
 }
 
