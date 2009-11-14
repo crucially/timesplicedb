@@ -43,29 +43,30 @@
 #include <dlfcn.h>
 
 typedef int (*func_t)();
+int dispatch(void* handle, char* command, ...);
 
 
-int usage (char * message, ...) {
+int usage (const char * message, ...) {
   va_list ap;
   va_start(ap, message);
   char *string;
 
   if (message) {
 	if (string=va_arg(ap, char *)) {
-		WARN_FMT(message, string);
+		WARN(message, string);
 	} else {
 		WARN(message);
 	}
   } 
   WARN("Usage:");
-  WARN("ngr <command> ");
-  WARN("ngr help <command> ");
-  WARN("Available commands: ");
-  WARN("    info");
-  WARN("    dump");
-  WARN("    insert");
-  WARN("    create");
-  WARN("    agg");
+  WARN("ngr <command>\n");
+  WARN("ngr help <command>\n");
+  WARN("Available commands:\n");
+  WARN("    info\n");
+  WARN("    dump\n");
+  WARN("    insert\n");
+  WARN("    create\n");
+  WARN("    agg\n");
   return 1;
 }
 
@@ -75,13 +76,13 @@ int main(int argc, char **argv) {
 	return usage("You must pass in a command\n");
   }	
 
-  void* handle = dlopen(argv[0], RTLD_LAZY);
+  void* handle = dlopen(NULL, RTLD_LAZY);
   if (!handle) {
-	WARN_FMT("Couldn't load handle: %s\nSomething has gone seriously wrong.", dlerror());
+	WARN("Couldn't load handle: %s\nSomething has gone seriously wrong.\n", dlerror());
 	return 1;
   }
 
-  char* func_name;
+
 
   /* skip the arguments forward */
   argv++;
@@ -92,31 +93,47 @@ int main(int argc, char **argv) {
 	if (argc<2) {
 		ret = usage(NULL);
 	} else {
-	    int  length = 7+strlen(argv[1]);
-		func_name   = malloc(length);
-		snprintf(func_name, length, "%s_usage", argv[1]);
-    	func_t f  = (func_t) dlsym(handle, func_name);
-    	if (!f) {
-			ret = usage("Couldn't find help for '%s'\n", argv[1]);
-    	} else {
-			WARN_FMT("Usage: ngr %s [options]\n", argv[1]);
-	    	ret = f();
-		}
+		ret = dispatch(handle, argv[1], 0);
 	}
   } else {
-	int length  = 6+strlen(argv[0]);
-	func_name   = malloc(length);
-	snprintf(func_name, length, "%s_main", argv[0]); 
-    func_t f  = (func_t) dlsym(handle, func_name);
-    if (!f) {
-		ret = usage("Couldn't find command '%s'\n", argv[0]);
-    } else {
-    	ret = f(argc, argv);	
-	}
+    ret = dispatch(handle, argv[0], argc, argv);
   }
   
-
-  dlclose(handle);
+  if (handle)
+	  dlclose(handle);
 
   return ret;
+}
+
+int dispatch(void* handle, char * command, ...) {
+  va_list ap;
+  va_start(ap, command);
+  int argc = 0;
+  char **argv;	
+  char *func_name;	
+
+  // if we're being passed argc and argv then we call <command>_main
+  if ((argc=va_arg(ap, int)) && (argv=va_arg(ap, char **))) {
+	int length = 6+strlen(command);
+	func_name = malloc(length);
+	snprintf(func_name, length, "%s_main", command);	
+  } else {
+  // otherwise we're calling <command>_usage
+	int length = 7+strlen(command);
+	func_name = malloc(length);
+	snprintf(func_name, length, "%s_usage", command);
+  }
+
+  func_t f  = (func_t) dlsym(handle, func_name);
+  if (!f) {
+  	return usage("Couldn't find command '%s'\n", command);
+  }
+
+  if (argc) {
+    return f(argc, argv);
+  } else {
+  	WARN("Usage: ngr %s [options]\n", command);
+	return f();
+  }
+  return 0;
 }
