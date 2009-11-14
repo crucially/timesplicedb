@@ -38,6 +38,12 @@
 #define NGR_GAUGE   0
 #define NGR_COUNTER 1
 
+#define NULL (0)
+#define WARN_FMT(fmt, args...) fprintf(stderr, fmt, ## args);	
+#define WARN(string) WARN_FMT("%s\n", string)
+#define strneq(s1, s2, n) (strncmp((s1), (s2), n) == 0)
+
+
 struct NGR_metric_t {
   u_int32_t  width;      /* are we in 32bit mode or 64bit  (4 bytes versus 8 bytes) */
   int        fd;         /* the underlying file */

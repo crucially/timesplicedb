@@ -42,9 +42,8 @@
 extern char *optarg;
 
 int dump_usage () {
-  printf("Usage:\n");
-  printf(" -f filename  db to get info about\n");
-  printf(" -h this help\n");
+  WARN(" -f filename  db to get info about\n");
+  WARN(" -h this help\n");
   return 1;
 }
 

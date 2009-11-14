@@ -43,9 +43,8 @@ extern char *optarg;
 
 
 int info_usage () {
-  printf("Usage:\n");
-  printf(" -f filename  db to get info about\n");
-  printf(" -h this help\n");
+  WARN(" -f filename  db to get info about\n");
+  WARN(" -h this help\n");
   return 1;
 }
 
@@ -59,9 +58,8 @@ int info_main(int argc, char **argv) {
 
     switch(o) {
     case 'f':
-	  DEBUG_FMT("%s\n", o);	
-      //filename = malloc(strlen(optarg)+1);
-      //memcpy(filename, optarg, strlen(optarg)+1);
+      filename = malloc(strlen(optarg)+1);
+      memcpy(filename, optarg, strlen(optarg)+1);
       break;
     }
   }

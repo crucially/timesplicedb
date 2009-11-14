@@ -42,13 +42,12 @@
 extern char *optarg;
 
 int insert_usage () {
-  printf("Usage:\n");
-  printf(" -f filename  db to get info about\n");
-  printf(" -t timestamp to insert this value at; defaults to now (unix timestamp)\n");
-  printf(" -v value to insert (integer)\n");
-  printf(" -h this help\n\n\n");
-  printf("Insert a value at a given time\n");
-  printf("\tngr insert -f data.ngr -t 1258096151 -v 50\n\n");
+  WARN(" -f filename  db to get info about\n");
+  WARN(" -t timestamp to insert this value at; defaults to now (unix timestamp)\n");
+  WARN(" -v value to insert (integer)\n");
+  WARN(" -h this help\n\n\n");
+  WARN("Insert a value at a given time\n");
+  WARN("\tngr insert -f data.ngr -t 1258096151 -v 50\n\n");
   return 1;
 }
 

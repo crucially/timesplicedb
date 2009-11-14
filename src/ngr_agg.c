@@ -43,14 +43,13 @@
 extern char *optarg;
 
 int agg_usage () {
-  printf("Usage:\n");
-  printf(" -f filename  db to get info about\n");
-  printf(" -s start aggregating from this timestamp (unix timestamp)\n");
-  printf(" -e aggregate until this timestamp (unix timestamp\n");
-  printf(" -i interval to aggregate down to (seconds)\n");
-  printf(" -h this help\n\n\n");
-  printf("Aggregate a 24 hour period into 12 buckets each with the aggregate of an hour\n");
-  printf("\tngr agg -f data.ngr -s 1258096151 -e 1258182558 -i 3600\n\n");
+  WARN(" -f filename  db to get info about\n");
+  WARN(" -s start aggregating from this timestamp (unix timestamp)\n");
+  WARN(" -e aggregate until this timestamp (unix timestamp\n");
+  WARN(" -i interval to aggregate down to (seconds)\n");
+  WARN(" -h this help\n\n\n");
+  WARN("Aggregate a 24 hour period into 12 buckets each with the aggregate of an hour\n");
+  WARN("\tngr agg -f data.ngr -s 1258096151 -e 1258182558 -i 3600\n\n");
   return 1;
 }
 
