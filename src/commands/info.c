@@ -43,8 +43,8 @@ extern char *optarg;
 
 
 int info_usage () {
-  WARN(" -f filename  db to get info about");
-  WARN(" -h this help");
+  WARN(" -f filename  db to get info about\n");
+  WARN(" -h this help\n");
   return 1;
 }
 
@@ -66,9 +66,10 @@ int info_main(int argc, char **argv) {
 
 
   
-  if (!filename)
+  if (!filename) {
+    WARN("Usage: ngr info [options]\n");
     return info_usage();
-
+  }
 
   struct NGR_metric_t *metric = NGR_open(filename);
   time_t last_entry = (metric->created + (NGR_last_entry_idx(metric, 0) * metric->resolution));

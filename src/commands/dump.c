@@ -42,8 +42,8 @@
 extern char *optarg;
 
 int dump_usage () {
-  WARN(" -f filename  db to get info about");
-  WARN(" -h this help");
+  WARN(" -f filename  db to get info about\n");
+  WARN(" -h this help\n");
   return 1;
 }
 
@@ -62,9 +62,10 @@ int dump_main(int argc, char * const *argv) {
     }
   }
   
-  if (!filename)
+  if (!filename) {
+	WARN("Usage: ngr dump [options]\n");
     return dump_usage();
-
+  }
 
   struct NGR_metric_t *metric = NGR_open(filename);
   struct NGR_range_t *range = NGR_range(metric, 0, NGR_last_entry_idx(metric, 0));

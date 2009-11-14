@@ -43,11 +43,11 @@
 extern char *optarg;
 
 int create_usage () {
-  WARN(" -f filename  db to get info about");
-  WARN(" -r resolution for each entry in the time series (seconds)");
-  WARN(" -c the time of the first entry in the time series (unix timestamp)");
+  WARN(" -f filename  db to get info about\n");
+  WARN(" -r resolution for each entry in the time series (seconds)\n");
+  WARN(" -c the time of the first entry in the time series (unix timestamp)\n");
   WARN(" -h this help\n\n");
-  WARN("Create a database starting at a given time with a storage interval of every 10 minutes");
+  WARN("Create a database starting at a given time with a storage interval of every 10 minutes\n");
   WARN("\tngr create -f data.ngr -c 1258096151 -r 600\n");
   return 1;
 }
@@ -73,15 +73,17 @@ int create_main(int argc, char * const *argv) {
       created_time = atoi(optarg);
       break;
     case 'h':
+ 	  WARN("Usage: ngr create [options]\n");
       return create_usage();
       break;
     }
 
   }
   
-  if(!filename)
+  if(!filename) {
+    WARN("Usage: ngr create [options]\n");
     return create_usage();
-
+  }
   struct NGR_metric_t *metric = NGR_create(filename, created_time, resolution, 0);
 
   time_t last_entry = (metric->created + (NGR_last_entry_idx(metric, 0) * 60));

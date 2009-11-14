@@ -34,7 +34,7 @@
 #include <stdio.h>
 
 int bench_usage() {
-	WARN("no options");
+	WARN("no options\n");
 }
 
 int bench_main(int argc, char **argv) {
