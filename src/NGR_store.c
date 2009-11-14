@@ -273,8 +273,8 @@ int NGR_entry (struct NGR_metric_t *obj, int column, int idx) {
 
 struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int data_type) {
   struct NGR_range_t *aggregate;
-  int src_items, trg_items, items_seen, curr_item, sum, sum_sqr, min, max;
-  
+  int src_items, trg_items, items_seen, curr_item, sum, min, max;
+  double sum_sqr;
 
   src_items = range->items;
   max = sum_sqr = sum = curr_item = items_seen = trg_items = 0;
@@ -301,7 +301,8 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
       value = range->entry[curr_item] - range->entry[curr_item-1];
     
     sum += value;
-    sum_sqr += value*value;
+
+    sum_sqr += (double)value * (double)value;
 
     if (min > value)
       min = value;
@@ -309,12 +310,13 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
       max = value;
 
     if(items_seen++ == items_per_bucket) {
+      double avg = (double)sum / (double)items_seen;
       aggregate->agg[trg_items].items_averaged = items_seen;
       aggregate->entry[trg_items] = sum / items_seen;
       aggregate->agg[trg_items].max = max;
       aggregate->agg[trg_items].min = min;
-      aggregate->agg[trg_items].stddev = ((sum_sqr - (sum * (sum / items_seen)))/(items_seen-1));
-      aggregate->agg[trg_items++].avg = (double)sum / (double)items_seen;
+      aggregate->agg[trg_items].stddev = ((sum_sqr - sum * avg)/(items_seen-1));
+      aggregate->agg[trg_items++].avg = avg;
       sum_sqr = max = sum = items_seen = 0;
       min = 2147483647;
     }

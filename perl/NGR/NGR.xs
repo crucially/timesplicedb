@@ -156,7 +156,7 @@ range_entry_max(obj, column, idx)
 	OUTPUT:
 	RETVAL
 
-int
+double
 range_entry_stddev(obj, column, idx)
 	struct NGR_range_t *	obj
 	int	column

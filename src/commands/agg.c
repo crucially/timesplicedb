@@ -90,7 +90,7 @@ int agg_main(int argc, char * const *argv) {
   int items = aggregate->items;
   int i = 0;
     while(items--) {
-      printf("AVG: %.4f      MAX: %d      MIN: %d      STDDEV: %d\n", aggregate->agg[i].avg, aggregate->agg[i].max, aggregate->agg[i].min, aggregate->agg[i].stddev);
+      printf("AVG: %.4f      MAX: %d      MIN: %d      STDDEV: %f\n", aggregate->agg[i].avg, aggregate->agg[i].max, aggregate->agg[i].min, aggregate->agg[i].stddev);
       i++;
     }
   return 0;
