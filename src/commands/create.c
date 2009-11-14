@@ -43,12 +43,12 @@
 extern char *optarg;
 
 int create_usage () {
-  WARN(" -f filename  db to get info about\n");
-  WARN(" -r resolution for each entry in the time series (seconds)\n");
-  WARN(" -c the time of the first entry in the time series (unix timestamp)\n");
-  WARN(" -h this help\n\n\n");
-  WARN("Create a database starting at a given time with a storage interval of every 10 minutes\n");
-  WARN("\tngr create -f data.ngr -c 1258096151 -r 600\n\n");
+  WARN(" -f filename  db to get info about");
+  WARN(" -r resolution for each entry in the time series (seconds)");
+  WARN(" -c the time of the first entry in the time series (unix timestamp)");
+  WARN(" -h this help\n\n");
+  WARN("Create a database starting at a given time with a storage interval of every 10 minutes");
+  WARN("\tngr create -f data.ngr -c 1258096151 -r 600\n");
   return 1;
 }
 
