@@ -60,6 +60,12 @@ int usage (char * message, ...) {
   WARN("Usage:");
   WARN("ngr <command> ");
   WARN("ngr help <command> ");
+  WARN("Available commands: ");
+  WARN("    info");
+  WARN("    dump");
+  WARN("    insert");
+  WARN("    create");
+  WARN("    agg");
   return 1;
 }
 
