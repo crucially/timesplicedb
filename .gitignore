@@ -2,6 +2,7 @@
 *.o
 *.dSYM
 ngr_*
+ngr
 *~
 Makefile.in
 Makefile
