@@ -42,18 +42,18 @@
 
 extern char *optarg;
 
-int usage () {
+int create_usage () {
   printf("Usage:\n");
   printf(" -f filename  db to get info about\n");
   printf(" -r resolution for each entry in the time series (seconds)\n");
   printf(" -c the time of the first entry in the time series (unix timestamp)\n");
   printf(" -h this help\n\n\n");
   printf("Create a database starting at a given time with a storage interval of every 10 minutes\n");
-  printf("\tngr_create -f data.ngr -c 1258096151 -r 600\n\n");
+  printf("\tngr create -f data.ngr -c 1258096151 -r 600\n\n");
   return 1;
 }
 
-int main(int argc, char * const *argv) {
+int create_main(int argc, char * const *argv) {
   int o, resolution;
   time_t created_time;
   char *filename = 0;
@@ -74,14 +74,14 @@ int main(int argc, char * const *argv) {
       created_time = atoi(optarg);
       break;
     case 'h':
-      return usage();
+      return create_usage();
       break;
     }
 
   }
   
   if(!filename)
-    return usage();
+    return create_usage();
 
   struct NGR_metric_t *metric = NGR_create(filename, created_time, resolution, 0);
 

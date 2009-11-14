@@ -42,30 +42,35 @@
 extern char *optarg;
 
 
-int usage () {
+int info_usage () {
   printf("Usage:\n");
   printf(" -f filename  db to get info about\n");
   printf(" -h this help\n");
   return 1;
 }
 
-int main(int argc, char * const *argv) {
+int info_main(int argc, char **argv) {
   int o;
   char *filename;
-  filename = 0;
+  filename = NULL;
+
   while ((o = getopt(argc, argv,
 		     "f:h")) != -1) {
 
     switch(o) {
     case 'f':
-      filename = malloc(strlen(optarg)+1);
-      memcpy(filename, optarg, strlen(optarg)+1);
+	  DEBUG_FMT("%s\n", o);	
+      //filename = malloc(strlen(optarg)+1);
+      //memcpy(filename, optarg, strlen(optarg)+1);
       break;
     }
   }
+
+
   
   if (!filename)
-    return usage();
+    return info_usage();
+
 
   struct NGR_metric_t *metric = NGR_open(filename);
   time_t last_entry = (metric->created + (NGR_last_entry_idx(metric, 0) * metric->resolution));

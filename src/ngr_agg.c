@@ -42,7 +42,7 @@
 
 extern char *optarg;
 
-int usage () {
+int agg_usage () {
   printf("Usage:\n");
   printf(" -f filename  db to get info about\n");
   printf(" -s start aggregating from this timestamp (unix timestamp)\n");
@@ -50,11 +50,11 @@ int usage () {
   printf(" -i interval to aggregate down to (seconds)\n");
   printf(" -h this help\n\n\n");
   printf("Aggregate a 24 hour period into 12 buckets each with the aggregate of an hour\n");
-  printf("\tngr_agg -f data.ngr -s 1258096151 -e 1258182558 -i 3600\n\n");
+  printf("\tngr agg -f data.ngr -s 1258096151 -e 1258182558 -i 3600\n\n");
   return 1;
 }
 
-int main(int argc, char * const *argv) {
+int agg_main(int argc, char * const *argv) {
   int o, start, end, interval;
   char *filename = 0;
   
@@ -81,7 +81,7 @@ int main(int argc, char * const *argv) {
   }
   
   if(!filename || !start || !end || !interval)
-    return usage();
+    return agg_usage();
 
 
   struct NGR_metric_t *metric    = NGR_open(filename);

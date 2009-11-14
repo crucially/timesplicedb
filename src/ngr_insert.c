@@ -41,18 +41,18 @@
 
 extern char *optarg;
 
-int usage () {
+int insert_usage () {
   printf("Usage:\n");
   printf(" -f filename  db to get info about\n");
   printf(" -t timestamp to insert this value at; defaults to now (unix timestamp)\n");
   printf(" -v value to insert (integer)\n");
   printf(" -h this help\n\n\n");
   printf("Insert a value at a given time\n");
-  printf("\tngr_insert -f data.ngr -t 1258096151 -v 50\n\n");
+  printf("\tngr insert -f data.ngr -t 1258096151 -v 50\n\n");
   return 1;
 }
 
-int main(int argc, char * const *argv) {
+int insert_main(int argc, char * const *argv) {
   int o, value;
   time_t insert_time;
   char *filename = 0;
@@ -77,7 +77,7 @@ int main(int argc, char * const *argv) {
   }
 
   if (!filename || !value)
-    return usage();
+    return insert_usage();
 
   struct NGR_metric_t *metric = NGR_open(filename);
 

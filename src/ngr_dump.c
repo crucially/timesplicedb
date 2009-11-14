@@ -41,14 +41,14 @@
 
 extern char *optarg;
 
-int usage () {
+int dump_usage () {
   printf("Usage:\n");
   printf(" -f filename  db to get info about\n");
   printf(" -h this help\n");
   return 1;
 }
 
-int main(int argc, char * const *argv) {
+int dump_main(int argc, char * const *argv) {
   int o;
   char *filename = 0;
 
@@ -64,7 +64,7 @@ int main(int argc, char * const *argv) {
   }
   
   if (!filename)
-    return usage();
+    return dump_usage();
 
 
   struct NGR_metric_t *metric = NGR_open(filename);
