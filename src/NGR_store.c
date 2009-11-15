@@ -132,6 +132,10 @@ struct NGR_metric_t * NGR_open(const char *filename) {
   return obj;
 }
 
+int NGR_close(struct NGR_metric_t *obj) {
+	close(obj->fd);
+	free(obj);
+}
 
 /* 
    column     which column to write in
