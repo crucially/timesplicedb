@@ -10,6 +10,26 @@ MODULE = NGR		PACKAGE = NGR::C	PREFIX=NGR_
 
 INCLUDE: const-xs.inc
 
+
+char* metric_name(obj);
+    	struct NGR_metric_t *	obj
+	CODE:
+	RETVAL = obj->names[0];
+	OUTPUT:
+	RETVAL      
+
+HV* metric_meta(obj);
+    	struct NGR_metric_t *	obj
+	CODE:
+	int i; 
+	RETVAL = newHV();
+	for(i = 1; i < obj->columns + 1; i++) {
+	      SV* flags = newSViv(obj->flags[i]);
+	      hv_store(RETVAL, (char*) obj->names[i], strlen(obj->names[i]), flags, 0);
+	}	
+	OUTPUT:
+	RETVAL      
+
 int metric_created(obj);
     	struct NGR_metric_t *	obj
 	CODE:

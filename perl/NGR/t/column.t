@@ -1,6 +1,6 @@
 
 
-use Test::More tests => 25;
+use Test::More tests => 27;
 BEGIN { use_ok('NGR') };
 
 use strict;
@@ -12,6 +12,7 @@ my $ngr = NGR->new(
     filename    => 'columntest.ngrd',
     resolution  => 60,
     columns     => { col1 => 1, col2 => 1},
+    name  => "test database",
     create_time => $ct);
 
 my $col0 = 1;
@@ -32,6 +33,10 @@ foreach(1..9) {
     $it += 60;
 }
 
+
+is($ngr->name, "test database", "");
+
+is_deeply($ngr->meta, { "col1" => 1, "col2" => 1 }, "");
 
 is($ngr->columns, 2);
 is($ngr->rows, 9);

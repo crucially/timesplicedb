@@ -108,6 +108,15 @@ sub last_updated {
     my $self = shift;
     return ($self->created + ($self->last_row_idx(column => 0) * $self->resolution));
 }
+sub name {
+    my $self = shift;
+    return NGR::C::metric_name($self->{ctx});
+}
+
+sub meta {
+    my $self = shift;
+    return NGR::C::metric_meta($self->{ctx});
+}
 
 sub timespan {
     my $self = shift;
