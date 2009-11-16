@@ -63,7 +63,6 @@ struct NGR_metric_t * NGR_create(const char *filename, time_t created_time, int 
   int   fd, write_len;
   int   size = sizeof(int);
   int   version = 1;
-  columns = 1; // only support one for now
 
   if(!created_time)
     created_time = time(NULL);
@@ -158,7 +157,7 @@ int NGR_insert (struct NGR_metric_t *obj, int column, time_t timestamp, int valu
      calculate the difference, and then turn that into a byte offset */
 
   entry  = ((timestamp - obj->created) / obj->resolution);
-  offset = (obj->base + ( entry * obj->width ) );
+  offset = (obj->base + ( entry * ( obj->width * obj->columns )) + ( column * obj->width ));
   lseek(obj->fd, offset, SEEK_SET);
   write_len = write(obj->fd, &value, obj->width);
   assert(write_len == obj->width);
@@ -245,10 +244,10 @@ struct NGR_range_t * NGR_timespan (struct NGR_metric_t *obj, time_t start, time_
 int NGR_last_entry_idx (struct NGR_metric_t *obj, int column) {
   int offset;
   assert (column <= obj->columns - 1);
-  offset = lseek(obj->fd, 0 - obj->width, SEEK_END);
+  offset = lseek(obj->fd, 0 - (obj->width * obj->columns), SEEK_END);
   if(offset < obj->base)
     return -1;
-  return (((int)offset - obj->base) / obj->width); /** is this really supposed to be please +1 **/
+  return (((int)offset - obj->base) / (obj->width * obj->columns)); /** is this really supposed to be please +1 **/
 }
 
 
@@ -256,8 +255,7 @@ int NGR_entry (struct NGR_metric_t *obj, int column, int idx) {
   char *buf;
   int rv, read_len, offset;
   assert (column <= obj->columns - 1);
-  offset = (obj->base + (idx * obj->width));
-
+  offset = (obj->base + (idx * ( obj->width * obj->columns)) + (column * obj->width));
   buf = malloc(obj->width);
   assert(sizeof(rv) == obj->width);
   lseek(obj->fd, offset, SEEK_SET);
