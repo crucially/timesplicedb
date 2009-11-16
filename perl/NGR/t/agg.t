@@ -11,7 +11,9 @@ my $ngr = NGR->new(
     create      => 1,
     filename    => 'aggtest.ngrd',
     resolution  => 60,
-    columns     => 1,
+    columns     => {
+		    test => 0
+		   },
     create_time => $ct);
 
 foreach(1..9) {

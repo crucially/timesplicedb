@@ -11,7 +11,7 @@ my $ngr = NGR->new(
     create      => 1,
     filename    => 'columntest.ngrd',
     resolution  => 60,
-    columns     => 2,
+    columns     => { col1 => 1, col2 => 1},
     create_time => $ct);
 
 my $col0 = 1;

@@ -13,15 +13,27 @@ sub new {
     my %options = @_;
 
     my $self = bless {}, $class;
+    my $names = [$options{name} || ""];
+    my $flags = [$options{flags} || 0];
+    my $columns = 0;
+    foreach my $column (keys %{$options{columns}}) {
+	$columns++;
+	$names->[$columns] = $column;
+	$flags->[$columns] = $options{columns}->{$column};
+    }
+
+    for(0..$options{columns}) {
+	
+    }
 
     
     if($options{create}) {
 	$self->{ctx} = NGR::C::create( $options{filename},
 				       $options{create_time},
 				       $options{resolution},
-				       $options{columns},
-				       [0,1,2,3],
-				       [0,1,2,3],
+				       $columns,
+				       $names,
+				       $flags,
 	    );
     } else {
 	$self->{ctx} = NGR::C::open( $options{filename} );

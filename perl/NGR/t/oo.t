@@ -12,7 +12,9 @@ my $ngr = NGR->new(
     create      => 1,
     filename    => 'ootest.ngrd',
     resolution  => 120,
-    columns     => 1,
+    columns     => {
+	test => 0,
+    },
     create_time => $ct);
 
 
@@ -52,9 +54,9 @@ is($ngr->cell(column => 0,
 is($ngr->last_row_idx, 1, ""); 
 is($ngr->rows, 2);
 
-my $it = time();
+my $it = $ct + 86400;
 $ngr->insert(column    => 0,
-	     timestamp => $it-1,
+	     timestamp => $it - 1,
 	     value     => 10);
 
 my $info = $ngr->info();
@@ -70,7 +72,6 @@ is_deeply($info, {
 	});
 
 is($ngr->last_updated, $it - 120, "Last modified is the value of the row");
-
 END {
     unlink("ootest.ngrd");
 };
