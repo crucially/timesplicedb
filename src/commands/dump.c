@@ -70,9 +70,9 @@ int dump_main(int argc, char * const *argv) {
   struct NGR_metric_t *metric = NGR_open(filename);
   struct NGR_range_t *range = NGR_range(metric, 0, NGR_last_entry_idx(metric, 0));
 
-  int items = range->items;
+  int rows = range->rows;
   int i = 0;
-    while(items--) {
+    while(rows--) {
       printf("%d\n", range->entry[i++]);
     }
   
