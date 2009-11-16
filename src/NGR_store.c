@@ -293,10 +293,11 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
   src_cells = src_rows * range->columns;
 
   int i = 0;
-  while(i++ < range->columns) {
+  while(i < range->columns) {
     counters[i].cells_counted = counters[i].sum = counters[i].max = 0;
     counters[i].min = 2147483647; /** broken on 64bit, i know, and I haven't how to deal with signed or unsigned yet probably counters
 			are unsigned and gauge signed?**/
+    i++;
   }
 
   /* figure out how many buckets we need, switch to floating point and then round up */
@@ -335,9 +336,10 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
 
     if(cells_seen++ == rows_per_bucket * range->columns) {
 
-      for(i = 0; i++; i < range->columns) {
 
-
+      int i = 0;
+      while(i < range->columns) {
+	i++;
 	/**
 	double avg = (double)counter->sum / (double)items_seen;
 	aggregate->agg[trg_items].rows_averaged = items_seen;
