@@ -44,6 +44,9 @@
 
 
 struct NGR_metric_t {
+  unsigned   magic;
+#define NGR_metric_magic 0x35fac554
+
   u_int32_t  width;      /* are we in 32bit mode or 64bit  (4 bytes versus 8 bytes) */
   int        fd;         /* the underlying file */
   int        base;       /* how many bytes the header consumes */
@@ -59,6 +62,9 @@ struct NGR_metric_t {
 };
 
 struct NGR_range_t {
+  unsigned   magic;
+#define NGR_range_magic 0x6428b5c9
+
   int *row;                  /* ptr into the first row in the range */
   void *area;                  /* if a range and a not an aggregate this points to the mmap of the file */ 
   int rows;                    /* how many rows exist in the range */

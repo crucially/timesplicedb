@@ -113,7 +113,7 @@ struct NGR_metric_t * NGR_open(const char *filename) {
   struct NGR_metric_t *obj;
 
   obj = malloc(sizeof(struct NGR_metric_t));
-
+  obj->magic = NGR_metric_magic;
   obj->fd = open(filename, O_RDWR);
 
   if(obj->fd == -1)
@@ -168,6 +168,7 @@ struct NGR_metric_t * NGR_open(const char *filename) {
 }
 
 int NGR_close(struct NGR_metric_t *obj) {
+  assert(obj->magic == NGR_metric_magic);
   assert(obj->ranges == 0);
   close(obj->fd);
   free(obj);
@@ -181,7 +182,9 @@ int NGR_close(struct NGR_metric_t *obj) {
 
 int NGR_insert (struct NGR_metric_t *obj, int column, time_t timestamp, int value) {
   int  row, offset, write_len;
-  
+
+  assert(obj->magic == NGR_metric_magic);
+
   if (!timestamp)
     timestamp = time(NULL);
 
@@ -212,9 +215,12 @@ struct NGR_range_t * NGR_range (struct NGR_metric_t *obj, int start, int end) {
   struct NGR_range_t *range;
   struct stat *file;
 
+  assert(obj->magic == NGR_metric_magic);
+
   range = malloc(sizeof(struct NGR_range_t));
   file = malloc(sizeof(struct stat));
   fstat(obj->fd, file);
+  range->magic = NGR_range_magic;
 
   /* if the range goes byond the file, map that as well */
   if ((end * obj->width + obj->base) > file->st_size)
@@ -251,7 +257,7 @@ struct NGR_range_t * NGR_range (struct NGR_metric_t *obj, int start, int end) {
 */
 
 void NGR_range_free (struct NGR_range_t * range) {
-
+  assert(range->magic == NGR_range_magic);
   range->metric->ranges--;
 
   if (range->mmap == 1)
@@ -274,6 +280,7 @@ void NGR_range_free (struct NGR_range_t * range) {
 struct NGR_range_t * NGR_timespan (struct NGR_metric_t *obj, time_t start, time_t end) {
   int start_offset, end_offset;
 
+  assert(obj->magic == NGR_metric_magic);
 
   /* this just converts the timestamp into an offset that the range function takes */
   start_offset = ((start - obj->created) / obj->resolution);
@@ -284,6 +291,7 @@ struct NGR_range_t * NGR_timespan (struct NGR_metric_t *obj, time_t start, time_
 
 int NGR_last_row_idx (struct NGR_metric_t *obj, int column) {
   int offset;
+  assert(obj->magic == NGR_metric_magic);
   assert (column <= obj->columns - 1);
   offset = lseek(obj->fd, 0 - (obj->width * obj->columns), SEEK_END);
   if(offset < obj->base)
@@ -295,6 +303,7 @@ int NGR_last_row_idx (struct NGR_metric_t *obj, int column) {
 int NGR_cell (struct NGR_metric_t *obj, int row, int column) {
   char *buf;
   int rv, read_len, offset;
+  assert(obj->magic == NGR_metric_magic);
   assert (column <= obj->columns - 1);
   offset = (obj->base + (row * ( obj->width * obj->columns)) + (column * obj->width));
   buf = malloc(obj->width);
@@ -325,6 +334,7 @@ struct NGR_agg_counters_t {
 struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int data_type) {
   struct NGR_range_t *aggregate;
   struct NGR_agg_counters_t *counters;
+  assert(range->magic == NGR_range_magic);
   int src_rows, src_cells, curr_cell, trg_cell;
   src_rows = src_cells = curr_cell = trg_cell = 0;
 
