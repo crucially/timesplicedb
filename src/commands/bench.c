@@ -47,8 +47,8 @@ int bench_main(int argc, char **argv) {
   return;
   //  struct NGR_metric_t *metric = NGR_open("host", "metric_year");
   printf("width: %d; created: %d\n", metric->width, metric->created);
-  int idx = NGR_last_entry_idx(metric);
-  printf("entry: %d\n", NGR_entry(metric,NGR_last_entry_idx(metric)));
+  int idx = NGR_last_row_idx(metric);
+  printf("row: %d\n", NGR_row(metric,NGR_last_row_idx(metric)));
 
   {
 
@@ -78,8 +78,8 @@ int bench_main(int argc, char **argv) {
     int items = range->items;
     int i = 0;
     while(items--) {
-      int foo = range->entry[i++];
-      //      printf("%d\n", range->entry[i++]);
+      int foo = range->row[i++];
+      //      printf("%d\n", range->row[i++]);
     }
     gettimeofday(&how_fast_stop, NGR_NULL);
     printf("%d.%d\n", how_fast_start.tv_sec, how_fast_start.tv_usec);

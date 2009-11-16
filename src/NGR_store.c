@@ -145,7 +145,7 @@ int NGR_close(struct NGR_metric_t *obj) {
 */
 
 int NGR_insert (struct NGR_metric_t *obj, int column, time_t timestamp, int value) {
-  int  entry, offset, write_len;
+  int  row, offset, write_len;
   
   if (!timestamp)
     timestamp = time(NULL);
@@ -154,23 +154,23 @@ int NGR_insert (struct NGR_metric_t *obj, int column, time_t timestamp, int valu
   assert( timestamp >= obj->created );
   assert (timestamp <= time(NULL) );
 
-  /* We have to transform the timestamp to a entry index and then into a byte offset
+  /* We have to transform the timestamp to a row index and then into a byte offset
      This is rather trivial because we know the value that it was created by, and we can 
      calculate the difference, and then turn that into a byte offset */
 
-  entry  = ((timestamp - obj->created) / obj->resolution);
-  offset = (obj->base + ( entry * ( obj->width * obj->columns )) + ( column * obj->width ));
+  row  = ((timestamp - obj->created) / obj->resolution);
+  offset = (obj->base + ( row * ( obj->width * obj->columns )) + ( column * obj->width ));
   lseek(obj->fd, offset, SEEK_SET);
   write_len = write(obj->fd, &value, obj->width);
   assert(write_len == obj->width);
-  return entry;
+  return row;
 }
 
 
 /*
   column    which column to retrieve
-  start     which entry to start with, indexed from 0
-  end       what entry to stop at
+  start     which row to start with, indexed from 0
+  end       what row to stop at
 */
 
 struct NGR_range_t * NGR_range (struct NGR_metric_t *obj, int start, int end) {
@@ -197,7 +197,7 @@ struct NGR_range_t * NGR_range (struct NGR_metric_t *obj, int start, int end) {
   free(file);
   range->area = mmap(0, range->len, PROT_READ, MAP_SHARED| MAP_FILE, obj->fd, 0);
   assert(range->area != (void*)-1);
-  range->entry = (range->area + obj->base + (obj->width * start));
+  range->row = (range->area + obj->base + (obj->width * start));
   range->rows = end - start + 1;
   range->mmap = 1;
   range->agg = 0; 
@@ -243,7 +243,7 @@ struct NGR_range_t * NGR_timespan (struct NGR_metric_t *obj, time_t start, time_
 }
 
 
-int NGR_last_entry_idx (struct NGR_metric_t *obj, int column) {
+int NGR_last_row_idx (struct NGR_metric_t *obj, int column) {
   int offset;
   assert (column <= obj->columns - 1);
   offset = lseek(obj->fd, 0 - (obj->width * obj->columns), SEEK_END);
@@ -253,7 +253,7 @@ int NGR_last_entry_idx (struct NGR_metric_t *obj, int column) {
 }
 
 
-int NGR_entry (struct NGR_metric_t *obj, int column, int idx) {
+int NGR_row (struct NGR_metric_t *obj, int column, int idx) {
   char *buf;
   int rv, read_len, offset;
   assert (column <= obj->columns - 1);
@@ -289,10 +289,10 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
   int buckets = rint(ceil(((double)range->rows / ((double)interval / (double)range->resolution))));
   aggregate = malloc(sizeof(struct NGR_range_t));
   aggregate->area = malloc(sizeof(int) * buckets);
-  aggregate->agg = malloc(sizeof(struct NGR_agg_entry_t) * buckets);
+  aggregate->agg = malloc(sizeof(struct NGR_agg_row_t) * buckets);
   aggregate->mmap = 0;
   aggregate->rows = buckets;
-  aggregate->entry = aggregate->area;
+  aggregate->row = aggregate->area;
   aggregate->columns = range->columns;
   int items_per_bucket = ((interval/range->resolution) - 1);
 
@@ -300,9 +300,9 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
     int value;
    
     if (data_type == NGR_GAUGE || curr_item == 0)
-      value = range->entry[curr_item];
+      value = range->row[curr_item];
     else 
-      value = range->entry[curr_item] - range->entry[curr_item-1];
+      value = range->row[curr_item] - range->row[curr_item-1];
     
     sum += value;
 
@@ -316,7 +316,7 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
     if(items_seen++ == items_per_bucket) {
       double avg = (double)sum / (double)items_seen;
       aggregate->agg[trg_items].rows_averaged = items_seen;
-      aggregate->entry[trg_items] = sum / items_seen;
+      aggregate->row[trg_items] = sum / items_seen;
       aggregate->agg[trg_items].max = max;
       aggregate->agg[trg_items].min = min;
       if (items_seen == 1)
@@ -342,7 +342,7 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
     else
       aggregate->agg[trg_items].stddev = ((sum_sqr - sum * avg)/(items_seen-1));
 
-    aggregate->entry[trg_items] = sum / items_seen;
+    aggregate->row[trg_items] = sum / items_seen;
     /* XXX SSHOULD SET THE RESOLUTION ON AGGREGATE */
   }
 

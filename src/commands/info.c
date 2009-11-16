@@ -72,11 +72,11 @@ int info_main(int argc, char **argv) {
   }
 
   struct NGR_metric_t *metric = NGR_open(filename);
-  time_t last_entry = (metric->created + (NGR_last_entry_idx(metric, 0) * metric->resolution));
+  time_t last_row = (metric->created + (NGR_last_row_idx(metric, 0) * metric->resolution));
 
   printf("Starting time: %s", ctime(&(metric->created)));
-  printf("Last entry:    %s", ctime(&last_entry)); 
-  printf("Rows:         %d\n", NGR_last_entry_idx(metric, 0) + 1);
+  printf("Last row:      %s", ctime(&last_row)); 
+  printf("Rows:          %d\n", NGR_last_row_idx(metric, 0) + 1);
   printf("Resolution:    %d seconds\n", metric->resolution);
   printf("Verison:       %d\n", metric->version);
   if (metric->width == 8) {

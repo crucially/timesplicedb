@@ -68,12 +68,12 @@ int dump_main(int argc, char * const *argv) {
   }
 
   struct NGR_metric_t *metric = NGR_open(filename);
-  struct NGR_range_t *range = NGR_range(metric, 0, NGR_last_entry_idx(metric, 0));
+  struct NGR_range_t *range = NGR_range(metric, 0, NGR_last_row_idx(metric, 0));
 
   int rows = range->rows;
   int i = 0;
     while(rows--) {
-      printf("%d\n", range->entry[i++]);
+      printf("%d\n", range->row[i++]);
     }
   
   return 0;

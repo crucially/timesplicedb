@@ -44,8 +44,8 @@ extern char *optarg;
 
 int create_usage () {
   WARN(" -f filename  db to get info about\n");
-  WARN(" -r resolution for each entry in the time series (seconds)\n");
-  WARN(" -b the time of the first entry in the time series (unix timestamp)\n");
+  WARN(" -r resolution for each row in the time series (seconds)\n");
+  WARN(" -b the time of the first row in the time series (unix timestamp)\n");
   WARN(" -c the number of columns per row");
   WARN(" -h this help\n\n");
   WARN("Create a database starting at a given time with a storage interval of every 10 minutes\n");
@@ -90,11 +90,11 @@ int create_main(int argc, char * const *argv) {
   }
   struct NGR_metric_t *metric = NGR_create(filename, beginning_time, resolution, columns);
 
-  time_t last_entry = (metric->created + (NGR_last_entry_idx(metric, 0) * 60));
+  time_t last_row = (metric->created + (NGR_last_row_idx(metric, 0) * 60));
 
   printf("Starting time: %s", ctime(&(metric->created)));
-  printf("Last entry:    %s", ctime(&last_entry)); 
-  printf("Rows:         %d\n", NGR_last_entry_idx(metric, 0) + 1);
+  printf("Last row:      %s", ctime(&last_row)); 
+  printf("Rows:          %d\n", NGR_last_row_idx(metric, 0) + 1);
   printf("Resolution:    %d seconds\n", metric->resolution);
   printf("Verison:       %d\n", metric->version);
   if (metric->width == 8) {

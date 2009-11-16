@@ -47,21 +47,21 @@ struct NGR_metric_t {
   u_int32_t  width;      /* are we in 32bit mode or 64bit  (4 bytes versus 8 bytes) */
   int        fd;         /* the underlying file */
   int        base;       /* how many bytes the header consumes */
-  time_t     created;    /* timestamp the first entry in the series is */
-  int        resolution; /* distance in seconds between each entry in the series */
+  time_t     created;    /* timestamp the first row in the series is */
+  int        resolution; /* distance in seconds between each row in the series */
   int        version;    /* storage verson */
   int        columns;    /* how many columns this store has */
 };
 
 struct NGR_range_t {
-  int *entry;                  /* ptr into the first entry in the range */
+  int *row;                  /* ptr into the first row in the range */
   void *area;                  /* if a range and a not an aggregate this points to the mmap of the file */ 
   int rows;                    /* how many rows exist in the range */
   size_t len;
   int mmap;                    /* if this is an mmaped range or not */
   int resolution;              /* resolution requested for this range  */
   int columns;                 /* how many columns are present in this range */
-  struct NGR_agg_entry_t *agg; /* If this is an aggregate range, this contains a pointer to extra data 
+  struct NGR_agg_row_t *agg; /* If this is an aggregate range, this contains a pointer to extra data 
 				  calculated during aggregaton
 				  these are values we can get doing a single pass only
 				  the reason this datacenter is dual purpose
@@ -69,7 +69,7 @@ struct NGR_range_t {
 			       */
 };
 
-struct NGR_agg_entry_t {
+struct NGR_agg_row_t {
   double avg;    /* average value in interval */
   int max;    /* max value seen in interval */
   int min;    /* minimum value seen -- flag determines if 0 is considered minium or undefined value */
@@ -82,9 +82,9 @@ struct NGR_metric_t * NGR_create(const char *filename, time_t create_time, int r
 struct NGR_metric_t * NGR_open(const char *filename);
 
 
-int NGR_last_entry_idx (struct NGR_metric_t *obj, int column);
+int NGR_last_row_idx (struct NGR_metric_t *obj, int column);
 
-int NGR_entry (struct NGR_metric_t *obj, int column, int idx);
+int NGR_row (struct NGR_metric_t *obj, int column, int idx);
 
 struct NGR_range_t * NGR_range (struct NGR_metric_t *obj, int start, int end);
 
