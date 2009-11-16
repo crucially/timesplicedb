@@ -45,7 +45,8 @@ extern char *optarg;
 int create_usage () {
   WARN(" -f filename  db to get info about\n");
   WARN(" -r resolution for each entry in the time series (seconds)\n");
-  WARN(" -c the time of the first entry in the time series (unix timestamp)\n");
+  WARN(" -b the time of the first entry in the time series (unix timestamp)\n");
+  WARN(" -c the number of columns per row");
   WARN(" -h this help\n\n");
   WARN("Create a database starting at a given time with a storage interval of every 10 minutes\n");
   WARN("\tngr create -f data.ngr -c 1258096151 -r 600\n");
@@ -53,24 +54,27 @@ int create_usage () {
 }
 
 int create_main(int argc, char * const *argv) {
-  int o, resolution;
-  time_t created_time;
+  int o, resolution, columns;
+  time_t beginning_time;
   char *filename = 0;
 
-  created_time = resolution = 0;
+  columns = beginning_time = resolution = 0;
 
   while ((o = getopt(argc, argv,
-		     "f:r:c:h")) != -1) {
+		     "f:r:b:h:c:")) != -1) {
 
     switch(o) {
+    case 'c':
+      columns = atoi(optarg);
+      break;
     case 'f':
       filename = optarg;
       break;
     case 'r':
       resolution = atoi(optarg);
       break;
-    case 'c':
-      created_time = atoi(optarg);
+    case 'b':
+      beginning_time = atoi(optarg);
       break;
     case 'h':
  	  WARN("Usage: ngr create [options]\n");
@@ -84,13 +88,13 @@ int create_main(int argc, char * const *argv) {
     WARN("Usage: ngr create [options]\n");
     return create_usage();
   }
-  struct NGR_metric_t *metric = NGR_create(filename, created_time, resolution, 0);
+  struct NGR_metric_t *metric = NGR_create(filename, beginning_time, resolution, columns);
 
   time_t last_entry = (metric->created + (NGR_last_entry_idx(metric, 0) * 60));
 
   printf("Starting time: %s", ctime(&(metric->created)));
   printf("Last entry:    %s", ctime(&last_entry)); 
-  printf("Items:         %d\n", NGR_last_entry_idx(metric, 0) + 1);
+  printf("Rows:         %d\n", NGR_last_entry_idx(metric, 0) + 1);
   printf("Resolution:    %d seconds\n", metric->resolution);
   printf("Verison:       %d\n", metric->version);
   if (metric->width == 8) {

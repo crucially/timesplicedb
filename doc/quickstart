@@ -5,7 +5,7 @@
 export PATH=$PATH:.
 
 rm file.ngr
-ngr create -f file.ngr -c 1258091219 -r 60
+ngr create -f file.ngr -b 1258091219 -r 60 -c 1
 
 # insert multiple values
 ngr insert -f file.ngr -t 1258091219 -v 1
