@@ -273,63 +273,92 @@ int NGR_cell (struct NGR_metric_t *obj, int row, int column) {
   return rv;
 }
 
+struct NGR_agg_counters_t {
+  int cells_counted;  // how many cells we have counted
+  int sum;            // sum
+  int min;            // minum value seen
+  int max;            // maximum value seen
+  double sum_sqr;     
+};
+
 
 struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int data_type) {
   struct NGR_range_t *aggregate;
-  int src_items, trg_items, items_seen, curr_item, sum, min, max;
-  double sum_sqr;
+  struct NGR_agg_counters_t *counters;
+  int src_rows, src_cells, curr_cell = 0;
 
-  src_items = range->rows;
-  max = sum_sqr = sum = curr_item = items_seen = trg_items = 0;
-  min = 2147483647; /** broken on 64bit, i know, and I haven't how to deal with signed or unsigned yet probably counters
+  counters = malloc(sizeof(struct NGR_agg_counters_t) * range->columns);
+
+  src_rows = range->rows;
+  src_cells = src_rows * range->columns;
+
+  int i = 0;
+  while(i++ < range->columns) {
+    counters[i].cells_counted = counters[i].sum = counters[i].max = 0;
+    counters[i].min = 2147483647; /** broken on 64bit, i know, and I haven't how to deal with signed or unsigned yet probably counters
 			are unsigned and gauge signed?**/
+  }
 
   /* figure out how many buckets we need, switch to floating point and then round up */
   int buckets = rint(ceil(((double)range->rows / ((double)interval / (double)range->resolution))));
+
   aggregate = malloc(sizeof(struct NGR_range_t));
-  aggregate->area = malloc(sizeof(int) * buckets);
-  aggregate->agg = malloc(sizeof(struct NGR_agg_row_t) * buckets);
+  aggregate->area = malloc(sizeof(int) * buckets * range->columns);
+  aggregate->agg = malloc(sizeof(struct NGR_agg_row_t) * buckets * range->columns);
   aggregate->mmap = 0;
   aggregate->rows = buckets;
   aggregate->row = aggregate->area;
   aggregate->columns = range->columns;
-  int items_per_bucket = ((interval/range->resolution) - 1);
+  int rows_per_bucket = ((interval/range->resolution) - 1);
+  int cells_seen = 0;
 
-  while(src_items--) {
+  while(src_cells--) {
     int value;
-   
-    if (data_type == NGR_GAUGE || curr_item == 0)
-      value = range->row[curr_item];
+    struct NGR_agg_counters_t counter = counters[curr_cell % range->columns];
+
+    if (data_type == NGR_GAUGE || curr_cell == 0)
+      value = range->row[curr_cell];
     else 
-      value = range->row[curr_item] - range->row[curr_item-1];
-    
-    sum += value;
+      value = range->row[curr_cell] - range->row[curr_cell-1];
 
-    sum_sqr += (double)value * (double)value;
 
-    if (min > value)
-      min = value;
-    if (max < value)
-      max = value;
 
-    if(items_seen++ == items_per_bucket) {
-      double avg = (double)sum / (double)items_seen;
-      aggregate->agg[trg_items].rows_averaged = items_seen;
-      aggregate->row[trg_items] = sum / items_seen;
-      aggregate->agg[trg_items].max = max;
-      aggregate->agg[trg_items].min = min;
-      if (items_seen == 1)
-	aggregate->agg[trg_items].stddev = 0;
-      else 
-	aggregate->agg[trg_items].stddev = ((sum_sqr - sum * avg)/(items_seen-1));
-      aggregate->agg[trg_items++].avg = avg;
-      sum_sqr = max = sum = items_seen = 0;
-      min = 2147483647;
+    counter.sum += value;
+
+
+    counter.sum_sqr += (double)value * (double)value;
+
+    if (counter.min > value)
+      counter.min = value;
+    if (counter.max < value)
+      counter.max = value;
+
+    if(cells_seen++ == rows_per_bucket * range->columns) {
+
+      for(i = 0; i++; i < range->columns) {
+
+
+	/**
+	double avg = (double)counter->sum / (double)items_seen;
+	aggregate->agg[trg_items].rows_averaged = items_seen;
+	aggregate->row[trg_items] = sum / items_seen;
+	aggregate->agg[trg_items].max = max;
+	aggregate->agg[trg_items].min = min;
+	if (items_seen == 1)
+	  aggregate->agg[trg_items].stddev = 0;
+	else 
+	  aggregate->agg[trg_items].stddev = ((sum_sqr - sum * avg)/(items_seen-1));
+	aggregate->agg[trg_items++].avg = avg;
+	sum_sqr = max = sum = items_seen = 0;
+	min = 2147483647;
+      }
+	**/
+      }
+    curr_cell++;
     }
-    curr_item++;
   }
-
-  if (items_seen) {
+  if (cells_seen) {
+    /**
     double avg = (double)sum / (double)items_seen;
     aggregate->agg[trg_items].rows_averaged = items_seen;
     aggregate->agg[trg_items].avg = avg;
