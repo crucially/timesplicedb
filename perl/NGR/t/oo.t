@@ -25,7 +25,7 @@ is($ngr->columns, 1);
 is($ngr->rows, 0, "no entries have been added");
 is($ngr->last_row_idx, -1, "there is no last idx");
 
-is($ngr->entry(column => 0,
+is($ngr->cell(column => 0,
 	       row    => 0), 0);
 
 
@@ -41,11 +41,11 @@ $ngr->insert(column    => 0,
 	     timestamp => $ct + $ngr->resolution,
 	     value     => 2);
 
-is($ngr->entry(column => 0,
+is($ngr->cell(column => 0,
 	       row    => 0), 1);
 
 
-is($ngr->entry(column => 0,
+is($ngr->cell(column => 0,
 	       row    => 1), 2);
 
 

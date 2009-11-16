@@ -33,9 +33,9 @@ isa_ok($range, "NGR::Range");
 is($range->rows, 9);
 
 for(1..9) {
-  my $entry = $range->entry(column => 0, row => $_-1);
+  my $cell = $range->cell(column => 0, row => $_-1);
 
-  is_deeply($entry, {
+  is_deeply($cell, {
 		     stddev => 0,
 		     min    => $_,
 		     value  => $_,
@@ -54,48 +54,48 @@ isa_ok($range, "NGR::Range");
 is($agg->rows, 5);
 
 {
-  my $entry = $agg->entry(column => 0, row => 0);
-  is($entry->{stddev}, 0.5, "stddev");
-  is($entry->{min}, 1, "lowest we have seen");
-  is($entry->{max}, 2, "highest we have seen");
-  is($entry->{avg}, 1.5 , "between 1 and 2");
-  is($entry->{rows_averaged}, 2, "this bucket should have two entries!");
+  my $cell = $agg->cell(column => 0, row => 0);
+  is($cell->{stddev}, 0.5, "stddev");
+  is($cell->{min}, 1, "lowest we have seen");
+  is($cell->{max}, 2, "highest we have seen");
+  is($cell->{avg}, 1.5 , "between 1 and 2");
+  is($cell->{rows_averaged}, 2, "this bucket should have two entries!");
 }
 
 {
-  my $entry = $agg->entry(column => 0, row => 1);
-  is($entry->{stddev}, 0.5, "stddev");
-  is($entry->{min}, 3, "lowest we have seen");
-  is($entry->{max}, 4, "highest we have seen");
-  is($entry->{avg}, 3.5 , "between 3 and 4");
-  is($entry->{rows_averaged}, 2, "this bucket should have two entries!");
+  my $cell = $agg->cell(column => 0, row => 1);
+  is($cell->{stddev}, 0.5, "stddev");
+  is($cell->{min}, 3, "lowest we have seen");
+  is($cell->{max}, 4, "highest we have seen");
+  is($cell->{avg}, 3.5 , "between 3 and 4");
+  is($cell->{rows_averaged}, 2, "this bucket should have two entries!");
 }
 
 {
-  my $entry = $agg->entry(column => 0, row => 2);
-  is($entry->{stddev}, 0.5, "stddev");
-  is($entry->{min}, 5, "lowest we have seen");
-  is($entry->{max}, 6, "highest we have seen");
-  is($entry->{avg}, 5.5 , "between 5 and 6");
-  is($entry->{rows_averaged}, 2, "this bucket should have two entries!");
+  my $cell = $agg->cell(column => 0, row => 2);
+  is($cell->{stddev}, 0.5, "stddev");
+  is($cell->{min}, 5, "lowest we have seen");
+  is($cell->{max}, 6, "highest we have seen");
+  is($cell->{avg}, 5.5 , "between 5 and 6");
+  is($cell->{rows_averaged}, 2, "this bucket should have two entries!");
 }
 
 {
-  my $entry = $agg->entry(column => 0, row => 3);
-  is($entry->{stddev}, 0.5, "stddev");
-  is($entry->{min}, 7, "lowest we have seen");
-  is($entry->{max}, 8, "highest we have seen");
-  is($entry->{avg}, 7.5 , "between 7 and 8");
-  is($entry->{rows_averaged}, 2, "this bucket should have two entries!");
+  my $cell = $agg->cell(column => 0, row => 3);
+  is($cell->{stddev}, 0.5, "stddev");
+  is($cell->{min}, 7, "lowest we have seen");
+  is($cell->{max}, 8, "highest we have seen");
+  is($cell->{avg}, 7.5 , "between 7 and 8");
+  is($cell->{rows_averaged}, 2, "this bucket should have two entries!");
 }
 
 {
-  my $entry = $agg->entry(column => 0, row => 4);
-  is($entry->{stddev}, 0, "no stddev");
-  is($entry->{min}, 9, "lowest we have seen");
-  is($entry->{max}, 9, "highest we have seen");
-  is($entry->{avg}, 9 , "only one in this bucket 9");
-  is($entry->{rows_averaged}, 1, "this bucket should have two entries!");
+  my $cell = $agg->cell(column => 0, row => 4);
+  is($cell->{stddev}, 0, "no stddev");
+  is($cell->{min}, 9, "lowest we have seen");
+  is($cell->{max}, 9, "highest we have seen");
+  is($cell->{avg}, 9 , "only one in this bucket 9");
+  is($cell->{rows_averaged}, 1, "this bucket should have two entries!");
 }
 
 END { unlink("aggtest.ngrd") }

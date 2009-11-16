@@ -83,10 +83,10 @@ sub last_row_idx {
     return NGR::C::last_row_idx($self->{ctx}, 0);
 }
 
-sub entry {
+sub cell {
     my $self = shift;
     my %options = @_;
-    return NGR::C::entry($self->{ctx}, $options{row}, $options{column});
+    return NGR::C::cell($self->{ctx}, $options{row}, $options{column});
 }
 
 sub last_updated {
@@ -126,7 +126,7 @@ sub aggregate {
     return NGR::Range->new(NGR::C::aggregate($self->{ctx}, $options{interval}, 0));
 }
 
-sub entry {
+sub cell {
     my $self = shift;
     my %options = @_;
 

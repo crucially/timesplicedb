@@ -67,7 +67,7 @@ NGR_create(filename, create_time, resolution, columns)
 	int	columns
 
 int
-NGR_entry(obj, row, column)
+NGR_cell(obj, row, column)
 	struct NGR_metric_t *	obj
 	int	row
 	int	column

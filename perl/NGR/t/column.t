@@ -36,10 +36,10 @@ foreach(1..9) {
 is($ngr->columns, 2);
 is($ngr->rows, 9);
 
-is($ngr->entry(column => 0, row => 0), 1, "first column is number 1");
-is($ngr->entry(column => 1, row => 0), 9, "second column first entry");
-is($ngr->entry(column => 0, row => 1), 2, "first column second entry");
-is($ngr->entry(column => 1, row => 1), 8, "second column second entry");
+is($ngr->cell(column => 0, row => 0), 1, "first column is number 1");
+is($ngr->cell(column => 1, row => 0), 9, "second column first cell");
+is($ngr->cell(column => 0, row => 1), 2, "first column second cell");
+is($ngr->cell(column => 1, row => 1), 8, "second column second cell");
 
 
 my $range = $ngr->timespan(start  => $ct,
@@ -49,11 +49,11 @@ my $range = $ngr->timespan(start  => $ct,
 isa_ok($range, "NGR::Range");
 is($range->rows, 9);
 
-is($range->entry(column => 0, row => 0)->{value}, 1);
-is($range->entry(column => 1, row => 0)->{value}, 9);
+is($range->cell(column => 0, row => 0)->{value}, 1);
+is($range->cell(column => 1, row => 0)->{value}, 9);
 
-is($range->entry(column => 0, row => 1)->{value}, 2);
-is($range->entry(column => 1, row => 1)->{value}, 8);
+is($range->cell(column => 0, row => 1)->{value}, 2);
+is($range->cell(column => 1, row => 1)->{value}, 8);
 
 
 END {
