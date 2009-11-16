@@ -19,9 +19,12 @@ sub new {
 	$self->{ctx} = NGR::C::create( $options{filename},
 				       $options{create_time},
 				       $options{resolution},
-				       $options{columns} );
+				       $options{columns},
+				       [0,1,2,3],
+				       [0,1,2,3],
+	    );
     } else {
-	$self->{ctx} = NGR::C::create( $options{filename} );
+	$self->{ctx} = NGR::C::open( $options{filename} );
     }
 
     return $self;

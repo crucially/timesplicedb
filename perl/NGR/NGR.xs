@@ -60,11 +60,29 @@ NGR_aggregate(range, interval, data_type)
 	int	data_type
 
 struct NGR_metric_t *
-NGR_create(filename, create_time, resolution, columns)
+NGR_create(filename, create_time, resolution, columns, names, flags)
 	char *	filename
 	time_t	create_time
 	int	resolution
 	int	columns
+	AV*	names
+	AV*	flags
+	CODE:
+	char **names_x;
+	int *flags_x;
+	int i;
+	names_x = malloc(columns + 1);
+	flags_x = malloc(sizeof(int) * (columns + 1));
+	for(i = 0; i < columns + 1; i++) {
+	      names_x[i] = SvPVbyte_nolen(*av_fetch(names, i, 0));
+	      flags_x[i] = SvIV(*av_fetch(flags, i, 0));
+	}
+	RETVAL = NGR_create(filename, create_time, resolution, columns, names_x, flags_x);
+	free(names_x);
+	free(flags_x);
+	OUTPUT:
+	RETVAL
+	
 
 int
 NGR_cell(obj, row, column)

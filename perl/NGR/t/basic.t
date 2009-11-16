@@ -8,7 +8,7 @@ BEGIN { use_ok('NGR::C') };
 
 my $ts = time-3600;
 
-my $ngr = NGR::C::create("test.data", $ts, 60, 1);
+my $ngr = NGR::C::create("test.data", $ts, 60, 1,["foo","bar"],[0,0]);
 
 for(1..60) {
   NGR::C::insert($ngr, 0, ($ts+($_*60)), int rand(100));
