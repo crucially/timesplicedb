@@ -48,7 +48,7 @@ int bench_main(int argc, char **argv) {
   //  struct NGR_metric_t *metric = NGR_open("host", "metric_year");
   printf("width: %d; created: %d\n", metric->width, metric->created);
   int idx = NGR_last_row_idx(metric);
-  printf("row: %d\n", NGR_row(metric,NGR_last_row_idx(metric)));
+  printf("row: %d\n", NGR_entry(metric,NGR_last_row_idx(metric),0));
 
   {
 

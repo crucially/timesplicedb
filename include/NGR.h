@@ -84,7 +84,7 @@ struct NGR_metric_t * NGR_open(const char *filename);
 
 int NGR_last_row_idx (struct NGR_metric_t *obj, int column);
 
-int NGR_row (struct NGR_metric_t *obj, int column, int idx);
+int NGR_entry (struct NGR_metric_t *obj, int row, int column);
 
 struct NGR_range_t * NGR_range (struct NGR_metric_t *obj, int start, int end);
 

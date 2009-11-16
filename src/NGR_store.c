@@ -253,11 +253,11 @@ int NGR_last_row_idx (struct NGR_metric_t *obj, int column) {
 }
 
 
-int NGR_row (struct NGR_metric_t *obj, int column, int idx) {
+int NGR_entry (struct NGR_metric_t *obj, int row, int column) {
   char *buf;
   int rv, read_len, offset;
   assert (column <= obj->columns - 1);
-  offset = (obj->base + (idx * ( obj->width * obj->columns)) + (column * obj->width));
+  offset = (obj->base + (row * ( obj->width * obj->columns)) + (column * obj->width));
   buf = malloc(obj->width);
   assert(sizeof(rv) == obj->width);
   lseek(obj->fd, offset, SEEK_SET);
