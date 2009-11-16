@@ -12,3 +12,4 @@ lib/NGR.pm
 lib/NGR/C.pm
 t/agg.t
 t/oo.t
+t/column.t

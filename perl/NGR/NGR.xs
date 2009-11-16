@@ -110,7 +110,7 @@ range_entry_value(obj, column, idx)
 	int	column
 	int	idx
 	CODE:
-	RETVAL = obj->entry[idx];
+	RETVAL = obj->entry[(idx * obj->columns) + column];
 	OUTPUT:
 	RETVAL
 
@@ -121,9 +121,9 @@ range_entry_avg(obj, column, idx)
 	int	idx
 	CODE:
 	if(obj->agg) {
-	  RETVAL = obj->agg[idx].avg;
+	  RETVAL = obj->agg[(idx * obj->columns) + column].avg;
 	} else {
-	  RETVAL = obj->entry[idx];
+	  RETVAL = obj->entry[(idx * obj->columns) + column];
 	}
 	OUTPUT:
 	RETVAL
@@ -135,9 +135,9 @@ range_entry_min(obj, column, idx)
 	int	idx
 	CODE:
 	if(obj->agg) {
-	  RETVAL = obj->agg[idx].min;
+	  RETVAL = obj->agg[(idx * obj->columns) + column].min;
 	} else {
-	  RETVAL = obj->entry[idx];
+	  RETVAL = obj->entry[(idx * obj->columns) + column];
 	}
 	OUTPUT:
 	RETVAL
@@ -149,9 +149,9 @@ range_entry_max(obj, column, idx)
 	int	idx
 	CODE:
 	if(obj->agg) {
-	  RETVAL = obj->agg[idx].max;
+	  RETVAL = obj->agg[(idx * obj->columns) + column].max;
 	} else {
-	  RETVAL = obj->entry[idx];
+	  RETVAL = obj->entry[(idx * obj->columns) + column];
 	}
 	OUTPUT:
 	RETVAL
@@ -163,7 +163,7 @@ range_entry_stddev(obj, column, idx)
 	int	idx
 	CODE:
 	if(obj->agg) {
-	  RETVAL = obj->agg[idx].stddev;
+	  RETVAL = obj->agg[(idx * obj->columns) + column].stddev;
 	} else {
 	  RETVAL = 0; // should be undef
 	}
@@ -177,7 +177,7 @@ range_entry_items_averaged(obj, column, idx)
 	int	idx
 	CODE:
 	if(obj->agg) {
-	  RETVAL = obj->agg[idx].items_averaged;
+	  RETVAL = obj->agg[(idx * obj->columns) + column].items_averaged;
 	} else {
 	  RETVAL = 0; // none
 	}
