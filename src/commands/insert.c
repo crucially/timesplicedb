@@ -44,6 +44,7 @@ extern char *optarg;
 int insert_usage () {
   WARN(" -f filename  db to get info about\n");
   WARN(" -t timestamp to insert this value at; defaults to now (unix timestamp)\n");
+  WARN(" -c column to insert into, defaults to 0\n");
   WARN(" -v value to insert (integer)\n");
   WARN(" -h this help\n\n");
   WARN("Insert a value at a given time\n");
@@ -52,16 +53,19 @@ int insert_usage () {
 }
 
 int insert_main(int argc, char * const *argv) {
-  int o, value;
+  int o, value , column;
   time_t insert_time;
   char *filename = 0;
 
-  insert_time = value = 0;
+  column = insert_time = value = 0;
 
   while ((o = getopt(argc, argv,
-		     "f:t:v:h")) != -1) {
+		     "f:t:v:c:h")) != -1) {
 
     switch(o) {
+    case 'c':
+      column = atoi(optarg);
+      break;
     case 'f':
       filename = malloc(strlen(optarg)+1);
       memcpy(filename, optarg, strlen(optarg)+1);
@@ -80,10 +84,9 @@ int insert_main(int argc, char * const *argv) {
     return insert_usage();
   }
 
-
   struct NGR_metric_t *metric = NGR_open(filename);
 
-  NGR_insert(metric, 0, insert_time, value);
+  NGR_insert(metric, column, insert_time, value);
 
   return 0;
 }

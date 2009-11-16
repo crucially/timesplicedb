@@ -100,7 +100,6 @@ struct NGR_metric_t * NGR_open(const char *filename) {
 
   obj = malloc(sizeof(struct NGR_metric_t));
 
-
   obj->fd = open(filename, O_RDWR);
 
   if(obj->fd == -1)
