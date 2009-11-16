@@ -311,7 +311,7 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
   aggregate->rows = buckets;
   aggregate->row = aggregate->area;
   aggregate->columns = range->columns;
-  int rows_per_bucket = ((interval/range->resolution) - 1);
+  int rows_per_bucket = ((interval/range->resolution));
   int cells_seen = 0;
 
   while(src_cells--) {
@@ -335,7 +335,7 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
     if (counter->max < value)
       counter->max = value;
 
-    if(cells_seen++ == rows_per_bucket * range->columns) {
+    if(cells_seen++ == rows_per_bucket * range->columns - 1) {
       int i = 0;
       while(i < range->columns) {
 	struct NGR_agg_counters_t *column = counters + i;
