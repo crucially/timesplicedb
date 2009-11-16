@@ -365,19 +365,27 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
   }
   
   if (cells_seen) {
-    /**
-    double avg = (double)sum / (double)items_seen;
-    aggregate->agg[trg_cell].rows_averaged = items_seen;
-    aggregate->agg[trg_cell].avg = avg;
-    aggregate->agg[trg_cell].max = max;
-    aggregate->agg[trg_cell].min = min;
 
-    if(items_seen == 1)
-      aggregate->agg[trg_cell].stddev = 0;
-    else
-      aggregate->agg[trg_cell].stddev = ((sum_sqr - sum * avg)/(items_seen-1));
-
-    aggregate->row[trg_cell] = sum / items_seen;
+    int i = 0;
+    while(i < range->columns) {
+      struct NGR_agg_counters_t *column = counters + i;
+      double avg = (double)column->sum / (double)column->cells_counted;
+      
+      aggregate->agg[trg_cell].rows_averaged = column->cells_counted;
+      aggregate->row[trg_cell] = column->sum / column->cells_counted;
+      aggregate->agg[trg_cell].max = column->max;
+      aggregate->agg[trg_cell].min = column->min;
+      
+      if (column->cells_counted == 1)
+	aggregate->agg[trg_cell].stddev = 0;
+      else 
+	aggregate->agg[trg_cell].stddev = ((column->sum_sqr - column->sum * avg)/(column->cells_counted - 1));
+      
+      aggregate->agg[trg_cell++].avg = avg;
+      
+      i++;
+    }
+    
     /* XXX SSHOULD SET THE RESOLUTION ON AGGREGATE */
   }
 
