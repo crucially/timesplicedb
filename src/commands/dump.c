@@ -48,16 +48,21 @@ int dump_usage () {
 }
 
 int dump_main(int argc, char * const *argv) {
-  int o;
+  int o, column, column_set;
   char *filename = 0;
+  column = column_set = 0;
 
   while ((o = getopt(argc, argv,
-		     "f:h")) != -1) {
+		     "c:f:h")) != -1) {
 
     switch(o) {
     case 'f':
       filename = malloc(strlen(optarg)+1);
       memcpy(filename, optarg, strlen(optarg)+1);
+      break;
+    case 'c':
+      column = atoi(o);
+      column_set = 1;
       break;
     }
   }
@@ -71,10 +76,22 @@ int dump_main(int argc, char * const *argv) {
   struct NGR_range_t *range = NGR_range(metric, 0, NGR_last_row_idx(metric, 0));
 
   int rows = range->rows;
+  int columns = range->columns;
   int i = 0;
+  if(column_set) {
     while(rows--) {
-      printf("%d\n", range->row[i++]);
+      printf("%d\n", range->row[(i++ * columns) + column]);
     }
-  
+  } else {
+    int col = 0;
+    while(rows--) {
+      while(col < columns) {
+	printf("%d\t", range->row[(i * columns) + col++]);
+      }
+      i++;
+      col = 0;
+      printf("\n");
+    }
+  }
   return 0;
 }
