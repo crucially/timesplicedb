@@ -76,7 +76,7 @@ int info_main(int argc, char **argv) {
 
   printf("Starting time: %s", ctime(&(metric->created)));
   printf("Last entry:    %s", ctime(&last_entry)); 
-  printf("Items:         %d\n", NGR_last_entry_idx(metric, 0) + 1);
+  printf("Rows:         %d\n", NGR_last_entry_idx(metric, 0) + 1);
   printf("Resolution:    %d seconds\n", metric->resolution);
   printf("Verison:       %d\n", metric->version);
   if (metric->width == 8) {
