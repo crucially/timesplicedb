@@ -67,10 +67,10 @@ NGR_create(filename, create_time, resolution, columns)
 	int	columns
 
 int
-NGR_entry(obj, column, idx)
+NGR_entry(obj, row, column)
 	struct NGR_metric_t *	obj
+	int	row
 	int	column
-	int	idx
 
 int
 NGR_insert(obj, column, timestmp, value)
@@ -80,7 +80,7 @@ NGR_insert(obj, column, timestmp, value)
 	int	value
 
 int
-NGR_last_entry_idx(obj, column)
+NGR_last_row_idx(obj, column)
 	struct NGR_metric_t *	obj
 	int	column
 
@@ -105,17 +105,17 @@ NGR_timespan(obj, start, end)
 	time_t	end
 
 int
-range_entry_value(obj, column, idx)
+range_row_value(obj, column, idx)
 	struct NGR_range_t *	obj
 	int	column
 	int	idx
 	CODE:
-	RETVAL = obj->entry[(idx * obj->columns) + column];
+	RETVAL = obj->row[(idx * obj->columns) + column];
 	OUTPUT:
 	RETVAL
 
 double
-range_entry_avg(obj, column, idx)
+range_row_avg(obj, column, idx)
 	struct NGR_range_t *	obj
 	int	column
 	int	idx
@@ -123,13 +123,13 @@ range_entry_avg(obj, column, idx)
 	if(obj->agg) {
 	  RETVAL = obj->agg[(idx * obj->columns) + column].avg;
 	} else {
-	  RETVAL = obj->entry[(idx * obj->columns) + column];
+	  RETVAL = obj->row[(idx * obj->columns) + column];
 	}
 	OUTPUT:
 	RETVAL
 
 int
-range_entry_min(obj, column, idx)
+range_row_min(obj, column, idx)
 	struct NGR_range_t *	obj
 	int	column
 	int	idx
@@ -137,13 +137,13 @@ range_entry_min(obj, column, idx)
 	if(obj->agg) {
 	  RETVAL = obj->agg[(idx * obj->columns) + column].min;
 	} else {
-	  RETVAL = obj->entry[(idx * obj->columns) + column];
+	  RETVAL = obj->row[(idx * obj->columns) + column];
 	}
 	OUTPUT:
 	RETVAL
 
 int
-range_entry_max(obj, column, idx)
+range_row_max(obj, column, idx)
 	struct NGR_range_t *	obj
 	int	column
 	int	idx
@@ -151,13 +151,13 @@ range_entry_max(obj, column, idx)
 	if(obj->agg) {
 	  RETVAL = obj->agg[(idx * obj->columns) + column].max;
 	} else {
-	  RETVAL = obj->entry[(idx * obj->columns) + column];
+	  RETVAL = obj->row[(idx * obj->columns) + column];
 	}
 	OUTPUT:
 	RETVAL
 
 double
-range_entry_stddev(obj, column, idx)
+range_row_stddev(obj, column, idx)
 	struct NGR_range_t *	obj
 	int	column
 	int	idx
@@ -171,7 +171,7 @@ range_entry_stddev(obj, column, idx)
 	RETVAL
 
 int
-range_entry_rows_averaged(obj, column, idx)
+range_row_rows_averaged(obj, column, idx)
 	struct NGR_range_t *	obj
 	int	column
 	int	idx

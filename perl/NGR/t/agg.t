@@ -33,7 +33,7 @@ isa_ok($range, "NGR::Range");
 is($range->rows, 9);
 
 for(1..9) {
-  my $entry = $range->entry(column => 0, idx => $_-1);
+  my $entry = $range->entry(column => 0, row => $_-1);
 
   is_deeply($entry, {
 		     stddev => 0,
@@ -41,10 +41,10 @@ for(1..9) {
 		     value  => $_,
 		     max    => $_,
 		     avg    => $_,
-		     idx    => $_-1,
+		     row    => $_-1,
 		     time   => 0,
 		     rows_averaged => 0,
-		    }, "entry, this is not aggregated");
+		    }, "row, this is not aggregated");
 }
 
 
@@ -54,7 +54,7 @@ isa_ok($range, "NGR::Range");
 is($agg->rows, 5);
 
 {
-  my $entry = $agg->entry(column => 0, idx => 0);
+  my $entry = $agg->entry(column => 0, row => 0);
   is($entry->{stddev}, 0.5, "stddev");
   is($entry->{min}, 1, "lowest we have seen");
   is($entry->{max}, 2, "highest we have seen");
@@ -63,7 +63,7 @@ is($agg->rows, 5);
 }
 
 {
-  my $entry = $agg->entry(column => 0, idx => 1);
+  my $entry = $agg->entry(column => 0, row => 1);
   is($entry->{stddev}, 0.5, "stddev");
   is($entry->{min}, 3, "lowest we have seen");
   is($entry->{max}, 4, "highest we have seen");
@@ -72,7 +72,7 @@ is($agg->rows, 5);
 }
 
 {
-  my $entry = $agg->entry(column => 0, idx => 2);
+  my $entry = $agg->entry(column => 0, row => 2);
   is($entry->{stddev}, 0.5, "stddev");
   is($entry->{min}, 5, "lowest we have seen");
   is($entry->{max}, 6, "highest we have seen");
@@ -81,7 +81,7 @@ is($agg->rows, 5);
 }
 
 {
-  my $entry = $agg->entry(column => 0, idx => 3);
+  my $entry = $agg->entry(column => 0, row => 3);
   is($entry->{stddev}, 0.5, "stddev");
   is($entry->{min}, 7, "lowest we have seen");
   is($entry->{max}, 8, "highest we have seen");
@@ -90,7 +90,7 @@ is($agg->rows, 5);
 }
 
 {
-  my $entry = $agg->entry(column => 0, idx => 4);
+  my $entry = $agg->entry(column => 0, row => 4);
   is($entry->{stddev}, 0, "no stddev");
   is($entry->{min}, 9, "lowest we have seen");
   is($entry->{max}, 9, "highest we have seen");

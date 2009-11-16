@@ -75,23 +75,23 @@ sub columns {
 
 sub rows {
     my $self = shift;
-    return NGR::C::last_entry_idx($self->{ctx}, 0) + 1;
+    return NGR::C::last_row_idx($self->{ctx}, 0) + 1;
 }
 
-sub last_entry_idx {
+sub last_row_idx {
     my $self = shift;
-    return NGR::C::last_entry_idx($self->{ctx}, 0);
+    return NGR::C::last_row_idx($self->{ctx}, 0);
 }
 
 sub entry {
     my $self = shift;
     my %options = @_;
-    return NGR::C::entry($self->{ctx}, $options{column}, $options{idx});
+    return NGR::C::entry($self->{ctx}, $options{row}, $options{column});
 }
 
 sub last_updated {
     my $self = shift;
-    return ($self->created + ($self->last_entry_idx(column => 0) * $self->resolution));
+    return ($self->created + ($self->last_row_idx(column => 0) * $self->resolution));
 }
 
 sub timespan {
@@ -131,14 +131,14 @@ sub entry {
     my %options = @_;
 
     return {
-	idx    => $options{idx},
+	row    => $options{row},
 	time   => 0,  # XXX calculate the time offset
-	value  => NGR::C::range_entry_value($self->{ctx}, $options{column}, $options{idx}),
-	avg    => NGR::C::range_entry_avg($self->{ctx}, $options{column}, $options{idx}),
-	min    => NGR::C::range_entry_min($self->{ctx}, $options{column}, $options{idx}),
-	max    => NGR::C::range_entry_max($self->{ctx}, $options{column}, $options{idx}),
-	stddev => NGR::C::range_entry_stddev($self->{ctx}, $options{column}, $options{idx}),
-	rows_averaged => NGR::C::range_entry_rows_averaged($self->{ctx}, $options{column}, $options{idx}),
+	value  => NGR::C::range_row_value($self->{ctx}, $options{column}, $options{row}),
+	avg    => NGR::C::range_row_avg($self->{ctx}, $options{column}, $options{row}),
+	min    => NGR::C::range_row_min($self->{ctx}, $options{column}, $options{row}),
+	max    => NGR::C::range_row_max($self->{ctx}, $options{column}, $options{row}),
+	stddev => NGR::C::range_row_stddev($self->{ctx}, $options{column}, $options{row}),
+	rows_averaged => NGR::C::range_row_rows_averaged($self->{ctx}, $options{column}, $options{row}),
     };
 }
 
