@@ -23,14 +23,14 @@ foreach(1..9) {
 }
 
 
-is($ngr->items, 9);
+is($ngr->rows, 9);
 
 my $range = $ngr->timespan(start  => $ct,
 			   end    => $it - 60,
 			  );
 
 isa_ok($range, "NGR::Range");
-is($range->items, 9);
+is($range->rows, 9);
 
 for(1..9) {
   my $entry = $range->entry(column => 0, idx => $_-1);
@@ -43,7 +43,7 @@ for(1..9) {
 		     avg    => $_,
 		     idx    => $_-1,
 		     time   => 0,
-		     items_averaged => 0,
+		     rows_averaged => 0,
 		    }, "entry, this is not aggregated");
 }
 
@@ -51,7 +51,7 @@ for(1..9) {
 my $agg = $range->aggregate(interval => 120);
 
 isa_ok($range, "NGR::Range");
-is($agg->items, 5);
+is($agg->rows, 5);
 
 {
   my $entry = $agg->entry(column => 0, idx => 0);
@@ -59,7 +59,7 @@ is($agg->items, 5);
   is($entry->{min}, 1, "lowest we have seen");
   is($entry->{max}, 2, "highest we have seen");
   is($entry->{avg}, 1.5 , "between 1 and 2");
-  is($entry->{items_averaged}, 2, "this bucket should have two entries!");
+  is($entry->{rows_averaged}, 2, "this bucket should have two entries!");
 }
 
 {
@@ -68,7 +68,7 @@ is($agg->items, 5);
   is($entry->{min}, 3, "lowest we have seen");
   is($entry->{max}, 4, "highest we have seen");
   is($entry->{avg}, 3.5 , "between 3 and 4");
-  is($entry->{items_averaged}, 2, "this bucket should have two entries!");
+  is($entry->{rows_averaged}, 2, "this bucket should have two entries!");
 }
 
 {
@@ -77,7 +77,7 @@ is($agg->items, 5);
   is($entry->{min}, 5, "lowest we have seen");
   is($entry->{max}, 6, "highest we have seen");
   is($entry->{avg}, 5.5 , "between 5 and 6");
-  is($entry->{items_averaged}, 2, "this bucket should have two entries!");
+  is($entry->{rows_averaged}, 2, "this bucket should have two entries!");
 }
 
 {
@@ -86,7 +86,7 @@ is($agg->items, 5);
   is($entry->{min}, 7, "lowest we have seen");
   is($entry->{max}, 8, "highest we have seen");
   is($entry->{avg}, 7.5 , "between 7 and 8");
-  is($entry->{items_averaged}, 2, "this bucket should have two entries!");
+  is($entry->{rows_averaged}, 2, "this bucket should have two entries!");
 }
 
 {
@@ -95,7 +95,7 @@ is($agg->items, 5);
   is($entry->{min}, 9, "lowest we have seen");
   is($entry->{max}, 9, "highest we have seen");
   is($entry->{avg}, 9 , "only one in this bucket 9");
-  is($entry->{items_averaged}, 1, "this bucket should have two entries!");
+  is($entry->{rows_averaged}, 1, "this bucket should have two entries!");
 }
 
 END { unlink("aggtest.ngrd") }

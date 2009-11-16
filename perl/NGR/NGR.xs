@@ -45,10 +45,10 @@ int metric_columns(obj);
 	OUTPUT:
 	RETVAL
 
-int range_items(obj);
+int range_rows(obj);
     	struct NGR_range_t *	obj
 	CODE:
-	RETVAL = obj->items;
+	RETVAL = obj->rows;
 	OUTPUT:
 	RETVAL
 
@@ -171,13 +171,13 @@ range_entry_stddev(obj, column, idx)
 	RETVAL
 
 int
-range_entry_items_averaged(obj, column, idx)
+range_entry_rows_averaged(obj, column, idx)
 	struct NGR_range_t *	obj
 	int	column
 	int	idx
 	CODE:
 	if(obj->agg) {
-	  RETVAL = obj->agg[(idx * obj->columns) + column].items_averaged;
+	  RETVAL = obj->agg[(idx * obj->columns) + column].rows_averaged;
 	} else {
 	  RETVAL = 0; // none
 	}

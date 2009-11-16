@@ -46,7 +46,7 @@ sub info {
 	resolution   => $self->resolution,
 	version      => $self->version,
 	columns      => $self->columns,
-	items        => $self->items,
+	rows         => $self->rows,
 	last_updated => $self->last_updated,
     };
 }
@@ -73,7 +73,7 @@ sub columns {
 }
 
 
-sub items {
+sub rows {
     my $self = shift;
     return NGR::C::last_entry_idx($self->{ctx}, 0) + 1;
 }
@@ -114,9 +114,9 @@ sub new {
     return $self;
 }
 
-sub items {
+sub rows {
     my $self = shift;
-    NGR::C::range_items($self->{ctx});
+    NGR::C::range_rows($self->{ctx});
 }
 
 sub aggregate {
@@ -138,7 +138,7 @@ sub entry {
 	min    => NGR::C::range_entry_min($self->{ctx}, $options{column}, $options{idx}),
 	max    => NGR::C::range_entry_max($self->{ctx}, $options{column}, $options{idx}),
 	stddev => NGR::C::range_entry_stddev($self->{ctx}, $options{column}, $options{idx}),
-	items_averaged => NGR::C::range_entry_items_averaged($self->{ctx}, $options{column}, $options{idx}),
+	rows_averaged => NGR::C::range_entry_rows_averaged($self->{ctx}, $options{column}, $options{idx}),
     };
 }
 
