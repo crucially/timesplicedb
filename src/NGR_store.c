@@ -63,6 +63,8 @@ struct NGR_metric_t * NGR_create(const char *filename, time_t created_time, int 
   int   fd, write_len;
   int   size = sizeof(int);
   int   version = 1;
+  
+  assert(columns > 0);
 
   if(!created_time)
     created_time = time(NULL);
@@ -196,7 +198,7 @@ struct NGR_range_t * NGR_range (struct NGR_metric_t *obj, int start, int end) {
   range->area = mmap(0, range->len, PROT_READ, MAP_SHARED| MAP_FILE, obj->fd, 0);
   assert(range->area != (void*)-1);
   range->entry = (range->area + obj->base + (obj->width * start));
-  range->items = end - start + 1;
+  range->rows = end - start + 1;
   range->mmap = 1;
   range->agg = 0; 
   range->resolution = obj->resolution;
@@ -278,18 +280,18 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
   int src_items, trg_items, items_seen, curr_item, sum, min, max;
   double sum_sqr;
 
-  src_items = range->items;
+  src_items = range->rows;
   max = sum_sqr = sum = curr_item = items_seen = trg_items = 0;
   min = 2147483647; /** broken on 64bit, i know, and I haven't how to deal with signed or unsigned yet probably counters
 			are unsigned and gauge signed?**/
 
   /* figure out how many buckets we need, switch to floating point and then round up */
-  int buckets = rint(ceil(((double)range->items / ((double)interval / (double)range->resolution))));
+  int buckets = rint(ceil(((double)range->rows / ((double)interval / (double)range->resolution))));
   aggregate = malloc(sizeof(struct NGR_range_t));
   aggregate->area = malloc(sizeof(int) * buckets);
   aggregate->agg = malloc(sizeof(struct NGR_agg_entry_t) * buckets);
   aggregate->mmap = 0;
-  aggregate->items = buckets;
+  aggregate->rows = buckets;
   aggregate->entry = aggregate->area;
   aggregate->columns = range->columns;
   int items_per_bucket = ((interval/range->resolution) - 1);
@@ -313,7 +315,7 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
 
     if(items_seen++ == items_per_bucket) {
       double avg = (double)sum / (double)items_seen;
-      aggregate->agg[trg_items].items_averaged = items_seen;
+      aggregate->agg[trg_items].rows_averaged = items_seen;
       aggregate->entry[trg_items] = sum / items_seen;
       aggregate->agg[trg_items].max = max;
       aggregate->agg[trg_items].min = min;
@@ -330,7 +332,7 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
 
   if (items_seen) {
     double avg = (double)sum / (double)items_seen;
-    aggregate->agg[trg_items].items_averaged = items_seen;
+    aggregate->agg[trg_items].rows_averaged = items_seen;
     aggregate->agg[trg_items].avg = avg;
     aggregate->agg[trg_items].max = max;
     aggregate->agg[trg_items].min = min;

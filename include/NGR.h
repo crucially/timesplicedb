@@ -56,7 +56,7 @@ struct NGR_metric_t {
 struct NGR_range_t {
   int *entry;                  /* ptr into the first entry in the range */
   void *area;                  /* if a range and a not an aggregate this points to the mmap of the file */ 
-  int items;                   /* how many items exist in the range */
+  int rows;                    /* how many rows exist in the range */
   size_t len;
   int mmap;                    /* if this is an mmaped range or not */
   int resolution;              /* resolution requested for this range  */
@@ -74,7 +74,7 @@ struct NGR_agg_entry_t {
   int max;    /* max value seen in interval */
   int min;    /* minimum value seen -- flag determines if 0 is considered minium or undefined value */
   double stddev; /* calculated stddev -- no idea if this is correct -- probably isn't */
-  int items_averaged; /* how many items went into this */
+  int rows_averaged; /* how many rows went into this */
 };
 
 struct NGR_metric_t * NGR_create(const char *filename, time_t create_time, int resolution, int columns);
