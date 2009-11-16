@@ -51,6 +51,7 @@ struct NGR_metric_t {
   int        resolution; /* distance in seconds between each row in the series */
   int        version;    /* storage verson */
   int        columns;    /* how many columns this store has */
+  int        *flags;     /* first is flag for db, rest is per column */
   char       **names;    /* first entry is the database name, rest is the column names */
 };
 
@@ -78,7 +79,7 @@ struct NGR_agg_row_t {
   int rows_averaged; /* how many rows went into this */
 };
 
-struct NGR_metric_t * NGR_create(const char *filename, time_t create_time, int resolution, int columns, char **names);
+struct NGR_metric_t * NGR_create(const char *filename, time_t create_time, int resolution, int columns, char **names, int *flags);
 
 struct NGR_metric_t * NGR_open(const char *filename);
 

@@ -60,7 +60,7 @@
 
 
 
-struct NGR_metric_t * NGR_create(const char *filename, time_t created_time, int resolution, int columns, char **names) {
+struct NGR_metric_t * NGR_create(const char *filename, time_t created_time, int resolution, int columns, char **names, int *flags) {
   int   fd, write_len;
   int   size = sizeof(int);
   int   version = 1;
@@ -94,8 +94,11 @@ struct NGR_metric_t * NGR_create(const char *filename, time_t created_time, int 
   int i;
   for(i = 0; i < columns + 1; i++) {
     int len = strlen(names[i]) + 1;
+
+    write_len = write(fd, &flags[i], 4);
+    assert(write_len == 4);
     write_len = write(fd, &len, 4);
-    assert(write_len == size);
+    assert(write_len == 4);
     write_len = write(fd, names[i], len);
     assert(write_len == len);
   }
@@ -143,9 +146,12 @@ struct NGR_metric_t * NGR_open(const char *filename) {
 
   int i;
   obj->names = malloc(sizeof(char *) * (obj->columns + 1));
+  obj->flags = malloc(sizeof(int) * (obj->columns + 1));
   for(i = 0; i < obj->columns + 1; i++) {
     int len;
-    char *name;
+    read_len = read(obj->fd, &obj->flags[i], 4);
+    assert(read_len == 4);
+    obj->base += 4;
     read_len = read(obj->fd, &len, 4);
     assert(read_len == 4);
     obj->base += 4;

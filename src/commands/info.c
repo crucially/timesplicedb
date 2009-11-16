@@ -90,7 +90,7 @@ int info_main(int argc, char **argv) {
   }
   int i;
   for(i = 1; i <= metric->columns; i++) {
-    printf("Column %d:      %s\n", i, metric->names[i]);
+    printf("Column %d:      %s (%d)\n", i, metric->names[i], metric->flags[i]);
   }
   return 0;
 }
