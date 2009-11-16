@@ -54,15 +54,18 @@ int agg_usage () {
 }
 
 int agg_main(int argc, char * const *argv) {
-  int o, start, end, interval;
+  int o, start, end, interval, column;
   char *filename = 0;
   
-  start = end = interval = 0;
+  column = start = end = interval = 0;
 
   while ((o = getopt(argc, argv,
-		     "f:s:e:i:h")) != -1) {
+		     "f:s:e:i:h:c:")) != -1) {
 
     switch(o) {
+    case 'c':
+      column = atoi(optarg);
+      break;
     case 'f':
       filename = malloc(strlen(optarg)+1);
       memcpy(filename, optarg, strlen(optarg)+1);
@@ -91,9 +94,10 @@ int agg_main(int argc, char * const *argv) {
 
   int rows = aggregate->rows;
   int i = 0;
-    while(rows--) {
-      printf("AVG: %.4f      MAX: %d      MIN: %d      STDDEV: %f\n", aggregate->agg[i].avg, aggregate->agg[i].max, aggregate->agg[i].min, aggregate->agg[i].stddev);
-      i++;
-    }
+  while(rows--) {
+    int offset = ((i * aggregate->columns) + column);
+    printf("AVG: %.4f      MAX: %d      MIN: %d      STDDEV: %f\n", aggregate->agg[offset].avg, aggregate->agg[offset].max, aggregate->agg[offset].min, aggregate->agg[offset].stddev);
+    i++;
+  }
   return 0;
 }
