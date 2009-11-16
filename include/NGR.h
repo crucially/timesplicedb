@@ -53,6 +53,9 @@ struct NGR_metric_t {
   int        columns;    /* how many columns this store has */
   int        *flags;     /* first is flag for db, rest is per column */
   char       **names;    /* first entry is the database name, rest is the column names */
+  int        ngrerrno;   /* set to non 0 if the latest function recorded an error */
+  int        syserrno;   /* underlying errno if result of a syscall */
+  int        ranges;     /* refcount off ranges */
 };
 
 struct NGR_range_t {
@@ -69,6 +72,7 @@ struct NGR_range_t {
 				  the reason this datacenter is dual purpose
 				  is so you can call aggregate on already aggregated ranges
 			       */
+  struct NGR_metric_t *metric; /* where did we come from ? */
 };
 
 struct NGR_agg_row_t {

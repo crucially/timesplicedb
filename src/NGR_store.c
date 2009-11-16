@@ -141,7 +141,7 @@ struct NGR_metric_t * NGR_open(const char *filename) {
   read_len = read(obj->fd, &obj->created, obj->width);
   assert(read_len == obj->width);
 
-
+  obj->ranges = 0;
 
 
   int i;
@@ -168,8 +168,9 @@ struct NGR_metric_t * NGR_open(const char *filename) {
 }
 
 int NGR_close(struct NGR_metric_t *obj) {
-	close(obj->fd);
-	free(obj);
+  assert(obj->ranges == 0);
+  close(obj->fd);
+  free(obj);
 }
 
 /* 
@@ -237,6 +238,8 @@ struct NGR_range_t * NGR_range (struct NGR_metric_t *obj, int start, int end) {
   range->agg = 0; 
   range->resolution = obj->resolution;
   range->columns = obj->columns;
+  range->metric = obj;
+  range->metric->ranges++;
   return range;
 }
 
@@ -248,6 +251,8 @@ struct NGR_range_t * NGR_range (struct NGR_metric_t *obj, int start, int end) {
 */
 
 void NGR_range_free (struct NGR_range_t * range) {
+
+  range->metric->ranges--;
 
   if (range->mmap == 1)
     munmap(range->area, range->len);
@@ -346,6 +351,8 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
   aggregate->rows = buckets;
   aggregate->row = aggregate->area;
   aggregate->columns = range->columns;
+  aggregate->metric = range->metric;
+  aggregate->metric->ranges++;
   int rows_per_bucket = ((interval/range->resolution));
   int cells_seen = 0;
 
