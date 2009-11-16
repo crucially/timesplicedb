@@ -285,7 +285,8 @@ struct NGR_agg_counters_t {
 struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int data_type) {
   struct NGR_range_t *aggregate;
   struct NGR_agg_counters_t *counters;
-  int src_rows, src_cells, curr_cell = 0;
+  int src_rows, src_cells, curr_cell, trg_cell;
+  src_rows = src_cells = curr_cell = trg_cell = 0;
 
   counters = malloc(sizeof(struct NGR_agg_counters_t) * range->columns);
 
@@ -294,7 +295,7 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
 
   int i = 0;
   while(i < range->columns) {
-    counters[i].cells_counted = counters[i].sum = counters[i].max = 0;
+    counters[i].cells_counted = counters[i].sum = counters[i].max = counters[i].sum_sqr = 0;
     counters[i].min = 2147483647; /** broken on 64bit, i know, and I haven't how to deal with signed or unsigned yet probably counters
 			are unsigned and gauge signed?**/
     i++;
@@ -315,7 +316,7 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
 
   while(src_cells--) {
     int value;
-    struct NGR_agg_counters_t counter = counters[curr_cell % range->columns];
+    struct NGR_agg_counters_t *counter = (counters + (curr_cell % range->columns));
 
     if (data_type == NGR_GAUGE || curr_cell == 0)
       value = range->row[curr_cell];
@@ -324,55 +325,59 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
 
 
 
-    counter.sum += value;
+    counter->sum += value;
+    counter->cells_counted++;
 
+    counter->sum_sqr += (double)value * (double)value;
 
-    counter.sum_sqr += (double)value * (double)value;
-
-    if (counter.min > value)
-      counter.min = value;
-    if (counter.max < value)
-      counter.max = value;
+    if (counter->min > value)
+      counter->min = value;
+    if (counter->max < value)
+      counter->max = value;
 
     if(cells_seen++ == rows_per_bucket * range->columns) {
-
-
       int i = 0;
       while(i < range->columns) {
-	i++;
-	/**
-	double avg = (double)counter->sum / (double)items_seen;
-	aggregate->agg[trg_items].rows_averaged = items_seen;
-	aggregate->row[trg_items] = sum / items_seen;
-	aggregate->agg[trg_items].max = max;
-	aggregate->agg[trg_items].min = min;
-	if (items_seen == 1)
-	  aggregate->agg[trg_items].stddev = 0;
+	struct NGR_agg_counters_t *column = counters + i;
+	double avg = (double)column->sum / (double)column->cells_counted;
+
+	aggregate->agg[trg_cell].rows_averaged = column->cells_counted;
+	aggregate->row[trg_cell] = column->sum / column->cells_counted;
+	aggregate->agg[trg_cell].max = column->max;
+	aggregate->agg[trg_cell].min = column->min;
+
+	if (column->cells_counted == 1)
+	  aggregate->agg[trg_cell].stddev = 0;
 	else 
-	  aggregate->agg[trg_items].stddev = ((sum_sqr - sum * avg)/(items_seen-1));
-	aggregate->agg[trg_items++].avg = avg;
-	sum_sqr = max = sum = items_seen = 0;
-	min = 2147483647;
+	  aggregate->agg[trg_cell].stddev = ((column->sum_sqr - column->sum * avg)/(column->cells_counted - 1));
+	
+	aggregate->agg[trg_cell++].avg = avg;
+
+	column->sum_sqr = column->cells_counted = column->sum = column->max = 0;
+	column->min = 2147483647; /** broken on 64bit, i know, and I haven't how to deal with signed or unsigned yet probably counters
+			are unsigned and gauge signed?**/
+
+	i++;
       }
-	**/
-      }
-    curr_cell++;
+      cells_seen = 0;
     }
+    curr_cell++;
   }
+  
   if (cells_seen) {
     /**
     double avg = (double)sum / (double)items_seen;
-    aggregate->agg[trg_items].rows_averaged = items_seen;
-    aggregate->agg[trg_items].avg = avg;
-    aggregate->agg[trg_items].max = max;
-    aggregate->agg[trg_items].min = min;
+    aggregate->agg[trg_cell].rows_averaged = items_seen;
+    aggregate->agg[trg_cell].avg = avg;
+    aggregate->agg[trg_cell].max = max;
+    aggregate->agg[trg_cell].min = min;
 
     if(items_seen == 1)
-      aggregate->agg[trg_items].stddev = 0;
+      aggregate->agg[trg_cell].stddev = 0;
     else
-      aggregate->agg[trg_items].stddev = ((sum_sqr - sum * avg)/(items_seen-1));
+      aggregate->agg[trg_cell].stddev = ((sum_sqr - sum * avg)/(items_seen-1));
 
-    aggregate->row[trg_items] = sum / items_seen;
+    aggregate->row[trg_cell] = sum / items_seen;
     /* XXX SSHOULD SET THE RESOLUTION ON AGGREGATE */
   }
 
