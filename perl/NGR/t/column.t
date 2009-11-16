@@ -1,6 +1,6 @@
 
 
-use Test::More tests => 13;
+use Test::More tests => 25;
 BEGIN { use_ok('NGR') };
 
 use strict;
@@ -54,6 +54,31 @@ is($range->cell(column => 1, row => 0)->{value}, 9);
 
 is($range->cell(column => 0, row => 1)->{value}, 2);
 is($range->cell(column => 1, row => 1)->{value}, 8);
+
+my $agg = $range->aggregate(interval => 120);
+
+isa_ok($range, "NGR::Range");
+is($agg->rows, 5);
+
+{
+  my $cell = $agg->cell(column => 0, row => 0);
+  is($cell->{stddev}, 0.5, "stddev");
+  is($cell->{min}, 1, "lowest we have seen");
+  is($cell->{max}, 2, "highest we have seen");
+  is($cell->{avg}, 1.5 , "between 1 and 2");
+  is($cell->{rows_averaged}, 2, "this bucket should have two entries!");
+}
+
+
+{
+  my $cell = $agg->cell(column => 1, row => 0);
+  is($cell->{stddev}, 0.5, "stddev");
+  is($cell->{min}, 8, "lowest we have seen");
+  is($cell->{max}, 9, "highest we have seen");
+  is($cell->{avg}, 8.5 , "between 1 and 2");
+  is($cell->{rows_averaged}, 2, "this bucket should have two entries!");
+}
+
 
 
 END {
