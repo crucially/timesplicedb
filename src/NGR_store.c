@@ -43,6 +43,7 @@
 #include <sys/stat.h>
 #include <time.h>
 #include <math.h>
+#include <string.h>
 
 
 
@@ -59,11 +60,11 @@
 
 
 
-struct NGR_metric_t * NGR_create(const char *filename, time_t created_time, int resolution, int columns) {
+struct NGR_metric_t * NGR_create(const char *filename, time_t created_time, int resolution, int columns, char **names) {
   int   fd, write_len;
   int   size = sizeof(int);
   int   version = 1;
-  
+
   assert(columns > 0);
 
   if(!created_time)
@@ -89,6 +90,16 @@ struct NGR_metric_t * NGR_create(const char *filename, time_t created_time, int 
   assert(write_len == 4);
   write_len = write(fd, &created_time, size);
   assert(write_len == size);
+
+  int i;
+  for(i = 0; i < columns + 1; i++) {
+    int len = strlen(names[i]) + 1;
+    write_len = write(fd, &len, 4);
+    assert(write_len == size);
+    write_len = write(fd, names[i], len);
+    assert(write_len == len);
+  }
+
   close(fd);
 
   return NGR_open(filename);
@@ -126,6 +137,24 @@ struct NGR_metric_t * NGR_open(const char *filename) {
   obj->base += obj->width;
   read_len = read(obj->fd, &obj->created, obj->width);
   assert(read_len == obj->width);
+
+
+
+
+  int i;
+  obj->names = malloc(sizeof(char *) * (obj->columns + 1));
+  for(i = 0; i < obj->columns + 1; i++) {
+    int len;
+    char *name;
+    read_len = read(obj->fd, &len, 4);
+    assert(read_len == 4);
+    obj->base += 4;
+    obj->names[i] = malloc(len);
+    read_len = read(obj->fd, obj->names[i], len);
+    assert(read_len == len);
+    obj->base += len;
+  }
+
 
   assert(obj->width == 4 || obj->width == 8);
 

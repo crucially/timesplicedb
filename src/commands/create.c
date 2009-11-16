@@ -88,10 +88,20 @@ int create_main(int argc, char * const *argv) {
     WARN("Usage: ngr create [options]\n");
     return create_usage();
   }
-  struct NGR_metric_t *metric = NGR_create(filename, beginning_time, resolution, columns);
+
+  char **foo = malloc(sizeof(char *) * (columns + 1));
+  foo[0] = "Database name";
+  int j;
+  for(j = 1; j <= columns; j++) {
+    foo[j] = "Column";
+  }
+
+
+  struct NGR_metric_t *metric = NGR_create(filename, beginning_time, resolution, columns, foo);
 
   time_t last_row = (metric->created + (NGR_last_row_idx(metric, 0) * 60));
 
+  printf("Name:          %s\n", metric->names[0]);
   printf("Starting time: %s", ctime(&(metric->created)));
   printf("Last row:      %s", ctime(&last_row)); 
   printf("Rows:          %d\n", NGR_last_row_idx(metric, 0) + 1);
@@ -105,6 +115,9 @@ int create_main(int argc, char * const *argv) {
   } else {
     printf("Format:        unknown!\n");
   }
-
+  int i;
+  for(i = 1; i <= metric->columns; i++) {
+    printf("Column %d:      %s\n", i, metric->names[i]);
+  }
   return 0;
 }
