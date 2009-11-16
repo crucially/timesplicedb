@@ -253,7 +253,7 @@ int NGR_last_row_idx (struct NGR_metric_t *obj, int column) {
 }
 
 
-int NGR_entry (struct NGR_metric_t *obj, int row, int column) {
+int NGR_cell (struct NGR_metric_t *obj, int row, int column) {
   char *buf;
   int rv, read_len, offset;
   assert (column <= obj->columns - 1);
