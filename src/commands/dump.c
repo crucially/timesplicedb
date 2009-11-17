@@ -81,6 +81,7 @@ int dump_main(int argc, char * const *argv) {
   int columns = range->columns;
   int i = 0;
   int *last_value = calloc(sizeof(int), columns);
+  int *last_diff  = calloc(sizeof(int), columns);
   if(column_set) {
     while(rows--) {
       printf("%u\n", range->row[(i++ * columns) + column]);
@@ -89,19 +90,26 @@ int dump_main(int argc, char * const *argv) {
     int col = 0;
     while(rows--) {
       while(col < columns) {
-	unsigned int last_value = range->row[((i - 1) * columns) + col];
-	unsigned int new_value = range->row[(i * columns) + col++];
-
+	unsigned int value = range->row[(i * columns) + col];
+	
 	if (difference) {
-	  if (last_value == 0 || new_value == 0)
+	  if (value == 0) {
+	    printf("%u\t", last_diff[col++]);
 	    continue;
-	  if (last_value > new_value) {
+	  }
+	  if (last_value[col] > value) {
 	    /* wrap around */
-	    printf("%u\t", 4294967295 - last_value + new_value);
-	  } else
-	    printf("%u\t", new_value - last_value);
+	    last_diff[col] = 4294967295 - last_value[col] + value;
+	  } else {
+	    last_diff[col] = value - last_value[col];
+	  }
+	  printf("%u\t", last_diff[col]);
+
 	} else
-	  printf("%u\t", new_value);
+	  printf("%u\t", value);
+	if (value)
+	  last_value[col] = value;
+	col++;
       }
       i++;
       col = 0;
