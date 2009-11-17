@@ -79,13 +79,13 @@ int dump_main(int argc, char * const *argv) {
   int i = 0;
   if(column_set) {
     while(rows--) {
-      printf("%d\n", range->row[(i++ * columns) + column]);
+      printf("%u\n", range->row[(i++ * columns) + column]);
     }
   } else {
     int col = 0;
     while(rows--) {
       while(col < columns) {
-	printf("%d\t", range->row[(i * columns) + col++]);
+	printf("%u\t", range->row[(i * columns) + col++]);
       }
       i++;
       col = 0;

@@ -323,10 +323,10 @@ int NGR_cell (struct NGR_metric_t *obj, int row, int column) {
 }
 
 struct NGR_agg_counters_t {
-  int cells_counted;  // how many cells we have counted
-  int sum;            // sum
-  int min;            // minum value seen
-  int max;            // maximum value seen
+  unsigned int cells_counted;  // how many cells we have counted
+  unsigned int sum;            // sum
+  unsigned int min;            // minum value seen
+  unsigned int max;            // maximum value seen
   double sum_sqr;     
 };
 
@@ -346,7 +346,7 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
   int i = 0;
   while(i < range->columns) {
     counters[i].cells_counted = counters[i].sum = counters[i].max = counters[i].sum_sqr = 0;
-    counters[i].min = 2147483647; /** broken on 64bit, i know, and I haven't how to deal with signed or unsigned yet probably counters
+    counters[i].min = 4294967295; /** broken on 64bit, i know, and I haven't how to deal with signed or unsigned yet probably counters
 			are unsigned and gauge signed?**/
     i++;
   }

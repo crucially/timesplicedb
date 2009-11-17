@@ -65,7 +65,7 @@ struct NGR_range_t {
   unsigned   magic;
 #define NGR_range_magic 0x6428b5c9
 
-  int *row;                  /* ptr into the first row in the range */
+  unsigned int *row;                  /* ptr into the first row in the range */
   void *area;                  /* if a range and a not an aggregate this points to the mmap of the file */ 
   int rows;                    /* how many rows exist in the range */
   size_t len;
@@ -83,8 +83,8 @@ struct NGR_range_t {
 
 struct NGR_agg_row_t {
   double avg;    /* average value in interval */
-  int max;    /* max value seen in interval */
-  int min;    /* minimum value seen -- flag determines if 0 is considered minium or undefined value */
+  unsigned int max;    /* max value seen in interval */
+  unsigned int min;    /* minimum value seen -- flag determines if 0 is considered minium or undefined value */
   double stddev; /* calculated stddev -- no idea if this is correct -- probably isn't */
   int rows_averaged; /* how many rows went into this */
 };
