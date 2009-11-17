@@ -327,7 +327,8 @@ struct NGR_agg_counters_t {
   unsigned int sum;            // sum
   unsigned int min;            // minum value seen
   unsigned int max;            // maximum value seen
-  double sum_sqr;     
+  double sum_sqr;
+  unsigned int last_value;
 };
 
 
@@ -345,9 +346,10 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
 
   int i = 0;
   while(i < range->columns) {
-    counters[i].cells_counted = counters[i].sum = counters[i].max = counters[i].sum_sqr = 0;
+    counters[i].last_value = counters[i].cells_counted = counters[i].sum = counters[i].max = counters[i].sum_sqr = 0;
     counters[i].min = 4294967295; /** broken on 64bit, i know, and I haven't how to deal with signed or unsigned yet probably counters
 			are unsigned and gauge signed?**/
+
     i++;
   }
 
@@ -370,11 +372,20 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
     int value;
     struct NGR_agg_counters_t *counter = (counters + (curr_cell % range->columns));
 
-    if (data_type == NGR_GAUGE || curr_cell == 0)
+    if (data_type == NGR_GAUGE)
       value = range->row[curr_cell];
-    else 
-      value = range->row[curr_cell] - range->row[curr_cell-1];
-
+    else  {
+      int new_value = range->row[curr_cell];
+      int old_value = range->row[curr_cell - range->columns];
+      if (range->row[curr_cell] == 0 || range->row[curr_cell - range->columns] == 0) {
+	value = counters->last_value;
+      } else {
+	if (old_value > new_value)
+	  value = 4294967295 - old_value + new_value;
+	else 
+	  value = new_value - old_value;
+      }
+    }
 
 
     counter->sum += value;
@@ -413,6 +424,7 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
       }
       cells_seen = 0;
     }
+    counter->last_value = value;
     curr_cell++;
   }
   
@@ -440,7 +452,7 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
     
     /* XXX SSHOULD SET THE RESOLUTION ON AGGREGATE */
   }
-
+  
   return aggregate;
 }
 
