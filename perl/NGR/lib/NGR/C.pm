@@ -1,6 +1,6 @@
 package NGR::C;
 
-use 5.008009;
+use 5.008;
 use strict;
 use warnings;
 use Carp;
