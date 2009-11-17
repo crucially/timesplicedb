@@ -80,6 +80,7 @@ int dump_main(int argc, char * const *argv) {
   int rows = range->rows;
   int columns = range->columns;
   int i = 0;
+  int *last_value = calloc(sizeof(int), columns);
   if(column_set) {
     while(rows--) {
       printf("%u\n", range->row[(i++ * columns) + column]);
