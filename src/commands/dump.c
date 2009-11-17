@@ -48,14 +48,17 @@ int dump_usage () {
 }
 
 int dump_main(int argc, char * const *argv) {
-  int o, column, column_set;
+  int o, column, column_set, difference;
   char *filename = 0;
-  column = column_set = 0;
+  difference = column = column_set = 0;
 
   while ((o = getopt(argc, argv,
-		     "c:f:h")) != -1) {
+		     "c:f:hd")) != -1) {
 
     switch(o) {
+    case 'd':
+      difference = 1;
+      break;
     case 'f':
       filename = malloc(strlen(optarg)+1);
       memcpy(filename, optarg, strlen(optarg)+1);
@@ -85,7 +88,19 @@ int dump_main(int argc, char * const *argv) {
     int col = 0;
     while(rows--) {
       while(col < columns) {
-	printf("%u\t", range->row[(i * columns) + col++]);
+	unsigned int last_value = range->row[((i - 1) * columns) + col];
+	unsigned int new_value = range->row[(i * columns) + col++];
+
+	if (difference) {
+	  if (last_value == 0 || new_value == 0)
+	    continue;
+	  if (last_value > new_value) {
+	    /* wrap around */
+	    printf("%u\t", 4294967295 - last_value + new_value);
+	  } else
+	    printf("%u\t", new_value - last_value);
+	} else
+	  printf("%u\t", new_value);
       }
       i++;
       col = 0;
