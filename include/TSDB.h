@@ -115,7 +115,7 @@ struct TSDB_metric_t * TSDB_open(const char *filename);
 
 int TSDB_last_row_idx (struct TSDB_metric_t *obj, int column);
 
-int TSDB_cell (struct TSDB_metric_t *obj, int row, int column);
+u_int64_t TSDB_cell (struct TSDB_metric_t *obj, int row, int column);
 
 struct TSDB_range_t * TSDB_range (struct TSDB_metric_t *obj, int start, int end);
 
