@@ -207,7 +207,7 @@ range_row_stddev(obj, column, idx)
 	if(obj->agg) {
 	  RETVAL = obj->agg[(idx * obj->columns) + column].stddev;
 	} else {
-	  RETVAL = 0; // should be undef
+	  RETVAL = 0; /* should be undef */
 	}
 	OUTPUT:
 	RETVAL
@@ -221,7 +221,7 @@ range_row_rows_averaged(obj, column, idx)
 	if(obj->agg) {
 	  RETVAL = obj->agg[(idx * obj->columns) + column].rows_averaged;
 	} else {
-	  RETVAL = 0; // none
+	  RETVAL = 0; /* none */
 	}
 	OUTPUT:
 	RETVAL
