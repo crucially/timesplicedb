@@ -59,8 +59,8 @@ int usage (const char * message, ...) {
 	}
   } 
   WARN("Usage:");
-  WARN("ngr <command>\n");
-  WARN("ngr help <command>\n");
+  WARN("tsdb <command>\n");
+  WARN("tsdb help <command>\n");
   WARN("Available commands:\n");
   WARN("    info\n");
   WARN("    dump\n");
@@ -132,7 +132,6 @@ int dispatch(void* handle, char * command, ...) {
   if (argc) {
     return f(argc, argv);
   } else {
-  	WARN("Usage: ngr %s [options]\n", command);
 	return f();
   }
   return 0;

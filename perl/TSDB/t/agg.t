@@ -1,15 +1,13 @@
-
-
 use Test::More tests => 40;
 BEGIN { use_ok('TSDB') };
 
 use strict;
 
-unlink("aggtest.ngrd");
+unlink("aggtest.tsdb");
 
 my $ct = 1258091219;
 my $it = $ct;
-my $tsdb = TSDB->new('aggtest.ngrd',
+my $tsdb = TSDB->new('aggtest.tsdb',
     clobber     => 1,
     resolution  => 60,
     columns     => 'test',

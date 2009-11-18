@@ -43,13 +43,14 @@
 extern char *optarg;
 
 int agg_usage () {
+  WARN("Usage: tsdb agg [options]\n");
   WARN(" -f filename  db to get info about\n");
   WARN(" -s start aggregating from this timestamp (unix timestamp)\n");
   WARN(" -e aggregate until this timestamp (unix timestamp)\n");
   WARN(" -i interval to aggregate down to (seconds)\n");
   WARN(" -h this help\n\n");
   WARN("Aggregate a 24 hour period into 12 buckets each with the aggregate of an hour\n");
-  WARN("\tngr agg -f data.ngr -s 1258096151 -e 1258182558 -i 3600\n");
+  WARN("\ttsdb agg -f data.tsdb -s 1258096151 -e 1258182558 -i 3600\n");
   return 1;
 }
 
@@ -86,7 +87,6 @@ int agg_main(int argc, char * const *argv) {
   }
   
   if(!filename || !start || !end || !interval) {
-    WARN("Usage: ngr agg [options]\n");
     return agg_usage();
   }
 

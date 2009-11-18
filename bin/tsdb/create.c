@@ -43,13 +43,14 @@
 extern char *optarg;
 
 int create_usage () {
+  WARN("Usage: tsdb create [options]\n");
   WARN(" -f filename  db to get info about\n");
   WARN(" -r resolution for each row in the time series (seconds)\n");
   WARN(" -b the time of the first row in the time series (unix timestamp)\n");
   WARN(" -c the number of columns per row");
   WARN(" -h this help\n\n");
   WARN("Create a database starting at a given time with a storage interval of every 10 minutes\n");
-  WARN("\tngr create -f data.ngr -c 1258096151 -r 600\n");
+  WARN("\ttsdb create -f data.tsdb -c 1258096151 -r 600\n");
   return 1;
 }
 
@@ -91,7 +92,6 @@ int create_main(int argc, char * const *argv) {
       beginning_time = atoi(optarg);
       break;
     case 'h':
- 	  WARN("Usage: ngr create [options]\n");
       return create_usage();
       break;
     }
@@ -99,7 +99,6 @@ int create_main(int argc, char * const *argv) {
   }
   
   if(!filename) {
-    WARN("Usage: ngr create [options]\n");
     return create_usage();
   }
 

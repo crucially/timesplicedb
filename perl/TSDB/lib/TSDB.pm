@@ -15,8 +15,8 @@ TSDB - a timeslice database
 =head1 SYNOPSIS
 
     use TSDB;
-    my $ngr = TSDB->new( $filename, columns => [ 'response_time',  'failure_rate'] );
-    $ngr->insert('response_time' => $value);
+    my $tsdb = TSDB->new( $filename, columns => [ 'response_time',  'failure_rate'] );
+    $tsdb->insert('response_time' => $value);
 
 
 =head1 METHODS
@@ -304,9 +304,9 @@ TSDB::Range - represent a range of values in TSDB
 
 =head1 SYNOPSIS
     
-    my $ngr   = TSDB->new($filename);
-    my $cols  = $ngr->columns;
-    my $range = $ngr->timespan($start, $end);
+    my $tsdb  = TSDB->new($filename);
+    my $cols  = $tsdb->columns;
+    my $range = $tsdb->timespan($start, $end);
     foreach my $row (0 .. $range->rows) {
         foreach my $col (0..$cols) {
             print Dumper ($range->cell($row, $col));

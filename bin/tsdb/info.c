@@ -43,6 +43,7 @@ extern char *optarg;
 
 
 int info_usage () {
+  WARN("Usage: tsdb info [options]\n");
   WARN(" -f filename  db to get info about\n");
   WARN(" -h this help\n");
   return 1;
@@ -67,7 +68,6 @@ int info_main(int argc, char **argv) {
 
   
   if (!filename) {
-    WARN("Usage: ngr info [options]\n");
     return info_usage();
   }
 

@@ -1,6 +1,6 @@
-Revision history for Perl extension NGR.
+Revision history for Perl extension TSDB.
 
 0.01  Thu Nov 12 21:32:35 2009
 	- original version; created by h2xs 1.23 with options
-		-x --name NGR ../include/NGR.h
+		-x --name TSDB ../include/TSDB.h
 

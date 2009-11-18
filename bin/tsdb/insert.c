@@ -42,13 +42,14 @@
 extern char *optarg;
 
 int insert_usage () {
+  WARN("Usage: tsdb insert [options]\n");
   WARN(" -f filename  db to get info about\n");
   WARN(" -t timestamp to insert this value at; defaults to now (unix timestamp)\n");
   WARN(" -c column to insert into, defaults to 0\n");
   WARN(" -v value to insert (integer)\n");
   WARN(" -h this help\n\n");
   WARN("Insert a value at a given time\n");
-  WARN("\tngr insert -f data.ngr -t 1258096151 -v 50\n");
+  WARN("\ttsdb insert -f data.tsdb -t 1258096151 -v 50\n");
   return 1;
 }
 
@@ -80,7 +81,6 @@ int insert_main(int argc, char * const *argv) {
   }
 
   if (!filename || !value) {
-    WARN("Usage: ngr insert [options]\n");
     return insert_usage();
   }
 

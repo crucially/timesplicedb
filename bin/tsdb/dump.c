@@ -42,6 +42,7 @@
 extern char *optarg;
 
 int dump_usage () {
+  WARN("Usage: tsdb dump [options]\n");
   WARN(" -f filename  db to get info about\n");
   WARN(" -c column    which column to dump (defaults to dumping all columns)\n");
   WARN(" -d           dump as difference rather than absolute value\n");
@@ -73,7 +74,6 @@ int dump_main(int argc, char * const *argv) {
   }
   
   if (!filename) {
-	WARN("Usage: ngr dump [options]\n");
     return dump_usage();
   }
 
