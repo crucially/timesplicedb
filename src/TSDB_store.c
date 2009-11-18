@@ -337,7 +337,8 @@ int TSDB_last_row_idx (struct TSDB_metric_t *obj, int column) {
 
 int TSDB_cell (struct TSDB_metric_t *obj, int row, int column) {
   char *buf;
-  int rv, read_len, offset;
+  u_int64_t rv;
+  int read_len, offset;
   assert(obj->magic == TSDB_metric_magic);
   assert (column <= obj->columns - 1);
   offset = (obj->base + (row * ( obj->width * obj->columns)) + (column * obj->width));
