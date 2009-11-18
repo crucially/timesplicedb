@@ -63,6 +63,14 @@ struct NGR_create_opts_t * NGR_create_opts(int columns) {
   opts->magic = NGR_create_opts_magic;
   opts->col_flags = calloc(sizeof(int), columns);
   opts->col_names = calloc(sizeof(char *), columns);
+  return opts;
+}
+
+void NGR_free_opts(struct NGR_create_opts_t *opts) {
+  free(opts->col_flags);
+  free(opts->col_names);
+  free(opts);
+  return;
 }
 
 struct NGR_metric_t * NGR_create(struct NGR_create_opts_t *opts) {

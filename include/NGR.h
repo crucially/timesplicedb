@@ -104,6 +104,8 @@ struct NGR_agg_row_t {
 
 struct NGR_create_opts_t * NGR_create_opts(int columns);
 
+void NGR_free_opts(struct NGR_create_opts_t *opts);
+
 struct NGR_metric_t * NGR_create(struct NGR_create_opts_t *opts);
 
 struct NGR_metric_t * NGR_open(const char *filename);
