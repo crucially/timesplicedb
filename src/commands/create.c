@@ -98,11 +98,10 @@ int create_main(int argc, char * const *argv) {
   opts->resolution   = resolution;
 
 
-  int *flag = malloc(sizeof(int));
-  *flag = 0;
+
   for(j = 0; j < columns; j++) {
-        opts->col_flags[j] = flag;
-        opts->col_names[j] = "Column";
+    opts->col_flags[j] = 0;
+    opts->col_names[j] = "Column";
   }
 
   struct NGR_metric_t *metric = NGR_create(opts);
@@ -110,7 +109,7 @@ int create_main(int argc, char * const *argv) {
 
   time_t last_row = (metric->created + (NGR_last_row_idx(metric, 0) * 60));
 
-  printf("Name:          %s\n", metric->names[0]);
+  printf("Name:          %s\n", metric->name);
   printf("Starting time: %s", ctime(&(metric->created)));
   printf("Last row:      %s", ctime(&last_row)); 
   printf("Rows:          %d\n", NGR_last_row_idx(metric, 0) + 1);
@@ -126,7 +125,7 @@ int create_main(int argc, char * const *argv) {
   }
   int i;
   for(i = 0; i < metric->columns; i++) {
-    printf("Column %d:      %s (%d)\n", i, metric->names[i], metric->flags[i]);
+    printf("Column %d:      %s (%d)\n", i, metric->col_names[i], metric->col_flags[i]);
   }
 
   return 0;

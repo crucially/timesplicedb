@@ -74,7 +74,7 @@ int info_main(int argc, char **argv) {
   struct NGR_metric_t *metric = NGR_open(filename);
   time_t last_row = (metric->created + (NGR_last_row_idx(metric, 0) * metric->resolution));
 
-  printf("Name:          %s\n", metric->names[0]);
+  printf("Name:          %s\n", metric->name);
   printf("Starting time: %s", ctime(&(metric->created)));
   printf("Last row:      %s", ctime(&last_row)); 
   printf("Rows:          %d\n", NGR_last_row_idx(metric, 0) + 1);
@@ -89,8 +89,8 @@ int info_main(int argc, char **argv) {
     printf("Format:        unknown!\n");
   }
   int i;
-  for(i = 1; i <= metric->columns; i++) {
-    printf("Column %d:      %s (%d)\n", i, metric->names[i], metric->flags[i]);
+  for(i = 0; i < metric->columns; i++) {
+    printf("Column %d:      %s (%d)\n", i, metric->col_names[i], metric->col_flags[i]);
   }
   return 0;
 }
