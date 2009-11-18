@@ -75,8 +75,8 @@ int dump_main(int argc, char * const *argv) {
     return dump_usage();
   }
 
-  struct NGR_metric_t *metric = NGR_open(filename);
-  struct NGR_range_t *range = NGR_range(metric, 0, NGR_last_row_idx(metric, 0));
+  struct TSDB_metric_t *metric = TSDB_open(filename);
+  struct TSDB_range_t *range = TSDB_range(metric, 0, TSDB_last_row_idx(metric, 0));
   int rows = range->rows;
   int columns = range->columns;
   int i = 0;

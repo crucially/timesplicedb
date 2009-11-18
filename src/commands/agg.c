@@ -92,13 +92,13 @@ int agg_main(int argc, char * const *argv) {
 
   int flags;
   if (difference)
-    flags = NGR_COUNTER;
+    flags = TSDB_COUNTER;
   else
-    flags = NGR_GAUGE;
+    flags = TSDB_GAUGE;
 
-  struct NGR_metric_t *metric    = NGR_open(filename);
-  struct NGR_range_t  *range     = NGR_timespan(metric, start, end);
-  struct NGR_range_t  *aggregate = NGR_aggregate(range, interval, flags);
+  struct TSDB_metric_t *metric    = TSDB_open(filename);
+  struct TSDB_range_t  *range     = TSDB_timespan(metric, start, end);
+  struct TSDB_range_t  *aggregate = TSDB_aggregate(range, interval, flags);
 
   int rows = aggregate->rows;
   int i = 0;

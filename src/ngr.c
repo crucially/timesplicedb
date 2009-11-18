@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
 	return usage("You must pass in a command\n");
   }	
 
-  void* handle = dlopen(NGR_NULL, RTLD_LAZY);
+  void* handle = dlopen(TSDB_NULL, RTLD_LAZY);
   if (!handle) {
 	WARN("Couldn't load handle: %s\nSomething has gone seriously wrong.\n", dlerror());
 	return 1;
@@ -91,7 +91,7 @@ int main(int argc, char **argv) {
   int ret = 0;
   if (strneq("help", argv[0], 4)) {
 	if (argc<2) {
-		ret = usage(NGR_NULL);
+		ret = usage(TSDB_NULL);
 	} else {
 		ret = dispatch(handle, argv[1], 0);
 	}

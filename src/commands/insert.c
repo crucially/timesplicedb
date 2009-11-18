@@ -84,9 +84,9 @@ int insert_main(int argc, char * const *argv) {
     return insert_usage();
   }
 
-  struct NGR_metric_t *metric = NGR_open(filename);
+  struct TSDB_metric_t *metric = TSDB_open(filename);
 
-  NGR_insert(metric, column, insert_time, value);
+  TSDB_insert(metric, column, insert_time, value);
 
   return 0;
 }

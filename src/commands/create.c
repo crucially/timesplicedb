@@ -90,7 +90,7 @@ int create_main(int argc, char * const *argv) {
     return create_usage();
   }
 
-  struct NGR_create_opts_t *opts = NGR_create_opts(columns);
+  struct TSDB_create_opts_t *opts = TSDB_create_opts(columns);
   opts->filename     = filename;
   opts->name         = "Database name";
   opts->flags        = 0;
@@ -104,15 +104,15 @@ int create_main(int argc, char * const *argv) {
     opts->col_names[j] = "Column";
   }
 
-  struct NGR_metric_t *metric = NGR_create(opts);
-  NGR_free_opts(opts);
+  struct TSDB_metric_t *metric = TSDB_create(opts);
+  TSDB_free_opts(opts);
 
-  time_t last_row = (metric->created + (NGR_last_row_idx(metric, 0) * 60));
+  time_t last_row = (metric->created + (TSDB_last_row_idx(metric, 0) * 60));
 
   printf("Name:          %s\n", metric->name);
   printf("Starting time: %s", ctime(&(metric->created)));
   printf("Last row:      %s", ctime(&last_row)); 
-  printf("Rows:          %d\n", NGR_last_row_idx(metric, 0) + 1);
+  printf("Rows:          %d\n", TSDB_last_row_idx(metric, 0) + 1);
   printf("Columns:       %d\n", metric->columns); 
   printf("Resolution:    %d seconds\n", metric->resolution);
   printf("Verison:       %d\n", metric->version);
