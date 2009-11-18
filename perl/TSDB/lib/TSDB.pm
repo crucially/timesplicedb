@@ -90,20 +90,23 @@ sub new {
     # TODO make this nicer than a bit pack
     my $flags = [$options{flags} || 0];
 
-    my @columns;
+    my @col_names;
+    my @col_flags;
+
+
     if ('HASH' eq ref($options{columns})) {
         while (my ($k,$v) = each %{$options{columns}}) {
-            push @columns, { name => $k, flags => $v };
-            $self->{_columns}{$k} = $#columns;
+	    push @col_names, $k;
+	    push @col_flags, $v;
         }
     } elsif ('ARRAY' eq ref($options{columns})) {
         foreach my $k (@{$options{columns}}) {
-            push @columns, { name => $k, flags => 0 }; 
-            $self->{_columns}{$k} = $#columns;
+	    push @col_names, $k;
+	    push @col_flags, 0;
         }
     } elsif (defined $options{columns}) {
-        push @columns, { name => $options{columns}, flags => 0 };
-        $self->{_columns}{$options{columns}} = $#columns;
+	push @col_names, $options{columns};
+	push @col_flags, 0;
     } elsif (!$open) {
         croak "You must pass in a columns definition";
     }
@@ -113,9 +116,12 @@ sub new {
         					 TSDB::C::create( $file,
                         		$options{create_time},
                         		$options{resolution},
+					scalar(@col_names),
                         		$name,
                         		$flags,
-                        		[@columns] );
+					\@col_names,
+					\@col_flags,
+						 );
 
     return $self;
 
