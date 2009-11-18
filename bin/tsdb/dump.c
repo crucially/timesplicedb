@@ -43,6 +43,8 @@ extern char *optarg;
 
 int dump_usage () {
   WARN(" -f filename  db to get info about\n");
+  WARN(" -c column    which column to dump (defaults to dumping all columns)\n");
+  WARN(" -d           dump as difference rather than absolute value\n");
   WARN(" -h this help\n");
   return 1;
 }
