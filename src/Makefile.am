@@ -3,8 +3,8 @@ INCLUDES = -I$(top_srcdir)/include
 
 
 bin_PROGRAMS = tsdb
-tsdb_SOURCES  = tsdb.c 
-tsdb_LDFLAGS  = -lm -ldl
+tsdb_SOURCES = tsdb.c 
+tsdb_LDFLAGS = -lm -ldl
 
 lib_LTLIBRARIES         = libTSDB_store.la
 
