@@ -9,11 +9,16 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_PROG_CC
 AC_PROG_LIBTOOL
 
+dnl Check pod2man for creating man pages
+AC_CHECK_PROG([HAVE_POD2MAN], [pod2man], "yes", "no")
+AM_CONDITIONAL(HAVE_POD2MAN, [ test "yes" = "$HAVE_POD2MAN" ])
+
 AC_CONFIG_FILES([
     Makefile
     src/Makefile
     bin/Makefile
     bin/tsdb/Makefile
     include/Makefile
+	man/Makefile
 ])
 AC_OUTPUT
