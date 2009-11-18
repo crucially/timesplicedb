@@ -91,12 +91,12 @@ sub new {
     my $flags = [$options{flags} || 0];
 
     my @columns;
-    if ('HASH' eq ref($options{columns}) {
-        while (my ($k,$v) = each %{$options{columns}) {
+    if ('HASH' eq ref($options{columns})) {
+        while (my ($k,$v) = each %{$options{columns}}) {
             push @columns, { name => $k, flags => $v };
             $self->{_columns}{$k} = $#columns;
         }
-    } elsif ('ARRAY' eq ref($options{columns}) {
+    } elsif ('ARRAY' eq ref($options{columns})) {
         foreach my $k (@{$options{columns}}) {
             push @columns, { name => $k, flags => 0 }; 
             $self->{_columns}{$k} = $#columns;
@@ -312,7 +312,7 @@ This should only be called internally.
 sub new {
     my $class = shift;
 	my $ctx   = shift;
-	my $opts  = @_;
+	my %opts  = @_;
 	my $self  = bless \%opts, $class;
     $self->{ctx}  = $ctx;
     $self->{iter} = 0;
