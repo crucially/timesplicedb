@@ -1,5 +1,16 @@
 =head1 NAME
 
-foo - bar quirka fleeg
+TSDB_cell - get the value of a cell from a TimeSplice .tsdb database
+
+=head1 LIBRARY
+
+libTSDB_store (-lTSDB_store)
+
+=head1 SYNOPSIS
+
+    #include <TSDB.h>
+
+    struct TSDB_metric_t *metric = TSDB_open(filename);
+	uint_64t value = TSDB_cell(metric, row, column);
 
 =cut

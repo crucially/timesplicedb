@@ -1,5 +1,112 @@
 =head1 NAME
 
-foo - bar quirka fleeg
+tsdb - manipulate a TimeSplice .tsdb database
+
+=head1 SYNOPSIS
+
+	tsdb <command> [option[s]]
+
+=head1 DESCRIPTION
+
+B<TimeSplice> is a fast time series database. The B<tsdb> command allows you to manipulate
+a C<.tsdb> database from the command line.
+
+=head1 COMMANDS
+
+Each command has its own options. All commands will print their usage if passed C<-h>.
+
+=head2 create
+
+Create a new database.
+
+=over 4
+
+=item -f <filename> (required)
+
+Name of the file the database should be created in.
+
+=item -r <resolution>
+
+Resolution for each row in the time series in seconds.
+
+=item -b <time>
+
+Rhe time of the first row in the time series as a unix timestamp.
+
+=item -c <column names>
+
+The name of the columns to create as comma seperated values.
+
+	-c count,foo,bar 
+
+=item -h
+
+Print out help.
+
+=back
+
+=head2 info
+
+Dump the meta information about a database.
+
+=over 4
+
+=item -f <filename>
+
+The filename of the C<.tsdb> database to dump.
+
+=back
+
+=head2 insert
+
+Insert a value into the database.
+
+=over 4
+
+=item -f <filename>
+
+The filename of the C<.tsdb> database to insert into.
+
+=item -t <timestamp>
+
+Timestamp  to insert this value at as a unix timestamp. Defaults to current time.
+
+=item -c <column>
+
+Column to insert into, defaults to 0.
+
+=item -v <value>
+
+Integer value to insert.
+
+=back
+
+=head2 dump
+
+Dump the all the rows from a database.
+
+=over 4
+
+=item -f <filename>
+
+The filename of the C<.tsdb> database to dump.
+
+=item -c <column>
+
+Which column to dump (defaults to dumping all columns).
+
+=item -d
+
+Dump as difference rather than absolute value.
+
+=back
+
+=head2 help <command>
+
+Get the help for any command.
+
+=head1 EXIT STATUS
+
+The B<tsdb> utility exits 0 on success, and >0 if an error occurs.
 
 =cut

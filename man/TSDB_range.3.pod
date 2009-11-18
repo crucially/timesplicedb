@@ -1,5 +1,24 @@
 =head1 NAME
 
-foo - bar quirka fleeg
+TSDB_range - get a range of data from  a TimeSplice .tsdb database
+
+=head1 LIBRARY
+
+libTSDB_store (-lTSDB_store)
+
+=head1 SYNOPSIS
+
+    #include <TSDB.h>
+
+    struct TSDB_metric_t *metric = TSDB_open(filename);
+    struct TSDB_range_t *range = TSDB_range(metric, 0, TSDB_last_row_idx(metric, 0));
+    for (int y=0; y<range->rows; y++) {
+        for (int x=0; y<range->columns; x++) {
+            u_int64_t value = range->row[(y * columns) + x];
+            printf("%l\t", value);
+        }
+        printf("\n");
+    }
 
 =cut
+

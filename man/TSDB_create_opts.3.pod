@@ -1,5 +1,30 @@
 =head1 NAME
 
-foo - bar quirka fleeg
+TSDB_create_opts - get a prepopulated TSDB_create options struct
+
+=head1 LIBRARY
+
+libTSDB_store (-lTSDB_store)
+
+=head1 SYNOPSIS
+
+    #include <TSDB.h>
+
+    struct TSDB_create_opts_t *opts = TSDB_create_opts(columns);
+    opts->filename     = filename;
+    opts->name         = "Database name";
+    opts->flags        = 0;                /* No flags so far */
+    opts->created_time = beginning_time;   /* Optional unix time stamp with the time of the first row in the time series*/
+    opts->resolution   = resolution;       /* resolution for each row in the time series in seconds */
+
+    for(j = 0; j < columns; j++) {
+        opts->col_flags[j] = 0; /* No flags so far */
+        opts->col_names[j] = col_names[j]
+    }
+    free(col_names);
+
+    struct TSDB_metric_t *metric = TSDB_create(opts);
+    TSDB_free_opts(opts);
 
 =cut
+

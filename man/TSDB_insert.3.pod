@@ -1,5 +1,21 @@
 =head1 NAME
 
-foo - bar quirka fleeg
+TSDB_insert - insert a value into a TimeSplice .tsdb database
+
+=head1 LIBRARY
+
+libTSDB_store (-lTSDB_store)
+
+=head1 SYNOPSIS
+
+    #include <TSDB.h>
+
+    struct TSDB_metric_t *metric = TSDB_open(filename));
+	TSDB_insert(metric, 
+                column,      /* Which column to insert the value into */ 
+			    insert_time, /* Unix time stamp representing the insert time. 0 means current time */ 
+				value        /* a uint_64_t */
+    );
 
 =cut
+

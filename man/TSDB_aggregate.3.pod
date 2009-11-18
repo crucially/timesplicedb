@@ -1,5 +1,28 @@
 =head1 NAME
 
-foo - bar quirka fleeg
+TSDB_aggregate - aggregate data from several rows of a TimeSplice .tsdb database
+
+=head1 LIBRARY 
+
+libTSDB_store (-lTSDB_store)
+
+=head1 SYNOPSIS
+
+	#include <TSDB.h>
+
+	int start, end; 	/* start and end are unix timestamps */
+	int interval;       /* interval to aggregate down to in seconds */
+	int flags;          /* TSDB_COUNTER or TSDB_GAUGE depending on whether you want the delta or absolute values */
+	struct TSDB_metric_t *metric    = TSDB_open(filename);	
+	struct TSDB_range_t  *range     = TSDB_timespan(metric, start, end);
+	struct TSDB_range_t  *aggregate = TSDB_aggregate(range, interval, flags);
+
+	int rows = aggregate->rows;
+  	int i = 0;
+  	while(rows--) {
+    	int offset = ((i * aggregate->columns) + column);
+    	printf("AVG: %.4f      MAX: %llu      MIN: %llu      STDDEV: %f\n", aggregate->agg[offset].avg, aggregate->agg[offset].max, aggregate->agg[offset].min, aggregate->agg[offset].stddev);
+    	i++;
+  	}
 
 =cut
