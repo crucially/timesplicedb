@@ -55,18 +55,31 @@ int create_usage () {
 
 int create_main(int argc, char * const *argv) {
   unsigned int resolution, columns;
-  int o, j;
+  int o, j, i;
   time_t beginning_time;
   char *filename = 0;
+  char *dbname   = 0;
+  char *tmp;
+  char **col_names;
 
   columns = beginning_time = resolution = 0;
 
   while ((o = getopt(argc, argv,
-		     "f:r:b:h:c:")) != -1) {
+		     "f:r:b:h:c:n:")) != -1) {
 
     switch(o) {
     case 'c':
-      columns = atoi(optarg);
+       tmp = optarg;
+       while(*optarg!='\0') 
+         columns += (','==*optarg++);
+       optarg=tmp;
+       col_names = (char **) malloc(sizeof(char*)*(columns + 1));
+       for (i=0; i<=columns; i++) {
+         col_names[i] = strtok((i)? NULL : optarg, ",");
+       }
+      break;
+    case 'n':
+      dbname = optarg;
       break;
     case 'f':
       filename = optarg;
@@ -92,7 +105,7 @@ int create_main(int argc, char * const *argv) {
 
   struct TSDB_create_opts_t *opts = TSDB_create_opts(columns);
   opts->filename     = filename;
-  opts->name         = "Database name";
+  opts->name         = (dbname)? dbname : "Database name";
   opts->flags        = 0;
   opts->created_time = beginning_time;
   opts->resolution   = resolution;
@@ -101,8 +114,9 @@ int create_main(int argc, char * const *argv) {
 
   for(j = 0; j < columns; j++) {
     opts->col_flags[j] = 0;
-    opts->col_names[j] = "Column";
+    opts->col_names[j] = (col_names[j])? col_names[j] : "Column";
   }
+  free(col_names);
 
   struct TSDB_metric_t *metric = TSDB_create(opts);
   TSDB_free_opts(opts);
@@ -123,7 +137,6 @@ int create_main(int argc, char * const *argv) {
   } else {
     printf("Format:        unknown!\n");
   }
-  int i;
   for(i = 0; i < metric->columns; i++) {
     printf("Column %d:      %s (%d)\n", i, metric->col_names[i], metric->col_flags[i]);
   }
