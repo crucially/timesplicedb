@@ -285,7 +285,10 @@ sub timespan {
 sub _fix_col {
     my $self = shift;
     my $col  = shift;
-    return $col if(int($col) eq $col);
+    {
+	no warnings;
+	return $col if(int($col) eq $col);
+    }
     return $self->{_columns}->{$col} if (exists $self->{_columns}->{$col});
     die "Unknown column '$col'";
 }
