@@ -58,7 +58,7 @@ struct TSDB_metric_t {
   int        columns;    /* how many columns this store has */
   int        *col_flags; /* first is flag for db, rest is per column */
   char       **col_names;/* first entry is the database name, rest is the column names */
-  int        ngrerrno;   /* set to non 0 if the latest function recorded an error */
+  int        tsdberrno;  /* set to non 0 if the latest function recorded an error */
   int        syserrno;   /* underlying errno if result of a syscall */
   int        ranges;     /* refcount off ranges */
 };
