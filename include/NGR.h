@@ -102,7 +102,7 @@ struct NGR_agg_row_t {
   int rows_averaged; /* how many rows went into this */
 };
 
-struct NGR_create_opts_t * NGR_create_opts(int columns);
+struct NGR_create_opts_t * NGR_create_opts(unsigned int columns);
 
 void NGR_free_opts(struct NGR_create_opts_t *opts);
 

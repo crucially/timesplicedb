@@ -58,11 +58,12 @@
    list of items, indexed of the time-create_time/interval
 */
 
-struct NGR_create_opts_t * NGR_create_opts(int columns) {
-  struct NGR_create_opts_t *opts = calloc(sizeof(opts), 1);
-  opts->magic = NGR_create_opts_magic;
-  opts->col_flags = calloc(sizeof(int), columns);
-  opts->col_names = calloc(sizeof(char *), columns);
+struct NGR_create_opts_t * NGR_create_opts(unsigned int columns) {
+  struct NGR_create_opts_t *opts = calloc(1, sizeof(struct NGR_create_opts_t));
+  opts->magic     = NGR_create_opts_magic;
+  opts->columns   = columns;
+  opts->col_names = (char*) calloc(columns, sizeof(char *));
+  opts->col_flags = calloc(columns, sizeof(int));
   return opts;
 }
 
@@ -74,7 +75,7 @@ void NGR_free_opts(struct NGR_create_opts_t *opts) {
 }
 
 struct NGR_metric_t * NGR_create(struct NGR_create_opts_t *opts) {
-  int   fd, write_len;
+  int   fd, write_len,len;
   int   size = sizeof(int);
   int   version = 1;
 
@@ -105,19 +106,27 @@ struct NGR_metric_t * NGR_create(struct NGR_create_opts_t *opts) {
   assert(write_len == 4);
   write_len = write(fd, &opts->created_time, size);
   assert(write_len == size);
-  /*
-  int i;
-  for(i = 0; i < columns + 1; i++) {
-    int len = strlen(names[i]) + 1;
 
-    write_len = write(fd, &flags[i], 4);
+  len = strlen(opts->name) + 1;
+  write_len = write(fd, &opts->flags, 4);
+  assert(write_len == 4);
+  write_len = write(fd, &len, 4);
+  assert(write_len == 4);
+  write_len = write(fd, opts->name, strlen(opts->name));
+  assert(write_len == strlen(opts->name));
+
+
+  int i;
+  for(i = 0; i < opts->columns; i++) {
+    len = strlen(opts->col_names[i]) + 1;
+    write_len = write(fd, &opts->col_flags[i], 4);
     assert(write_len == 4);
     write_len = write(fd, &len, 4);
     assert(write_len == 4);
-    write_len = write(fd, names[i], len);
+    write_len = write(fd, opts->col_names[i], len);
     assert(write_len == len);
   }
-  */
+
 
   close(fd);
 
@@ -161,9 +170,9 @@ struct NGR_metric_t * NGR_open(const char *filename) {
 
 
   int i;
-  obj->names = malloc(sizeof(char *) * (obj->columns + 1));
-  obj->flags = malloc(sizeof(int) * (obj->columns + 1));
-  for(i = 0; i < obj->columns + 1; i++) {
+  obj->names = malloc(sizeof(char *) * (obj->columns));
+  obj->flags = malloc(sizeof(int) * (obj->columns));
+  for(i = 0; i < obj->columns; i++) {
     int len;
     read_len = read(obj->fd, &obj->flags[i], 4);
     assert(read_len == 4);

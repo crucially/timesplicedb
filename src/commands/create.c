@@ -54,7 +54,8 @@ int create_usage () {
 }
 
 int create_main(int argc, char * const *argv) {
-  int o, resolution, columns;
+  unsigned int resolution, columns;
+  int o, j;
   time_t beginning_time;
   char *filename = 0;
 
@@ -89,18 +90,23 @@ int create_main(int argc, char * const *argv) {
     return create_usage();
   }
 
-  char **foo = malloc(sizeof(char *) * (columns + 1));
-  int *flags = malloc(sizeof(int) * ( columns + 1));
+  struct NGR_create_opts_t *opts = NGR_create_opts(columns);
+  opts->filename     = filename;
+  opts->name         = "Database name";
+  opts->flags        = 0;
+  opts->created_time = beginning_time;
+  opts->resolution   = resolution;
 
-  foo[0] = "Database name";
-  int j;
-  for(j = 1; j <= columns; j++) {
-    foo[j] = "Column";
-    flags[j] = 1;
+
+  int *flag = malloc(sizeof(int));
+  *flag = 0;
+  for(j = 0; j < columns; j++) {
+        opts->col_flags[j] = flag;
+        opts->col_names[j] = "Column";
   }
 
-  /*
-  struct NGR_metric_t *metric = NGR_create(filename, beginning_time, resolution, columns, foo, flags);
+  struct NGR_metric_t *metric = NGR_create(opts);
+  NGR_free_opts(opts);
 
   time_t last_row = (metric->created + (NGR_last_row_idx(metric, 0) * 60));
 
@@ -119,9 +125,9 @@ int create_main(int argc, char * const *argv) {
     printf("Format:        unknown!\n");
   }
   int i;
-  for(i = 1; i <= metric->columns; i++) {
+  for(i = 0; i < metric->columns; i++) {
     printf("Column %d:      %s (%d)\n", i, metric->names[i], metric->flags[i]);
   }
-  */
+
   return 0;
 }
