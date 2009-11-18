@@ -93,18 +93,18 @@ sub new {
     my @col_names;
     my @col_flags;
 
-
+    my $i = 0;
     if ('HASH' eq ref($options{columns})) {
         while (my ($k,$v) = each %{$options{columns}}) {
 	    push @col_names, $k;
 	    push @col_flags, $v;
-	    $self->{_columns}->{$k} = $#col_names;
+	    $self->{_columns}->{$k} = $i++;
         }
     } elsif ('ARRAY' eq ref($options{columns})) {
         foreach my $k (@{$options{columns}}) {
 	    push @col_names, $k;
 	    push @col_flags, 0;
-	    $self->{_columns}->{$k} = $#col_names;
+	    $self->{_columns}->{$k} = $i++;
         }
     } elsif (defined $options{columns}) {
 	push @col_names, $options{columns};
@@ -285,7 +285,9 @@ sub timespan {
 sub _fix_col {
     my $self = shift;
     my $col  = shift;
-    return $self->{_columns}->{$col} || $col;
+    return $col if(int($col) eq $col);
+    return $self->{_columns}->{$col} if (exists $self->{_columns}->{$col});
+    die "Unknown column '$col'";
 }
 
 package TSDB::Range;
@@ -348,9 +350,8 @@ Returns an C<TSDB::Range>
 sub aggregate {
     my $self     = shift;
     my $interval = shift;
-    my %options = @_; 
-    
-    return TSDB::Range->new(TSDB::C::aggregate($self->{ctx}, $interval, 0), $self->{_columns});
+
+    return TSDB::Range->new(TSDB::C::aggregate($self->{ctx}, $interval, 0), _columns => $self->{_columns});
 }
 
 =head2 cell <row> <column> 
