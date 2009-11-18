@@ -106,7 +106,7 @@ int dump_main(int argc, char * const *argv) {
 	  printf("%llu\t", last_diff[col]);
 
 	} else
-	  printf("%u\t", value);
+	  printf("%llu\t", value);
 	if (value)
 	  last_value[col] = value;
 	col++;
