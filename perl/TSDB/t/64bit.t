@@ -15,9 +15,8 @@ TSDB::C::insert($tsdb, 0, $ts+60, 3294967395);
 TSDB::C::insert($tsdb, 0, $ts+120, "18446744073709551615");
 is(TSDB::C::cell($tsdb, 0, 0), 5294967395);
 is(TSDB::C::cell($tsdb, 1, 0), 3294967395);
-{ local $TODO = "need to fake it using bigints";
-  is(TSDB::C::cell($tsdb, 2, 0), "18446744073709551615");
-}
+is(TSDB::C::cell($tsdb, 2, 0), "18446744073709551615");
+
 
 
 

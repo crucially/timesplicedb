@@ -108,18 +108,38 @@ TSDB_create(filename, create_time, resolution, columns, name, flags, col_names, 
 	RETVAL
 	
 
-u_int64_t
+SV*
 TSDB_cell(obj, row, column)
 	struct TSDB_metric_t *	obj
 	int	row
 	int	column
+	CODE:
+#if IVSIZE == 8
+        RETVAL = newSVuv(TSDB_cell(obj, row, column));
+#else
+	char strval[24];
+	snprintf((char*)&strval, 24, "%llu", TSDB_cell(obj, row,column));
+	RETVAL = newSVpv(&strval,(STRLEN)0);
+#endif
+	OUTPUT:
+	RETVAL	
 
 int
-TSDB_insert(obj, column, timestmp, value)
+TSDB_insert(obj, column, timestamp, value)
 	struct TSDB_metric_t *	obj
 	int	column
-	time_t	timestmp
-	u_int64_t	value
+	time_t	timestamp
+	SV*	value
+	CODE:
+#if IVSIZE == 8
+    	RETVAL = TSDB_insert(obj, column, timestamp, SvUV(value));
+#else	
+	u_int64_t val;
+	sscanf(SvPV_nolen(value),"%llu", &val);
+	RETVAL = TSDB_insert(obj, column, timestamp, val);
+#endif
+	OUTPUT:
+	RETVAL
 
 int
 TSDB_last_row_idx(obj, column)
