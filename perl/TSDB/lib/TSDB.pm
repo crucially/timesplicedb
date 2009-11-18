@@ -98,15 +98,18 @@ sub new {
         while (my ($k,$v) = each %{$options{columns}}) {
 	    push @col_names, $k;
 	    push @col_flags, $v;
+	    $self->{_columns}->{$k} = $#col_names;
         }
     } elsif ('ARRAY' eq ref($options{columns})) {
         foreach my $k (@{$options{columns}}) {
 	    push @col_names, $k;
 	    push @col_flags, 0;
+	    $self->{_columns}->{$k} = $#col_names;
         }
     } elsif (defined $options{columns}) {
 	push @col_names, $options{columns};
 	push @col_flags, 0;
+	$self->{_columns}->{$options{columns}} = 0;
     } elsif (!$open) {
         croak "You must pass in a columns definition";
     }
