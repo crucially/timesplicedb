@@ -74,7 +74,7 @@ struct TSDB_range_t {
   int mmap;                    /* if this is an mmaped range or not */
   int resolution;              /* resolution requested for this range  */
   int columns;                 /* how many columns are present in this range */
-  struct TSDB_agg_row_t *agg; /* If this is an aggregate range, this contains a pointer to extra data 
+  struct TSDB_agg_row_t *agg;  /* If this is an aggregate range, this contains a pointer to extra data 
 				  calculated during aggregaton
 				  these are values we can get doing a single pass only
 				  the reason this datacenter is dual purpose
@@ -97,10 +97,10 @@ struct TSDB_create_opts_t {
 };
 
 struct TSDB_agg_row_t {
-  double avg;    /* average value in interval */
-  u_int64_t max; /* max value seen in interval */
-  u_int64_t min; /* minimum value seen -- flag determines if 0 is considered minium or undefined value */
-  double stddev; /* calculated stddev -- no idea if this is correct -- probably isn't */
+  double avg;        /* average value in interval */
+  u_int64_t max;     /* max value seen in interval */
+  u_int64_t min;     /* minimum value seen -- flag determines if 0 is considered minium or undefined value */
+  double stddev;     /* calculated stddev -- no idea if this is correct -- probably isn't */
   int rows_averaged; /* how many rows went into this */
 };
 
