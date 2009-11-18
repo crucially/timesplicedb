@@ -5,6 +5,8 @@ BEGIN { use_ok('TSDB') };
 
 use strict;
 
+unlink("aggtest.ngrd");
+
 my $ct = 1258091219;
 my $it = $ct;
 my $tsdb = TSDB->new('aggtest.ngrd',
@@ -42,7 +44,7 @@ for(1..9) {
 }
 
 
-my $agg = $range->aggregate(interval => 120);
+my $agg = $range->aggregate(120);
 
 isa_ok($range, "TSDB::Range");
 is($agg->rows, 5);
@@ -92,4 +94,4 @@ is($agg->rows, 5);
   is($cell->{rows_averaged}, 1, "this bucket should have two entries!");
 }
 
-END { unlink("aggtest.ngrd") }
+
