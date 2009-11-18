@@ -125,4 +125,4 @@ struct TSDB_range_t * TSDB_timespan (struct TSDB_metric_t *obj, time_t start, ti
 
 struct TSDB_range_t * TSDB_aggregate (struct TSDB_range_t *range, int interval, int data_type);
 
-int TSDB_insert (struct TSDB_metric_t *obj, int column, time_t timestmp, int value);
+int TSDB_insert (struct TSDB_metric_t *obj, int column, time_t timestmp, u_int64_t value);

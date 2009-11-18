@@ -215,7 +215,7 @@ int TSDB_close(struct TSDB_metric_t *obj) {
    value      value to store
 */
 
-int TSDB_insert (struct TSDB_metric_t *obj, int column, time_t timestamp, int value) {
+int TSDB_insert (struct TSDB_metric_t *obj, int column, time_t timestamp, u_int64_t value) {
   int  row, offset, write_len;
 
   assert(obj->magic == TSDB_metric_magic);
@@ -360,11 +360,11 @@ int TSDB_cell (struct TSDB_metric_t *obj, int row, int column) {
 
 struct TSDB_agg_counters_t {
   unsigned int cells_counted;  // how many cells we have counted
-  unsigned int sum;            // sum
-  unsigned int min;            // minum value seen
-  unsigned int max;            // maximum value seen
+  u_int64_t sum;            // sum
+  u_int64_t min;            // minum value seen
+  u_int64_t max;            // maximum value seen
   double sum_sqr;
-  unsigned int last_value;
+  u_int64_t last_value;
 };
 
 
@@ -375,7 +375,7 @@ struct TSDB_range_t * TSDB_aggregate (struct TSDB_range_t *range, int interval, 
   int src_rows, src_cells, curr_cell, trg_cell;
   src_rows = src_cells = curr_cell = trg_cell = 0;
 
-  counters = malloc(sizeof(struct TSDB_agg_counters_t) * range->columns);
+  counters = calloc(range->columns, sizeof(struct TSDB_agg_counters_t));
 
   src_rows = range->rows;
   src_cells = src_rows * range->columns;

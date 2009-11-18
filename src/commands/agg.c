@@ -104,7 +104,7 @@ int agg_main(int argc, char * const *argv) {
   int i = 0;
   while(rows--) {
     int offset = ((i * aggregate->columns) + column);
-    printf("AVG: %.4f      MAX: %u      MIN: %u      STDDEV: %f\n", aggregate->agg[offset].avg, aggregate->agg[offset].max, aggregate->agg[offset].min, aggregate->agg[offset].stddev);
+    printf("AVG: %.4f      MAX: %llu      MIN: %llu      STDDEV: %f\n", aggregate->agg[offset].avg, aggregate->agg[offset].max, aggregate->agg[offset].min, aggregate->agg[offset].stddev);
     i++;
   }
   return 0;
