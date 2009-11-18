@@ -393,7 +393,7 @@ struct TSDB_range_t * TSDB_aggregate (struct TSDB_range_t *range, int interval, 
   int buckets = rint(ceil(((double)range->rows / ((double)interval / (double)range->resolution))));
 
   aggregate = malloc(sizeof(struct TSDB_range_t));
-  aggregate->area = malloc(sizeof(int) * buckets * range->columns);
+  aggregate->area = malloc(sizeof(u_int64_t) * buckets * range->columns);
   aggregate->agg = malloc(sizeof(struct TSDB_agg_row_t) * buckets * range->columns);
   aggregate->mmap = 0;
   aggregate->rows = buckets;
@@ -405,7 +405,7 @@ struct TSDB_range_t * TSDB_aggregate (struct TSDB_range_t *range, int interval, 
   int cells_seen = 0;
 
   while(src_cells--) {
-    int value;
+    u_int64_t value;
     struct TSDB_agg_counters_t *counter = (counters + (curr_cell % range->columns));
 
     if (data_type == TSDB_GAUGE)
