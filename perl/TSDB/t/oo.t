@@ -1,13 +1,13 @@
 #!/usr/bin/perl
 
-
+use strict;
 
 use Test::More tests => 17;
 BEGIN { use_ok('TSDB') };
 
 
 my $ct = time()-86400;
-
+unlink("ootest.tsdb");
 my $tsdb = TSDB->new('ootest.tsdb',
     				clobber     => 1,
     				resolution  => 120,
@@ -33,7 +33,7 @@ is($tsdb->rows, 1, "there is an actual item in the first slot");
 is($tsdb->last_row_idx, 0, "the index of said slot is still 0"); 
 
 
-$tsdb->insert('test' => $value, $ct + $tsdb->resolution); # insert with column name instead of offset
+$tsdb->insert('test' => 2, $ct + $tsdb->resolution); # insert with column name instead of offset
 
 is($tsdb->cell(0, 'test'), 1, "correct column lookup with name");
 is($tsdb->cell(1, 0),      2, "correct column lookup with offset");
@@ -49,14 +49,13 @@ my $info = $tsdb->info();
 is_deeply($info, {
     rows         => 720,
     created      => $ct,
-    columns      => 1,
     resolution   => 120,
     version      => 1,
     columns      => 1,
+    name         => 'ootest',
     last_updated => $it - 120,
+    meta => { test => 0 },
 	});
 
 is($tsdb->last_updated, $it - 120, "Last modified is the value of the row");
-END {
-    unlink("ootest.tsdb");
-};
+
