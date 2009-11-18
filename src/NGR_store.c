@@ -58,7 +58,12 @@
    list of items, indexed of the time-create_time/interval
 */
 
-
+struct NGR_create_opts_t * NGR_create_opts(int columns) {
+  struct NGR_create_opts_t *opts = calloc(sizeof(opts), 1);
+  opts->magic = NGR_create_opts_magic;
+  opts->col_flags = calloc(sizeof(int), columns);
+  opts->col_names = calloc(sizeof(char *), columns);
+}
 
 struct NGR_metric_t * NGR_create(const char *filename, time_t created_time, int resolution, int columns, char **names, int *flags) {
   int   fd, write_len;

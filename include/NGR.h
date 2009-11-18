@@ -81,6 +81,19 @@ struct NGR_range_t {
   struct NGR_metric_t *metric; /* where did we come from ? */
 };
 
+struct NGR_create_opts_t {
+  unsigned        magic;
+#define NGR_create_opts_magic 0x7428b5c9
+  char           *filanem;
+  time_t         create_time;
+  unsigned int   resolution;
+  unsigned int   columns;
+  char           *name;
+  unsigned int   flags;
+  char           **col_names;
+  int            *col_flags;
+};
+
 struct NGR_agg_row_t {
   double avg;    /* average value in interval */
   unsigned int max;    /* max value seen in interval */
@@ -88,6 +101,8 @@ struct NGR_agg_row_t {
   double stddev; /* calculated stddev -- no idea if this is correct -- probably isn't */
   int rows_averaged; /* how many rows went into this */
 };
+
+struct NGR_create_opts_t * NGR_create_opts(int columns);
 
 struct NGR_metric_t * NGR_create(const char *filename, time_t create_time, int resolution, int columns, char **names, int *flags);
 
