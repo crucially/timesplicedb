@@ -50,7 +50,7 @@ struct TSDB_metric_t {
   u_int32_t  width;      /* are we in 32bit mode or 64bit  (4 bytes versus 8 bytes) */
   int        fd;         /* the underlying file */
   int        base;       /* how many bytes the header consumes */
-  time_t     created;    /* timestamp the first row in the series is */
+  u_int64_t  created;    /* timestamp the first row in the series is */
   int        resolution; /* distance in seconds between each row in the series */
   int        version;    /* storage verson */
   char       *name;
@@ -67,7 +67,7 @@ struct TSDB_range_t {
   unsigned   magic;
 #define TSDB_range_magic 0x6428b5c9
 
-  unsigned int *row;                  /* ptr into the first row in the range */
+  u_int64_t *row;              /* ptr into the first row in the range */
   void *area;                  /* if a range and a not an aggregate this points to the mmap of the file */ 
   int rows;                    /* how many rows exist in the range */
   size_t len;
@@ -87,7 +87,7 @@ struct TSDB_create_opts_t {
   unsigned        magic;
 #define TSDB_create_opts_magic 0x7428b5c9
   char           *filename;
-  time_t         created_time;
+  u_int64_t      created_time;
   unsigned int   resolution;
   unsigned int   columns;
   char           *name;
@@ -98,8 +98,8 @@ struct TSDB_create_opts_t {
 
 struct TSDB_agg_row_t {
   double avg;    /* average value in interval */
-  unsigned int max;    /* max value seen in interval */
-  unsigned int min;    /* minimum value seen -- flag determines if 0 is considered minium or undefined value */
+  u_int64_t max; /* max value seen in interval */
+  u_int64_t min; /* minimum value seen -- flag determines if 0 is considered minium or undefined value */
   double stddev; /* calculated stddev -- no idea if this is correct -- probably isn't */
   int rows_averaged; /* how many rows went into this */
 };

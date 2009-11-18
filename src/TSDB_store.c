@@ -76,7 +76,7 @@ void TSDB_free_opts(struct TSDB_create_opts_t *opts) {
 
 struct TSDB_metric_t * TSDB_create(struct TSDB_create_opts_t *opts) {
   int   fd, write_len,len;
-  int   size = sizeof(int);
+  int   size = sizeof(unsigned long long);
   int   version = 1;
 
   assert(opts->magic == TSDB_create_opts_magic);
