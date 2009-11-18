@@ -119,7 +119,7 @@ TSDB_insert(obj, column, timestmp, value)
 	struct TSDB_metric_t *	obj
 	int	column
 	time_t	timestmp
-	int	value
+	u_int64_t	value
 
 int
 TSDB_last_row_idx(obj, column)

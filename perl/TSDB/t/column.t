@@ -4,6 +4,7 @@ use Test::More tests => 27;
 BEGIN { use_ok('TSDB') };
 
 use strict;
+unlink("columntest.tsdb");
 
 my $ct = 1258091219;
 my $it = $ct;
@@ -50,7 +51,7 @@ is($range->cell(0, 1)->{value}, 9);
 is($range->cell(1, 'col1')->{value}, 2);
 is($range->cell(1, 'col2')->{value}, 8);
 
-my $agg = $range->aggregate(interval => 120);
+my $agg = $range->aggregate(120);
 
 isa_ok($range, "TSDB::Range");
 is($agg->rows, 5);
@@ -75,7 +76,3 @@ is($agg->rows, 5);
 }
 
 
-
-END {
-    unlink("columntest.tsdb");
-}
