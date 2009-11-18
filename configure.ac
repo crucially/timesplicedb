@@ -13,7 +13,6 @@ AC_CONFIG_FILES([
     Makefile
     src/Makefile
     src/commands/Makefile
-    src/collectd/Makefile
     include/Makefile
 ])
 AC_OUTPUT

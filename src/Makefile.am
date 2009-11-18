@@ -1,4 +1,4 @@
-SUBDIRS  = commands collectd .
+SUBDIRS  = commands .
 INCLUDES = -I$(top_srcdir)/include 
 
 
