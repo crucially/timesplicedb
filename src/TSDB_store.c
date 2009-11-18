@@ -359,10 +359,10 @@ u_int64_t TSDB_cell (struct TSDB_metric_t *obj, int row, int column) {
 }
 
 struct TSDB_agg_counters_t {
-  unsigned int cells_counted;  // how many cells we have counted
-  u_int64_t sum;            // sum
-  u_int64_t min;            // minum value seen
-  u_int64_t max;            // maximum value seen
+  unsigned int cells_counted;  /* how many cells we have counted */
+  u_int64_t sum;            /* sum */
+  u_int64_t min;            /* minum value seen */
+  u_int64_t max;            /* maximum value seen */
   double sum_sqr;
   u_int64_t last_value;
 };
