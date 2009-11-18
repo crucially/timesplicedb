@@ -37,22 +37,22 @@ constant (pTHX_ const char *name, STRLEN len, IV *iv_return) {
 use ExtUtils::Constant qw (constant_types C_constant XS_constant);
 
 my $types = {map {($_, 1)} qw(IV)};
-my @names = (qw(NGR_COUNTER NGR_GAUGE));
+my @names = (qw(TSDB_COUNTER TSDB_GAUGE));
 
 print constant_types(), "\n"; # macro defs
-foreach (C_constant ("NGR", 'constant', 'IV', $types, undef, 3, @names) ) {
+foreach (C_constant ("TSDB", 'constant', 'IV', $types, undef, 3, @names) ) {
     print $_, "\n"; # C constant subs
 }
 print "\n#### XS Section:\n";
-print XS_constant ("NGR", $types);
+print XS_constant ("TSDB", $types);
 __END__
    */
 
   switch (len) {
   case 9:
-    if (memEQ(name, "NGR_GAUGE", 9)) {
-#ifdef NGR_GAUGE
-      *iv_return = NGR_GAUGE;
+    if (memEQ(name, "TSDB_GAUGE", 9)) {
+#ifdef TSDB_GAUGE
+      *iv_return = TSDB_GAUGE;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
@@ -60,9 +60,9 @@ __END__
     }
     break;
   case 11:
-    if (memEQ(name, "NGR_COUNTER", 11)) {
-#ifdef NGR_COUNTER
-      *iv_return = NGR_COUNTER;
+    if (memEQ(name, "TSDB_COUNTER", 11)) {
+#ifdef TSDB_COUNTER
+      *iv_return = TSDB_COUNTER;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;

@@ -1,4 +1,4 @@
-package NGR::C;
+package TSDB::C;
 
 use 5.008;
 use strict;
@@ -14,12 +14,12 @@ our @ISA = qw(Exporter);
 # names by default without a very good reason. Use EXPORT_OK instead.
 # Do not simply export all your public functions/methods/constants.
 
-# This allows declaration	use NGR ':all';
+# This allows declaration	use TSDB ':all';
 # If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
 # will save memory.
 our %EXPORT_TAGS = ( 'all' => [ qw(
-	NGR_COUNTER
-	NGR_GAUGE
+	TSDB_COUNTER
+	TSDB_GAUGE
 	aggregate
 	create
 	entry
@@ -34,8 +34,8 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = qw(
-	NGR_COUNTER
-	NGR_GAUGE
+	TSDB_COUNTER
+	TSDB_GAUGE
 );
 
 our $VERSION = '0.01';
@@ -47,7 +47,7 @@ sub AUTOLOAD {
     my $constname;
     our $AUTOLOAD;
     ($constname = $AUTOLOAD) =~ s/.*:://;
-    croak "&NGR::constant not defined" if $constname eq 'constant';
+    croak "&TSDB::constant not defined" if $constname eq 'constant';
     my ($error, $val) = constant($constname);
     if ($error) { croak $error; }
     {
@@ -64,7 +64,7 @@ sub AUTOLOAD {
 }
 
 require XSLoader;
-XSLoader::load('NGR', $VERSION);
+XSLoader::load('TSDB', $VERSION);
 
 # Preloaded methods go here.
 
@@ -76,16 +76,16 @@ __END__
 
 =head1 NAME
 
-NGR - Perl extension for blah blah blah
+TSDB - Perl extension for blah blah blah
 
 =head1 SYNOPSIS
 
-  use NGR;
+  use TSDB;
   blah blah blah
 
 =head1 DESCRIPTION
 
-Stub documentation for NGR, created by h2xs. It looks like the
+Stub documentation for TSDB, created by h2xs. It looks like the
 author of the extension was negligent enough to leave the stub
 unedited.
 
@@ -97,21 +97,21 @@ None by default.
 
 =head2 Exportable constants
 
-  NGR_COUNTER
-  NGR_GAUGE
+  TSDB_COUNTER
+  TSDB_GAUGE
 
 =head2 Exportable functions
 
-  struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int data_type)
-  struct NGR_metric_t * NGR_create(char *filename, time_t create_time, int resolution, int columns)
-  int NGR_entry (struct NGR_metric_t *obj, int column, int idx)
-  int NGR_insert (struct NGR_metric_t *obj, int column, time_t timestmp, int value)
-  int NGR_last_entry_idx (struct NGR_metric_t *obj, int column)
-  char * NGR_make_path (char *collection, char *metric)
-  struct NGR_metric_t * NGR_open(char *filename)
-  struct NGR_range_t * NGR_range (struct NGR_metric_t *obj, int column, int start, int end)
-  void NGR_range_free (struct NGR_range_t *range)
-  struct NGR_range_t * NGR_timespan (struct NGR_metric_t *obj, int column, time_t start, time_t end)
+  struct TSDB_range_t * TSDB_aggregate (struct TSDB_range_t *range, int interval, int data_type)
+  struct TSDB_metric_t * TSDB_create(char *filename, time_t create_time, int resolution, int columns)
+  int TSDB_entry (struct TSDB_metric_t *obj, int column, int idx)
+  int TSDB_insert (struct TSDB_metric_t *obj, int column, time_t timestmp, int value)
+  int TSDB_last_entry_idx (struct TSDB_metric_t *obj, int column)
+  char * TSDB_make_path (char *collection, char *metric)
+  struct TSDB_metric_t * TSDB_open(char *filename)
+  struct TSDB_range_t * TSDB_range (struct TSDB_metric_t *obj, int column, int start, int end)
+  void TSDB_range_free (struct TSDB_range_t *range)
+  struct TSDB_range_t * TSDB_timespan (struct TSDB_metric_t *obj, int column, time_t start, time_t end)
 
 
 

@@ -1,21 +1,21 @@
-package NGR;
+package TSDB;
 
 use strict;
 use version;
 use Carp qw(croak);
 
-use NGR::C qw();
+use TSDB::C qw();
 
 our $VERSION = '0.01';
 
 =head1 NAME
 
-NGR - a timeslice database
+TSDB - a timeslice database
 
 =head1 SYNOPSIS
 
-    use NGR;
-    my $ngr = NGR->new( $filename, columns => [ 'response_time',  'failure_rate'] );
+    use TSDB;
+    my $ngr = TSDB->new( $filename, columns => [ 'response_time',  'failure_rate'] );
     $ngr->insert('response_time' => $value);
 
 
@@ -109,8 +109,8 @@ sub new {
     }
 
 
-	$self->{ctx} = ($open) ? NGR::C::open( $file) :    
-        					 NGR::C::create( $file,
+	$self->{ctx} = ($open) ? TSDB::C::open( $file) :    
+        					 TSDB::C::create( $file,
                         		$options{create_time},
                         		$options{resolution},
                         		$name,
@@ -148,7 +148,7 @@ Get the name of the database
 =cut
 sub name {
     my $self = shift;
-    return NGR::C::metric_name($self->{ctx});
+    return TSDB::C::metric_name($self->{ctx});
 }
 
 =head2 created
@@ -158,7 +158,7 @@ Get when the database was created.
 =cut
 sub created {
     my $self = shift;
-    return NGR::C::metric_created($self->{ctx});
+    return TSDB::C::metric_created($self->{ctx});
 }
 
 =head2 resolution
@@ -168,7 +168,7 @@ Get the resolution of the database
 =cut
 sub resolution {
     my $self = shift;
-    return NGR::C::metric_resolution($self->{ctx});
+    return TSDB::C::metric_resolution($self->{ctx});
 }
 
 =head2 version
@@ -178,7 +178,7 @@ Get the database version
 =cut
 sub version {
     my $self = shift;
-    return NGR::C::metric_version($self->{ctx});
+    return TSDB::C::metric_version($self->{ctx});
 }
 
 =head2 columns
@@ -188,7 +188,7 @@ Get the number of columns.
 =cut
 sub columns {
     my $self = shift;
-    return NGR::C::metric_columns($self->{ctx});
+    return TSDB::C::metric_columns($self->{ctx});
 }
 
 
@@ -199,7 +199,7 @@ Get the number of rows
 =cut
 sub rows {
     my $self = shift;
-    return NGR::C::last_row_idx($self->{ctx}, 0) + 1;
+    return TSDB::C::last_row_idx($self->{ctx}, 0) + 1;
 }
 
 =head2 last_row_idx
@@ -209,7 +209,7 @@ Get the index of the last row
 =cut
 sub last_row_idx {
     my $self = shift;
-    return NGR::C::last_row_idx($self->{ctx}, 0);
+    return TSDB::C::last_row_idx($self->{ctx}, 0);
 }
 
 =head2 last_updated
@@ -229,7 +229,7 @@ Get some meta data about the database.
 =cut
 sub meta {
     my $self = shift;
-    return NGR::C::metric_meta($self->{ctx});
+    return TSDB::C::metric_meta($self->{ctx});
 }
 
 
@@ -243,7 +243,7 @@ sub insert {
     my ($column, $value, $ts) = @_;
     $ts ||= 0;
 
-    return NGR::C::insert( $self->{ctx}, NGR::_fix_col($self, $column), $ts, $value );
+    return TSDB::C::insert( $self->{ctx}, TSDB::_fix_col($self, $column), $ts, $value );
 }
 
 
@@ -256,20 +256,20 @@ sub cell {
     my $self = shift;
     my ($row, $column) = @_;
 
-    return NGR::C::cell($self->{ctx}, $row, NGR::_fix_col($self,$column));
+    return TSDB::C::cell($self->{ctx}, $row, TSDB::_fix_col($self,$column));
 }
 
 =head2 timespan <start> <end>
 
 Get all values between the unix time stamps I<start> and I<end>.
 
-Returns a C<NGR::Range>
+Returns a C<TSDB::Range>
 
 =cut
 sub timespan {
     my $self = shift;
     my ($start, $end) = @_;
-    return NGR::Range->new(NGR::C::timespan($self->{ctx}, $start, $end), _columns => $self->{_columns});
+    return TSDB::Range->new(TSDB::C::timespan($self->{ctx}, $start, $end), _columns => $self->{_columns});
 }
 
 # turn a column name into an number
@@ -279,18 +279,18 @@ sub _fix_col {
     return $self->{_columns}->{$col} || $col;
 }
 
-package NGR::Range;
+package TSDB::Range;
 
 use strict;
 use warnings;
 
 =head1 NAME
 
-NGR::Range - represent a range of values in NGR
+TSDB::Range - represent a range of values in TSDB
 
 =head1 SYNOPSIS
     
-    my $ngr   = NGR->new($filename);
+    my $ngr   = TSDB->new($filename);
     my $cols  = $ngr->columns;
     my $range = $ngr->timespan($start, $end);
     foreach my $row (0 .. $range->rows) {
@@ -326,14 +326,14 @@ The number of rows in this range
 =cut
 sub rows {
     my $self = shift;
-    NGR::C::range_rows($self->{ctx});
+    TSDB::C::range_rows($self->{ctx});
 }
 
 =head2 aggregate <interval> 
 
 The aggregate of the rows over the interval.
 
-Returns an C<NGR::Range>
+Returns an C<TSDB::Range>
 
 =cut
 sub aggregate {
@@ -341,7 +341,7 @@ sub aggregate {
     my $interval = shift;
     my %options = @_; 
     
-    return NGR::Range->new(NGR::C::aggregate($self->{ctx}, $interval, 0), $self->{_columns});
+    return TSDB::Range->new(TSDB::C::aggregate($self->{ctx}, $interval, 0), $self->{_columns});
 }
 
 =head2 cell <row> <column> 
@@ -352,18 +352,18 @@ Returns information about a cell in a columns.
 sub cell {
     my $self    = shift;
     my $row     = shift;
-    my $column  = NGR::_fix_col($self, shift);
+    my $column  = TSDB::_fix_col($self, shift);
     my %options = @_;
 
     return {
         row    => $row,
         time   => 0,  # XXX calculate the time offset
-        value  => NGR::C::range_row_value($self->{ctx},  $column, $row),
-        avg    => NGR::C::range_row_avg($self->{ctx},    $column, $row),
-        min    => NGR::C::range_row_min($self->{ctx},    $column, $row),
-        max    => NGR::C::range_row_max($self->{ctx},    $column, $row),
-        stddev => NGR::C::range_row_stddev($self->{ctx}, $column, $row),
-        rows_averaged => NGR::C::range_row_rows_averaged($self->{ctx}, $column, $row),
+        value  => TSDB::C::range_row_value($self->{ctx},  $column, $row),
+        avg    => TSDB::C::range_row_avg($self->{ctx},    $column, $row),
+        min    => TSDB::C::range_row_min($self->{ctx},    $column, $row),
+        max    => TSDB::C::range_row_max($self->{ctx},    $column, $row),
+        stddev => TSDB::C::range_row_stddev($self->{ctx}, $column, $row),
+        rows_averaged => TSDB::C::range_row_rows_averaged($self->{ctx}, $column, $row),
     };
 }
 

@@ -2,24 +2,24 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#include <../../include/NGR.h>
+#include <../../include/TSDB.h>
 
 #include "const-c.inc"
 
-MODULE = NGR		PACKAGE = NGR::C	PREFIX=NGR_
+MODULE = TSDB		PACKAGE = TSDB::C	PREFIX=TSDB_
 
 INCLUDE: const-xs.inc
 
 
 char* metric_name(obj);
-    	struct NGR_metric_t *	obj
+    	struct TSDB_metric_t *	obj
 	CODE:
 	RETVAL = obj->names[0];
 	OUTPUT:
 	RETVAL      
 
 HV* metric_meta(obj);
-    	struct NGR_metric_t *	obj
+    	struct TSDB_metric_t *	obj
 	CODE:
 	int i; 
 	RETVAL = newHV();
@@ -31,56 +31,56 @@ HV* metric_meta(obj);
 	RETVAL      
 
 int metric_created(obj);
-    	struct NGR_metric_t *	obj
+    	struct TSDB_metric_t *	obj
 	CODE:
 	RETVAL = obj->created;
 	OUTPUT:
 	RETVAL
 
 int metric_width(obj);
-    	struct NGR_metric_t *	obj
+    	struct TSDB_metric_t *	obj
 	CODE:
 	RETVAL = obj->created;
 	OUTPUT:
 	RETVAL
 
 int metric_resolution(obj);
-    	struct NGR_metric_t *	obj
+    	struct TSDB_metric_t *	obj
 	CODE:
 	RETVAL = obj->resolution;
 	OUTPUT:
 	RETVAL
 
 int metric_version(obj);
-    	struct NGR_metric_t *	obj
+    	struct TSDB_metric_t *	obj
 	CODE:
 	RETVAL = obj->version;
 	OUTPUT:
 	RETVAL
 
 int metric_columns(obj);
-    	struct NGR_metric_t *	obj
+    	struct TSDB_metric_t *	obj
 	CODE:
 	RETVAL = obj->columns;
 	OUTPUT:
 	RETVAL
 
 int range_rows(obj);
-    	struct NGR_range_t *	obj
+    	struct TSDB_range_t *	obj
 	CODE:
 	RETVAL = obj->rows;
 	OUTPUT:
 	RETVAL
 
 
-struct NGR_range_t *
-NGR_aggregate(range, interval, data_type)
-	struct NGR_range_t *	range
+struct TSDB_range_t *
+TSDB_aggregate(range, interval, data_type)
+	struct TSDB_range_t *	range
 	int	interval
 	int	data_type
 
-struct NGR_metric_t *
-NGR_create(filename, create_time, resolution, columns, names, flags)
+struct TSDB_metric_t *
+TSDB_create(filename, create_time, resolution, columns, names, flags)
 	char *	filename
 	time_t	create_time
 	int	resolution
@@ -97,7 +97,7 @@ NGR_create(filename, create_time, resolution, columns, names, flags)
 	      names_x[i] = SvPVbyte_nolen(*av_fetch(names, i, 0));
 	      flags_x[i] = SvIV(*av_fetch(flags, i, 0));
 	}
-	RETVAL = NGR_create(filename, create_time, resolution, columns, names_x, flags_x);
+	RETVAL = TSDB_create(filename, create_time, resolution, columns, names_x, flags_x);
 	free(names_x);
 	free(flags_x);
 	OUTPUT:
@@ -105,46 +105,46 @@ NGR_create(filename, create_time, resolution, columns, names, flags)
 	
 
 int
-NGR_cell(obj, row, column)
-	struct NGR_metric_t *	obj
+TSDB_cell(obj, row, column)
+	struct TSDB_metric_t *	obj
 	int	row
 	int	column
 
 int
-NGR_insert(obj, column, timestmp, value)
-	struct NGR_metric_t *	obj
+TSDB_insert(obj, column, timestmp, value)
+	struct TSDB_metric_t *	obj
 	int	column
 	time_t	timestmp
 	int	value
 
 int
-NGR_last_row_idx(obj, column)
-	struct NGR_metric_t *	obj
+TSDB_last_row_idx(obj, column)
+	struct TSDB_metric_t *	obj
 	int	column
 
-struct NGR_metric_t *
-NGR_open(filename)
+struct TSDB_metric_t *
+TSDB_open(filename)
 	char *	filename
 
-struct NGR_range_t *
-NGR_range(obj, start, end)
-	struct NGR_metric_t *	obj
+struct TSDB_range_t *
+TSDB_range(obj, start, end)
+	struct TSDB_metric_t *	obj
 	int	start
 	int	end
 
 void
-NGR_range_free(range)
-	struct NGR_range_t *	range
+TSDB_range_free(range)
+	struct TSDB_range_t *	range
 
-struct NGR_range_t *
-NGR_timespan(obj, start, end)
-	struct NGR_metric_t *	obj
+struct TSDB_range_t *
+TSDB_timespan(obj, start, end)
+	struct TSDB_metric_t *	obj
 	time_t	start
 	time_t	end
 
 int
 range_row_value(obj, column, idx)
-	struct NGR_range_t *	obj
+	struct TSDB_range_t *	obj
 	int	column
 	int	idx
 	CODE:
@@ -154,7 +154,7 @@ range_row_value(obj, column, idx)
 
 double
 range_row_avg(obj, column, idx)
-	struct NGR_range_t *	obj
+	struct TSDB_range_t *	obj
 	int	column
 	int	idx
 	CODE:
@@ -168,7 +168,7 @@ range_row_avg(obj, column, idx)
 
 int
 range_row_min(obj, column, idx)
-	struct NGR_range_t *	obj
+	struct TSDB_range_t *	obj
 	int	column
 	int	idx
 	CODE:
@@ -182,7 +182,7 @@ range_row_min(obj, column, idx)
 
 int
 range_row_max(obj, column, idx)
-	struct NGR_range_t *	obj
+	struct TSDB_range_t *	obj
 	int	column
 	int	idx
 	CODE:
@@ -196,7 +196,7 @@ range_row_max(obj, column, idx)
 
 double
 range_row_stddev(obj, column, idx)
-	struct NGR_range_t *	obj
+	struct TSDB_range_t *	obj
 	int	column
 	int	idx
 	CODE:
@@ -210,7 +210,7 @@ range_row_stddev(obj, column, idx)
 
 int
 range_row_rows_averaged(obj, column, idx)
-	struct NGR_range_t *	obj
+	struct TSDB_range_t *	obj
 	int	column
 	int	idx
 	CODE:
