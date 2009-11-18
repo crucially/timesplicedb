@@ -14,7 +14,7 @@ INCLUDE: const-xs.inc
 char* metric_name(obj);
     	struct TSDB_metric_t *	obj
 	CODE:
-	RETVAL = obj->names[0];
+	RETVAL = obj->name;
 	OUTPUT:
 	RETVAL      
 
@@ -23,9 +23,9 @@ HV* metric_meta(obj);
 	CODE:
 	int i; 
 	RETVAL = newHV();
-	for(i = 1; i < obj->columns + 1; i++) {
-	      SV* flags = newSViv(obj->flags[i]);
-	      hv_store(RETVAL, (char*) obj->names[i], strlen(obj->names[i]), flags, 0);
+	for(i = 0; i < obj->columns; i++) {
+	      SV* flags = newSViv(obj->col_flags[i]);
+	      hv_store(RETVAL, (char*) obj->col_names[i], strlen(obj->col_names[i]), flags, 0);
 	}	
 	OUTPUT:
 	RETVAL      
@@ -91,13 +91,14 @@ TSDB_create(filename, create_time, resolution, columns, names, flags)
 	char **names_x;
 	int *flags_x;
 	int i;
+	struct TSDB_create_opts_t *opts = TSDB_create_opts(columns);
 	names_x = malloc(columns + 1);
 	flags_x = malloc(sizeof(int) * (columns + 1));
 	for(i = 0; i < columns + 1; i++) {
 	      names_x[i] = SvPVbyte_nolen(*av_fetch(names, i, 0));
 	      flags_x[i] = SvIV(*av_fetch(flags, i, 0));
 	}
-	RETVAL = TSDB_create(filename, create_time, resolution, columns, names_x, flags_x);
+	RETVAL = TSDB_create(opts);
 	free(names_x);
 	free(flags_x);
 	OUTPUT:
