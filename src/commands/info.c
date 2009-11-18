@@ -29,7 +29,7 @@
  * SUCH DAMAGE.
  */
 
-#include "NGR.h"
+#include "TSDB.h"
 #include <sys/time.h>
 #include <stdio.h>
 #include <time.h>
@@ -51,7 +51,7 @@ int info_usage () {
 int info_main(int argc, char **argv) {
   int o;
   char *filename;
-  filename = NGR_NULL;
+  filename = TSDB_NULL;
 
   while ((o = getopt(argc, argv,
 		     "f:h")) != -1) {
@@ -71,13 +71,13 @@ int info_main(int argc, char **argv) {
     return info_usage();
   }
 
-  struct NGR_metric_t *metric = NGR_open(filename);
-  time_t last_row = (metric->created + (NGR_last_row_idx(metric, 0) * metric->resolution));
+  struct TSDB_metric_t *metric = TSDB_open(filename);
+  time_t last_row = (metric->created + (TSDB_last_row_idx(metric, 0) * metric->resolution));
 
-  printf("Name:          %s\n", metric->names[0]);
+  printf("Name:          %s\n", metric->name);
   printf("Starting time: %s", ctime(&(metric->created)));
   printf("Last row:      %s", ctime(&last_row)); 
-  printf("Rows:          %d\n", NGR_last_row_idx(metric, 0) + 1);
+  printf("Rows:          %d\n", TSDB_last_row_idx(metric, 0) + 1);
   printf("Columns:       %d\n", metric->columns); 
   printf("Resolution:    %d seconds\n", metric->resolution);
   printf("Verison:       %d\n", metric->version);
@@ -89,8 +89,8 @@ int info_main(int argc, char **argv) {
     printf("Format:        unknown!\n");
   }
   int i;
-  for(i = 1; i <= metric->columns; i++) {
-    printf("Column %d:      %s (%d)\n", i, metric->names[i], metric->flags[i]);
+  for(i = 0; i < metric->columns; i++) {
+    printf("Column %d:      %s (%d)\n", i, metric->col_names[i], metric->col_flags[i]);
   }
   return 0;
 }

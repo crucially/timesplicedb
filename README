@@ -1,5 +1,5 @@
 
-NGR is a storage engine for timeseries data
+timesplicedb is a storage engine for timeseries data
 
 It is similar to rrdtool in that, but with some key differences:
 
@@ -21,5 +21,5 @@ None of the aggregation functions have been tested extensively, getting floating
 
 ****
 
-I hange out on freenode #ngr
+I hange out on freenode #timesplicedb
 

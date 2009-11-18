@@ -29,7 +29,7 @@
  * SUCH DAMAGE.
  */
 
-#include "NGR.h"
+#include "TSDB.h"
 #include <stdio.h>
 #include <fcntl.h>
 #include <string.h>
@@ -58,25 +58,41 @@
    list of items, indexed of the time-create_time/interval
 */
 
+struct TSDB_create_opts_t * TSDB_create_opts(unsigned int columns) {
+  struct TSDB_create_opts_t *opts = calloc(1, sizeof(struct TSDB_create_opts_t));
+  opts->magic     = TSDB_create_opts_magic;
+  opts->columns   = columns;
+  opts->col_names = calloc(columns, sizeof(char *));
+  opts->col_flags = calloc(columns, sizeof(int));
+  return opts;
+}
 
+void TSDB_free_opts(struct TSDB_create_opts_t *opts) {
+  free(opts->col_flags);
+  free(opts->col_names);
+  free(opts);
+  return;
+}
 
-struct NGR_metric_t * NGR_create(const char *filename, time_t created_time, int resolution, int columns, char **names, int *flags) {
-  int   fd, write_len;
+struct TSDB_metric_t * TSDB_create(struct TSDB_create_opts_t *opts) {
+  int   fd, write_len,len;
   int   size = sizeof(int);
   int   version = 1;
 
-  assert(columns > 0);
+  assert(opts->magic == TSDB_create_opts_magic);
 
-  if(!created_time)
-    created_time = time(NULL);
+  assert(opts->columns > 0);
 
-  if(!resolution)
-    resolution = 60;
+  if(!opts->created_time)
+    opts->created_time = time(NULL);
+
+  if(!opts->resolution)
+    opts->resolution = 60;
   
-  fd = open(filename, O_CREAT | O_RDWR | O_EXCL, 0755);
+  fd = open(opts->filename, O_CREAT | O_RDWR | O_EXCL, 0755);
 
   if(fd == -1)
-    printf("Cannot open %s (%s)\n", filename, strerror(errno));
+    printf("Cannot open %s (%s)\n", opts->filename, strerror(errno));
   assert(fd != -1);
 
   
@@ -84,36 +100,46 @@ struct NGR_metric_t * NGR_create(const char *filename, time_t created_time, int 
   assert(write_len == 4);
   write_len = write(fd, &version, 4);
   assert(write_len == 4);
-  write_len = write(fd, &resolution, 4);
+  write_len = write(fd, &opts->resolution, 4);
   assert(write_len == 4);
-  write_len = write(fd, &columns, 4);
+  write_len = write(fd, &opts->columns, 4);
   assert(write_len == 4);
-  write_len = write(fd, &created_time, size);
+  write_len = write(fd, &opts->created_time, size);
   assert(write_len == size);
 
-  int i;
-  for(i = 0; i < columns + 1; i++) {
-    int len = strlen(names[i]) + 1;
+  len = strlen(opts->name) + 1;
+  write_len = write(fd, &opts->flags, 4);
+  assert(write_len == 4);
+  write_len = write(fd, &len, 4);
+  assert(write_len == 4);
+  write_len = write(fd, opts->name, strlen(opts->name)+1);
+  assert(write_len == strlen(opts->name)+1);
 
-    write_len = write(fd, &flags[i], 4);
+
+  int i;
+  for(i = 0; i < opts->columns; i++) {
+    len = strlen(opts->col_names[i]) + 1;
+    write_len = write(fd, &opts->col_flags[i], 4);
     assert(write_len == 4);
     write_len = write(fd, &len, 4);
     assert(write_len == 4);
-    write_len = write(fd, names[i], len);
+    write_len = write(fd, opts->col_names[i], len);
     assert(write_len == len);
   }
 
+
   close(fd);
 
-  return NGR_open(filename);
+  return TSDB_open(opts->filename);
 }
 
-struct NGR_metric_t * NGR_open(const char *filename) {
+struct TSDB_metric_t * TSDB_open(const char *filename) {
+  int len;
   size_t read_len;
-  struct NGR_metric_t *obj;
+  struct TSDB_metric_t *obj;
 
-  obj = malloc(sizeof(struct NGR_metric_t));
-  obj->magic = NGR_metric_magic;
+  obj = malloc(sizeof(struct TSDB_metric_t));
+  obj->magic = TSDB_metric_magic;
   obj->fd = open(filename, O_RDWR);
 
   if(obj->fd == -1)
@@ -143,20 +169,29 @@ struct NGR_metric_t * NGR_open(const char *filename) {
 
   obj->ranges = 0;
 
+  read_len = read(obj->fd, &obj->flags, 4);
+  assert(read_len == 4);
+  obj->base += 4;
+  read_len = read(obj->fd, &len, 4);
+  assert(read_len == 4);
+  obj->base += 4;
+  obj->name = malloc(len);
+  read_len = read(obj->fd, obj->name, len);
+  assert(read_len == len);
+  obj->base += len;
 
+  obj->col_names = malloc(sizeof(char *) * (obj->columns));
+  obj->col_flags = malloc(sizeof(int) * (obj->columns));
   int i;
-  obj->names = malloc(sizeof(char *) * (obj->columns + 1));
-  obj->flags = malloc(sizeof(int) * (obj->columns + 1));
-  for(i = 0; i < obj->columns + 1; i++) {
-    int len;
-    read_len = read(obj->fd, &obj->flags[i], 4);
+  for(i = 0; i < obj->columns; i++) {
+    read_len = read(obj->fd, &obj->col_flags[i], 4);
     assert(read_len == 4);
     obj->base += 4;
     read_len = read(obj->fd, &len, 4);
     assert(read_len == 4);
     obj->base += 4;
-    obj->names[i] = malloc(len);
-    read_len = read(obj->fd, obj->names[i], len);
+    obj->col_names[i] = malloc(len);
+    read_len = read(obj->fd, obj->col_names[i], len);
     assert(read_len == len);
     obj->base += len;
   }
@@ -167,8 +202,8 @@ struct NGR_metric_t * NGR_open(const char *filename) {
   return obj;
 }
 
-int NGR_close(struct NGR_metric_t *obj) {
-  assert(obj->magic == NGR_metric_magic);
+int TSDB_close(struct TSDB_metric_t *obj) {
+  assert(obj->magic == TSDB_metric_magic);
   assert(obj->ranges == 0);
   close(obj->fd);
   free(obj);
@@ -180,10 +215,10 @@ int NGR_close(struct NGR_metric_t *obj) {
    value      value to store
 */
 
-int NGR_insert (struct NGR_metric_t *obj, int column, time_t timestamp, int value) {
+int TSDB_insert (struct TSDB_metric_t *obj, int column, time_t timestamp, int value) {
   int  row, offset, write_len;
 
-  assert(obj->magic == NGR_metric_magic);
+  assert(obj->magic == TSDB_metric_magic);
 
   if (!timestamp)
     timestamp = time(NULL);
@@ -211,16 +246,16 @@ int NGR_insert (struct NGR_metric_t *obj, int column, time_t timestamp, int valu
   end       what row to stop at
 */
 
-struct NGR_range_t * NGR_range (struct NGR_metric_t *obj, int start, int end) {
-  struct NGR_range_t *range;
+struct TSDB_range_t * TSDB_range (struct TSDB_metric_t *obj, int start, int end) {
+  struct TSDB_range_t *range;
   struct stat *file;
 
-  assert(obj->magic == NGR_metric_magic);
+  assert(obj->magic == TSDB_metric_magic);
 
-  range = malloc(sizeof(struct NGR_range_t));
+  range = malloc(sizeof(struct TSDB_range_t));
   file = malloc(sizeof(struct stat));
   fstat(obj->fd, file);
-  range->magic = NGR_range_magic;
+  range->magic = TSDB_range_magic;
 
   /* if the range goes byond the file, map that as well */
   if ((end * obj->width + obj->base) > file->st_size)
@@ -256,8 +291,8 @@ struct NGR_range_t * NGR_range (struct NGR_metric_t *obj, int start, int end) {
   aggregates are not mmaped, pure ranges are
 */
 
-void NGR_range_free (struct NGR_range_t * range) {
-  assert(range->magic == NGR_range_magic);
+void TSDB_range_free (struct TSDB_range_t * range) {
+  assert(range->magic == TSDB_range_magic);
   range->metric->ranges--;
 
   if (range->mmap == 1)
@@ -277,21 +312,21 @@ void NGR_range_free (struct NGR_range_t * range) {
    start     what time this starts from
    stop      and last time we want
 */
-struct NGR_range_t * NGR_timespan (struct NGR_metric_t *obj, time_t start, time_t end) {
+struct TSDB_range_t * TSDB_timespan (struct TSDB_metric_t *obj, time_t start, time_t end) {
   int start_offset, end_offset;
 
-  assert(obj->magic == NGR_metric_magic);
+  assert(obj->magic == TSDB_metric_magic);
 
   /* this just converts the timestamp into an offset that the range function takes */
   start_offset = ((start - obj->created) / obj->resolution);
   end_offset = ((end - obj->created) / obj->resolution);
-  return NGR_range(obj, start_offset, end_offset);
+  return TSDB_range(obj, start_offset, end_offset);
 }
 
 
-int NGR_last_row_idx (struct NGR_metric_t *obj, int column) {
+int TSDB_last_row_idx (struct TSDB_metric_t *obj, int column) {
   int offset;
-  assert(obj->magic == NGR_metric_magic);
+  assert(obj->magic == TSDB_metric_magic);
   assert (column <= obj->columns - 1);
   offset = lseek(obj->fd, 0 - (obj->width * obj->columns), SEEK_END);
   if(offset < obj->base)
@@ -300,10 +335,10 @@ int NGR_last_row_idx (struct NGR_metric_t *obj, int column) {
 }
 
 
-int NGR_cell (struct NGR_metric_t *obj, int row, int column) {
+int TSDB_cell (struct TSDB_metric_t *obj, int row, int column) {
   char *buf;
   int rv, read_len, offset;
-  assert(obj->magic == NGR_metric_magic);
+  assert(obj->magic == TSDB_metric_magic);
   assert (column <= obj->columns - 1);
   offset = (obj->base + (row * ( obj->width * obj->columns)) + (column * obj->width));
   buf = malloc(obj->width);
@@ -322,41 +357,43 @@ int NGR_cell (struct NGR_metric_t *obj, int row, int column) {
   return rv;
 }
 
-struct NGR_agg_counters_t {
-  int cells_counted;  // how many cells we have counted
-  int sum;            // sum
-  int min;            // minum value seen
-  int max;            // maximum value seen
-  double sum_sqr;     
+struct TSDB_agg_counters_t {
+  unsigned int cells_counted;  // how many cells we have counted
+  unsigned int sum;            // sum
+  unsigned int min;            // minum value seen
+  unsigned int max;            // maximum value seen
+  double sum_sqr;
+  unsigned int last_value;
 };
 
 
-struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int data_type) {
-  struct NGR_range_t *aggregate;
-  struct NGR_agg_counters_t *counters;
-  assert(range->magic == NGR_range_magic);
+struct TSDB_range_t * TSDB_aggregate (struct TSDB_range_t *range, int interval, int data_type) {
+  struct TSDB_range_t *aggregate;
+  struct TSDB_agg_counters_t *counters;
+  assert(range->magic == TSDB_range_magic);
   int src_rows, src_cells, curr_cell, trg_cell;
   src_rows = src_cells = curr_cell = trg_cell = 0;
 
-  counters = malloc(sizeof(struct NGR_agg_counters_t) * range->columns);
+  counters = malloc(sizeof(struct TSDB_agg_counters_t) * range->columns);
 
   src_rows = range->rows;
   src_cells = src_rows * range->columns;
 
   int i = 0;
   while(i < range->columns) {
-    counters[i].cells_counted = counters[i].sum = counters[i].max = counters[i].sum_sqr = 0;
-    counters[i].min = 2147483647; /** broken on 64bit, i know, and I haven't how to deal with signed or unsigned yet probably counters
+    counters[i].last_value = counters[i].cells_counted = counters[i].sum = counters[i].max = counters[i].sum_sqr = 0;
+    counters[i].min = 4294967295; /** broken on 64bit, i know, and I haven't how to deal with signed or unsigned yet probably counters
 			are unsigned and gauge signed?**/
+
     i++;
   }
 
   /* figure out how many buckets we need, switch to floating point and then round up */
   int buckets = rint(ceil(((double)range->rows / ((double)interval / (double)range->resolution))));
 
-  aggregate = malloc(sizeof(struct NGR_range_t));
+  aggregate = malloc(sizeof(struct TSDB_range_t));
   aggregate->area = malloc(sizeof(int) * buckets * range->columns);
-  aggregate->agg = malloc(sizeof(struct NGR_agg_row_t) * buckets * range->columns);
+  aggregate->agg = malloc(sizeof(struct TSDB_agg_row_t) * buckets * range->columns);
   aggregate->mmap = 0;
   aggregate->rows = buckets;
   aggregate->row = aggregate->area;
@@ -368,13 +405,22 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
 
   while(src_cells--) {
     int value;
-    struct NGR_agg_counters_t *counter = (counters + (curr_cell % range->columns));
+    struct TSDB_agg_counters_t *counter = (counters + (curr_cell % range->columns));
 
-    if (data_type == NGR_GAUGE || curr_cell == 0)
+    if (data_type == TSDB_GAUGE)
       value = range->row[curr_cell];
-    else 
-      value = range->row[curr_cell] - range->row[curr_cell-1];
-
+    else  {
+      int new_value = range->row[curr_cell];
+      int old_value = range->row[curr_cell - range->columns];
+      if (range->row[curr_cell] == 0 || range->row[curr_cell - range->columns] == 0) {
+	value = counters->last_value;
+      } else {
+	if (old_value > new_value)
+	  value = 4294967295 - old_value + new_value;
+	else 
+	  value = new_value - old_value;
+      }
+    }
 
 
     counter->sum += value;
@@ -390,7 +436,7 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
     if(cells_seen++ == rows_per_bucket * range->columns - 1) {
       int i = 0;
       while(i < range->columns) {
-	struct NGR_agg_counters_t *column = counters + i;
+	struct TSDB_agg_counters_t *column = counters + i;
 	double avg = (double)column->sum / (double)column->cells_counted;
 
 	aggregate->agg[trg_cell].rows_averaged = column->cells_counted;
@@ -413,6 +459,7 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
       }
       cells_seen = 0;
     }
+    counter->last_value = value;
     curr_cell++;
   }
   
@@ -420,7 +467,7 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
 
     int i = 0;
     while(i < range->columns) {
-      struct NGR_agg_counters_t *column = counters + i;
+      struct TSDB_agg_counters_t *column = counters + i;
       double avg = (double)column->sum / (double)column->cells_counted;
       
       aggregate->agg[trg_cell].rows_averaged = column->cells_counted;
@@ -440,7 +487,7 @@ struct NGR_range_t * NGR_aggregate (struct NGR_range_t *range, int interval, int
     
     /* XXX SSHOULD SET THE RESOLUTION ON AGGREGATE */
   }
-
+  
   return aggregate;
 }
 

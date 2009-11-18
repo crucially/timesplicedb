@@ -29,7 +29,7 @@
  * SUCH DAMAGE.
  */
 
-#include "NGR.h"
+#include "TSDB.h"
 #include <sys/time.h>
 #include <stdio.h>
 #include <time.h>
@@ -54,15 +54,18 @@ int agg_usage () {
 }
 
 int agg_main(int argc, char * const *argv) {
-  int o, start, end, interval, column;
+  int o, start, end, interval, column, difference;
   char *filename = 0;
   
-  column = start = end = interval = 0;
+  difference = column = start = end = interval = 0;
 
   while ((o = getopt(argc, argv,
-		     "f:s:e:i:h:c:")) != -1) {
+		     "f:s:e:i:h:c:d")) != -1) {
 
     switch(o) {
+    case 'd':
+      difference = 1;
+      break;
     case 'c':
       column = atoi(optarg);
       break;
@@ -87,16 +90,21 @@ int agg_main(int argc, char * const *argv) {
     return agg_usage();
   }
 
+  int flags;
+  if (difference)
+    flags = TSDB_COUNTER;
+  else
+    flags = TSDB_GAUGE;
 
-  struct NGR_metric_t *metric    = NGR_open(filename);
-  struct NGR_range_t  *range     = NGR_timespan(metric, start, end);
-  struct NGR_range_t  *aggregate = NGR_aggregate(range, interval, NGR_GAUGE);
+  struct TSDB_metric_t *metric    = TSDB_open(filename);
+  struct TSDB_range_t  *range     = TSDB_timespan(metric, start, end);
+  struct TSDB_range_t  *aggregate = TSDB_aggregate(range, interval, flags);
 
   int rows = aggregate->rows;
   int i = 0;
   while(rows--) {
     int offset = ((i * aggregate->columns) + column);
-    printf("AVG: %.4f      MAX: %d      MIN: %d      STDDEV: %f\n", aggregate->agg[offset].avg, aggregate->agg[offset].max, aggregate->agg[offset].min, aggregate->agg[offset].stddev);
+    printf("AVG: %.4f      MAX: %u      MIN: %u      STDDEV: %f\n", aggregate->agg[offset].avg, aggregate->agg[offset].max, aggregate->agg[offset].min, aggregate->agg[offset].stddev);
     i++;
   }
   return 0;

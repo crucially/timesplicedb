@@ -29,7 +29,7 @@
  * SUCH DAMAGE.
  */
 
-#include "NGR.h"
+#include "TSDB.h"
 #include <sys/time.h>
 #include <stdio.h>
 #include <time.h>
@@ -48,14 +48,17 @@ int dump_usage () {
 }
 
 int dump_main(int argc, char * const *argv) {
-  int o, column, column_set;
+  int o, column, column_set, difference;
   char *filename = 0;
-  column = column_set = 0;
+  difference = column = column_set = 0;
 
   while ((o = getopt(argc, argv,
-		     "c:f:h")) != -1) {
+		     "c:f:hd")) != -1) {
 
     switch(o) {
+    case 'd':
+      difference = 1;
+      break;
     case 'f':
       filename = malloc(strlen(optarg)+1);
       memcpy(filename, optarg, strlen(optarg)+1);
@@ -72,20 +75,41 @@ int dump_main(int argc, char * const *argv) {
     return dump_usage();
   }
 
-  struct NGR_metric_t *metric = NGR_open(filename);
-  struct NGR_range_t *range = NGR_range(metric, 0, NGR_last_row_idx(metric, 0));
+  struct TSDB_metric_t *metric = TSDB_open(filename);
+  struct TSDB_range_t *range = TSDB_range(metric, 0, TSDB_last_row_idx(metric, 0));
   int rows = range->rows;
   int columns = range->columns;
   int i = 0;
+  int *last_value = calloc(sizeof(int), columns);
+  int *last_diff  = calloc(sizeof(int), columns);
   if(column_set) {
     while(rows--) {
-      printf("%d\n", range->row[(i++ * columns) + column]);
+      printf("%u\n", range->row[(i++ * columns) + column]);
     }
   } else {
     int col = 0;
     while(rows--) {
       while(col < columns) {
-	printf("%d\t", range->row[(i * columns) + col++]);
+	unsigned int value = range->row[(i * columns) + col];
+	
+	if (difference) {
+	  if (value == 0) {
+	    printf("%u\t", last_diff[col++]);
+	    continue;
+	  }
+	  if (last_value[col] > value) {
+	    /* wrap around */
+	    last_diff[col] = 4294967295 - last_value[col] + value;
+	  } else {
+	    last_diff[col] = value - last_value[col];
+	  }
+	  printf("%u\t", last_diff[col]);
+
+	} else
+	  printf("%u\t", value);
+	if (value)
+	  last_value[col] = value;
+	col++;
       }
       i++;
       col = 0;

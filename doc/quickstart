@@ -4,26 +4,26 @@
 
 export PATH=$PATH:.
 
-rm file.ngr
-ngr create -f file.ngr -b 1258091219 -r 60 -c 1
+rm file.tsdb
+tsdb create -f file.tsdb -b 1258091219 -r 60 -c 1
 
 # insert multiple values
-ngr insert -f file.ngr -t 1258091219 -v 1
-ngr insert -f file.ngr -t 1258091279 -v 2
-ngr insert -f file.ngr -t 1258091339 -v 3
-ngr insert -f file.ngr -t 1258091399 -v 4
-ngr insert -f file.ngr -t 1258091459 -v 5
-ngr insert -f file.ngr -t 1258091519 -v 6
-ngr insert -f file.ngr -t 1258091579 -v 7
-ngr insert -f file.ngr -t 1258091639 -v 8
-ngr insert -f file.ngr -t 1258091699 -v 9
+tsdb insert -f file.tsdb -t 1258091219 -v 1
+tsdb insert -f file.tsdb -t 1258091279 -v 2
+tsdb insert -f file.tsdb -t 1258091339 -v 3
+tsdb insert -f file.tsdb -t 1258091399 -v 4
+tsdb insert -f file.tsdb -t 1258091459 -v 5
+tsdb insert -f file.tsdb -t 1258091519 -v 6
+tsdb insert -f file.tsdb -t 1258091579 -v 7
+tsdb insert -f file.tsdb -t 1258091639 -v 8
+tsdb insert -f file.tsdb -t 1258091699 -v 9
 
 # see raw content
-ngr dump -f file.ngr
+tsdb dump -f file.tsdb
 
 #see info 
-ngr info -f file.ngr
+tsdb info -f file.tsdb
 
-ngr agg -f file.ngr -s 1258091219 -e 1258091699 -i 120
+tsdb agg -f file.tsdb -s 1258091219 -e 1258091699 -i 120
 
 
