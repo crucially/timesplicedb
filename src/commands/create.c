@@ -99,7 +99,7 @@ int create_main(int argc, char * const *argv) {
     flags[j] = 1;
   }
 
-
+  /*
   struct NGR_metric_t *metric = NGR_create(filename, beginning_time, resolution, columns, foo, flags);
 
   time_t last_row = (metric->created + (NGR_last_row_idx(metric, 0) * 60));
@@ -122,5 +122,6 @@ int create_main(int argc, char * const *argv) {
   for(i = 1; i <= metric->columns; i++) {
     printf("Column %d:      %s (%d)\n", i, metric->names[i], metric->flags[i]);
   }
+  */
   return 0;
 }

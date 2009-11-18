@@ -65,23 +65,25 @@ struct NGR_create_opts_t * NGR_create_opts(int columns) {
   opts->col_names = calloc(sizeof(char *), columns);
 }
 
-struct NGR_metric_t * NGR_create(const char *filename, time_t created_time, int resolution, int columns, char **names, int *flags) {
+struct NGR_metric_t * NGR_create(struct NGR_create_opts_t *opts) {
   int   fd, write_len;
   int   size = sizeof(int);
   int   version = 1;
 
-  assert(columns > 0);
+  assert(opts->magic == NGR_create_opts_magic);
 
-  if(!created_time)
-    created_time = time(NULL);
+  assert(opts->columns > 0);
 
-  if(!resolution)
-    resolution = 60;
+  if(!opts->created_time)
+    opts->created_time = time(NULL);
+
+  if(!opts->resolution)
+    opts->resolution = 60;
   
-  fd = open(filename, O_CREAT | O_RDWR | O_EXCL, 0755);
+  fd = open(opts->filename, O_CREAT | O_RDWR | O_EXCL, 0755);
 
   if(fd == -1)
-    printf("Cannot open %s (%s)\n", filename, strerror(errno));
+    printf("Cannot open %s (%s)\n", opts->filename, strerror(errno));
   assert(fd != -1);
 
   
@@ -89,13 +91,13 @@ struct NGR_metric_t * NGR_create(const char *filename, time_t created_time, int 
   assert(write_len == 4);
   write_len = write(fd, &version, 4);
   assert(write_len == 4);
-  write_len = write(fd, &resolution, 4);
+  write_len = write(fd, &opts->resolution, 4);
   assert(write_len == 4);
-  write_len = write(fd, &columns, 4);
+  write_len = write(fd, &opts->columns, 4);
   assert(write_len == 4);
-  write_len = write(fd, &created_time, size);
+  write_len = write(fd, &opts->created_time, size);
   assert(write_len == size);
-
+  /*
   int i;
   for(i = 0; i < columns + 1; i++) {
     int len = strlen(names[i]) + 1;
@@ -107,10 +109,11 @@ struct NGR_metric_t * NGR_create(const char *filename, time_t created_time, int 
     write_len = write(fd, names[i], len);
     assert(write_len == len);
   }
+  */
 
   close(fd);
 
-  return NGR_open(filename);
+  return NGR_open(opts->filename);
 }
 
 struct NGR_metric_t * NGR_open(const char *filename) {

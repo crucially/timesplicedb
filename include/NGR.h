@@ -104,7 +104,7 @@ struct NGR_agg_row_t {
 
 struct NGR_create_opts_t * NGR_create_opts(int columns);
 
-struct NGR_metric_t * NGR_create(const char *filename, time_t create_time, int resolution, int columns, char **names, int *flags);
+struct NGR_metric_t * NGR_create(struct NGR_create_opts_t *opts);
 
 struct NGR_metric_t * NGR_open(const char *filename);
 
