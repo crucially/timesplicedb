@@ -26,3 +26,4 @@ ltmain.sh
 blib/
 *.bs
 pm_to_blib
+*.tar.gz
