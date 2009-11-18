@@ -1,168 +1,369 @@
-
 package NGR;
+
 use strict;
 use version;
+use Carp qw(croak);
 
 use NGR::C qw();
 
 our $VERSION = '0.01';
 
+=head1 NAME
+
+NGR - a timeslice database
+
+=head1 SYNOPSIS
+
+    use NGR;
+    my $ngr = NGR->new( $filename, columns => [ 'response_time',  'failure_rate'] );
+    $ngr->insert('response_time' => $value);
+
+
+=head1 METHODS
+
+=cut
+
+
+=head2 new <filename> [option[s]]
+
+=over 4
+
+=item overwrite 
+
+If true then will create a new database, no matter what.
+
+Otherwise the default behaviour is to create a new database if none 
+exists and open any existing ones.
+
+=item name
+
+A name for the database.
+
+Defaults to the filename without file extension.
+
+=item flags 
+
+A bit pack of flags for the database.
+
+
+=item resolution 
+
+Takes a number, in milliseconds, of the interval between rows.
+
+Defaults to ???
+
+=item create_time
+
+Takes a Unix time stamp which allows you to set the creation time of the db.
+
+Defaults to the current time. 
+
+=items columns <required>
+
+The column definitions. Can be in multiple formats:
+
+    # The simplest form - a single column with a name 
+    columns => $name;
+
+    # Second simplest form - multiple named columns
+    columns => [$name1, $name2, $name3];
+
+    # Third form - multiple columns with flags
+    columns => { $name1 => $flag1, $name2 => $flag2, $name3 => $flag3 };
+
+=back
+
+=cut
 
 sub new {
-    my $class = shift;
+    my $class   = shift;
+	my $file    = shift || croak "You must pass in a filename";
     my %options = @_;
 
-    my $self = bless {}, $class;
-    my $names = [$options{name} || ""];
+
+	my $open    = ( -f $file && !$options{clobber} );
+
+
+    my $self    = bless {}, $class;
+    my ($name)  = ($options{name}) || ($file =~ m!([^./]+)(?:\..*)?$!);  
+
+    # TODO make this nicer than a bit pack
     my $flags = [$options{flags} || 0];
-    my $columns = 0;
-    foreach my $column (keys %{$options{columns}}) {
-	$columns++;
-	$names->[$columns] = $column;
-	$flags->[$columns] = $options{columns}->{$column};
+
+    my @columns;
+    if ('HASH' eq ref($options{columns}) {
+        while (my ($k,$v) = each %{$options{columns}) {
+            push @columns, { name => $k, flags => $v };
+            $self->{_columns}{$k} = $#columns;
+        }
+    } elsif ('ARRAY' eq ref($options{columns}) {
+        foreach my $k (@{$options{columns}}) {
+            push @columns, { name => $k, flags => 0 }; 
+            $self->{_columns}{$k} = $#columns;
+        }
+    } elsif (defined $options{columns}) {
+        push @columns, { name => $options{columns}, flags => 0 };
+        $self->{_columns}{$options{columns}} = $#columns;
+    } elsif (!$open) {
+        croak "You must pass in a columns definition";
     }
 
-    for(0..$options{columns}) {
-	
-    }
 
-    
-    if($options{create}) {
-	$self->{ctx} = NGR::C::create( $options{filename},
-				       $options{create_time},
-				       $options{resolution},
-				       $columns,
-				       $names,
-				       $flags,
-	    );
-    } else {
-	$self->{ctx} = NGR::C::open( $options{filename} );
-    }
+	$self->{ctx} = ($open) ? NGR::C::open( $file) :    
+        					 NGR::C::create( $file,
+                        		$options{create_time},
+                        		$options{resolution},
+                        		$name,
+                        		$flags,
+                        		[@columns] );
 
     return $self;
 
 }
 
-sub insert {
-    my $self = shift;
-    my %options = @_;
+=head2 info 
 
-    NGR::C::insert( $self->{ctx},
-		    $options{column},
-		    $options{timestamp},
-		    $options{value} );
-    
-}
+Get info about the database.
 
+=cut
 sub info {
     my $self = shift;
     return {
-	created      => $self->created,
-	resolution   => $self->resolution,
-	version      => $self->version,
-	columns      => $self->columns,
-	rows         => $self->rows,
-	last_updated => $self->last_updated,
+        name         => $self->name,
+        created      => $self->created,
+        resolution   => $self->resolution,
+        version      => $self->version,
+        columns      => $self->columns,
+        rows         => $self->rows,
+        last_updated => $self->last_updated,
+        meta         => $self->meta,
     };
 }
 
 
+=head2 name
+
+Get the name of the database
+
+=cut
+sub name {
+    my $self = shift;
+    return NGR::C::metric_name($self->{ctx});
+}
+
+=head2 created
+
+Get when the database was created.
+
+=cut
 sub created {
     my $self = shift;
     return NGR::C::metric_created($self->{ctx});
 }
 
+=head2 resolution
+
+Get the resolution of the database
+
+=cut
 sub resolution {
     my $self = shift;
     return NGR::C::metric_resolution($self->{ctx});
 }
 
+=head2 version
+
+Get the database version
+
+=cut
 sub version {
     my $self = shift;
     return NGR::C::metric_version($self->{ctx});
 }
 
+=head2 columns
+
+Get the number of columns.
+
+=cut
 sub columns {
     my $self = shift;
     return NGR::C::metric_columns($self->{ctx});
 }
 
 
+=head2 rows
+
+Get the number of rows
+
+=cut
 sub rows {
     my $self = shift;
     return NGR::C::last_row_idx($self->{ctx}, 0) + 1;
 }
 
+=head2 last_row_idx
+
+Get the index of the last row
+
+=cut
 sub last_row_idx {
     my $self = shift;
     return NGR::C::last_row_idx($self->{ctx}, 0);
 }
 
-sub cell {
-    my $self = shift;
-    my %options = @_;
-    return NGR::C::cell($self->{ctx}, $options{row}, $options{column});
-}
+=head2 last_updated
 
+Get the last time a row was inserted as a Unix timestamp.
+
+=cut
 sub last_updated {
     my $self = shift;
     return ($self->created + ($self->last_row_idx(column => 0) * $self->resolution));
 }
-sub name {
-    my $self = shift;
-    return NGR::C::metric_name($self->{ctx});
-}
 
+=head2 meta
+
+Get some meta data about the database.
+
+=cut
 sub meta {
     my $self = shift;
     return NGR::C::metric_meta($self->{ctx});
 }
 
-sub timespan {
+
+=head2 insert <column> => <value> [timestamp]
+
+Insert the I<value> into I<column>.
+
+=cut
+sub insert {
     my $self = shift;
-    my %options = @_;
-    return NGR::Range->new(NGR::C::timespan($self->{ctx}, $options{start}, $options{end}));
+    my ($column, $value, $ts) = @_;
+    $ts ||= 0;
+
+    return NGR::C::insert( $self->{ctx}, NGR::_fix_col($self, $column), $ts, $value );
 }
 
+
+=head2 cell <row> <column>
+
+Get the value of a cell.
+
+=cut
+sub cell {
+    my $self = shift;
+    my ($row, $column) = @_;
+
+    return NGR::C::cell($self->{ctx}, $row, NGR::_fix_col($self,$column));
+}
+
+=head2 timespan <start> <end>
+
+Get all values between the unix time stamps I<start> and I<end>.
+
+Returns a C<NGR::Range>
+
+=cut
+sub timespan {
+    my $self = shift;
+    my ($start, $end) = @_;
+    return NGR::Range->new(NGR::C::timespan($self->{ctx}, $start, $end), _columns => $self->{_columns});
+}
+
+# turn a column name into an number
+sub _fix_col {
+    my $self = shift;
+    my $col  = shift;
+    return $self->{_columns}->{$col} || $col;
+}
 
 package NGR::Range;
 
 use strict;
 use warnings;
 
+=head1 NAME
+
+NGR::Range - represent a range of values in NGR
+
+=head1 SYNOPSIS
+    
+    my $ngr   = NGR->new($filename);
+    my $cols  = $ngr->columns;
+    my $range = $ngr->timespan($start, $end);
+    foreach my $row (0 .. $range->rows) {
+        foreach my $col (0..$cols) {
+            print Dumper ($range->cell($row, $col));
+        }   
+    }
+
+
+=head1 METHODS
+
+=cut
+
+=head2 new 
+
+This should only be called internally.
+
+=cut
 sub new {
     my $class = shift;
-    my $self = bless {};
-    $self->{ctx} = shift;
+	my $ctx   = shift;
+	my $opts  = @_;
+	my $self  = bless \%opts, $class;
+    $self->{ctx}  = $ctx;
     $self->{iter} = 0;
     return $self;
 }
 
+=head2 rows
+
+The number of rows in this range
+
+=cut
 sub rows {
     my $self = shift;
     NGR::C::range_rows($self->{ctx});
 }
 
+=head2 aggregate <interval> 
+
+The aggregate of the rows over the interval.
+
+Returns an C<NGR::Range>
+
+=cut
 sub aggregate {
-    my $self = shift;
+    my $self     = shift;
+    my $interval = shift;
     my %options = @_; 
     
-    return NGR::Range->new(NGR::C::aggregate($self->{ctx}, $options{interval}, 0));
+    return NGR::Range->new(NGR::C::aggregate($self->{ctx}, $interval, 0), $self->{_columns});
 }
 
+=head2 cell <row> <column> 
+
+Returns information about a cell in a columns.
+
+=cut
 sub cell {
-    my $self = shift;
+    my $self    = shift;
+    my $row     = shift;
+    my $column  = NGR::_fix_col($self, shift);
     my %options = @_;
 
     return {
-	row    => $options{row},
-	time   => 0,  # XXX calculate the time offset
-	value  => NGR::C::range_row_value($self->{ctx}, $options{column}, $options{row}),
-	avg    => NGR::C::range_row_avg($self->{ctx}, $options{column}, $options{row}),
-	min    => NGR::C::range_row_min($self->{ctx}, $options{column}, $options{row}),
-	max    => NGR::C::range_row_max($self->{ctx}, $options{column}, $options{row}),
-	stddev => NGR::C::range_row_stddev($self->{ctx}, $options{column}, $options{row}),
-	rows_averaged => NGR::C::range_row_rows_averaged($self->{ctx}, $options{column}, $options{row}),
+        row    => $row,
+        time   => 0,  # XXX calculate the time offset
+        value  => NGR::C::range_row_value($self->{ctx},  $column, $row),
+        avg    => NGR::C::range_row_avg($self->{ctx},    $column, $row),
+        min    => NGR::C::range_row_min($self->{ctx},    $column, $row),
+        max    => NGR::C::range_row_max($self->{ctx},    $column, $row),
+        stddev => NGR::C::range_row_stddev($self->{ctx}, $column, $row),
+        rows_averaged => NGR::C::range_row_rows_averaged($self->{ctx}, $column, $row),
     };
 }
 

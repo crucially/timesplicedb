@@ -7,35 +7,27 @@ use strict;
 
 my $ct = 1258091219;
 my $it = $ct;
-my $ngr = NGR->new(
-    create      => 1,
-    filename    => 'aggtest.ngrd',
+my $ngr = NGR->new('aggtest.ngrd'
+    clobber     => 1,
     resolution  => 60,
-    columns     => {
-		    test => 0
-		   },
+    columns     => 'test',
     create_time => $ct);
 
 foreach(1..9) {
-  $ngr->insert(column => 0,
-	       timestamp => $it,
-	       value => $_,
-	       );
+  $ngr->insert('test' => $_, $it);
   $it += 60;
 }
 
 
 is($ngr->rows, 9);
 
-my $range = $ngr->timespan(start  => $ct,
-			   end    => $it - 60,
-			  );
+my $range = $ngr->timespan($ct, $it - 60);
 
 isa_ok($range, "NGR::Range");
 is($range->rows, 9);
 
 for(1..9) {
-  my $cell = $range->cell(column => 0, row => $_-1);
+  my $cell = $range->cell($_-1, 'test');
 
   is_deeply($cell, {
 		     stddev => 0,
@@ -56,7 +48,7 @@ isa_ok($range, "NGR::Range");
 is($agg->rows, 5);
 
 {
-  my $cell = $agg->cell(column => 0, row => 0);
+  my $cell = $agg->cell(0, 'test');
   is($cell->{stddev}, 0.5, "stddev");
   is($cell->{min}, 1, "lowest we have seen");
   is($cell->{max}, 2, "highest we have seen");
@@ -65,7 +57,7 @@ is($agg->rows, 5);
 }
 
 {
-  my $cell = $agg->cell(column => 0, row => 1);
+  my $cell = $agg->cell(1, 0);
   is($cell->{stddev}, 0.5, "stddev");
   is($cell->{min}, 3, "lowest we have seen");
   is($cell->{max}, 4, "highest we have seen");
@@ -74,7 +66,7 @@ is($agg->rows, 5);
 }
 
 {
-  my $cell = $agg->cell(column => 0, row => 2);
+  my $cell = $agg->cell(2, 'test');
   is($cell->{stddev}, 0.5, "stddev");
   is($cell->{min}, 5, "lowest we have seen");
   is($cell->{max}, 6, "highest we have seen");
@@ -83,7 +75,7 @@ is($agg->rows, 5);
 }
 
 {
-  my $cell = $agg->cell(column => 0, row => 3);
+  my $cell = $agg->cell(3, 0);
   is($cell->{stddev}, 0.5, "stddev");
   is($cell->{min}, 7, "lowest we have seen");
   is($cell->{max}, 8, "highest we have seen");
@@ -92,7 +84,7 @@ is($agg->rows, 5);
 }
 
 {
-  my $cell = $agg->cell(column => 0, row => 4);
+  my $cell = $agg->cell(4, 'test');
   is($cell->{stddev}, 0, "no stddev");
   is($cell->{min}, 9, "lowest we have seen");
   is($cell->{max}, 9, "highest we have seen");
