@@ -12,8 +12,10 @@
 
 * create configure script for collectd
 
-* make the perl bridge not fake 64bit using doubles on real 64bit platforms
+* make the perl bridge not fake 64bit using doubles on real 64bit platforms [done uses strings]
   make it use bigint on 32 bit platforms? do I care?
+
+* fall back to pread if mmap fails
 
 
 
