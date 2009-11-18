@@ -84,7 +84,7 @@ int dump_main(int argc, char * const *argv) {
   int *last_diff  = calloc(sizeof(int), columns);
   if(column_set) {
     while(rows--) {
-      printf("%u\n", range->row[(i++ * columns) + column]);
+      printf("%llu\n", range->row[(i++ * columns) + column]);
     }
   } else {
     int col = 0;
@@ -94,7 +94,7 @@ int dump_main(int argc, char * const *argv) {
 	
 	if (difference) {
 	  if (value == 0) {
-	    printf("%u\t", last_diff[col++]);
+	    printf("%llu\t", last_diff[col++]);
 	    continue;
 	  }
 	  if (last_value[col] > value) {
@@ -103,7 +103,7 @@ int dump_main(int argc, char * const *argv) {
 	  } else {
 	    last_diff[col] = value - last_value[col];
 	  }
-	  printf("%u\t", last_diff[col]);
+	  printf("%llu\t", last_diff[col]);
 
 	} else
 	  printf("%u\t", value);
