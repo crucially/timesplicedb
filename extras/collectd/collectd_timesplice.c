@@ -1,4 +1,4 @@
-//#include "collectd.h"
+#include "collectd.h"
 #include "plugin.h" /* plugin_register_*, plugin_dispatch_values */
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -42,8 +42,8 @@ static int timesplice_config (const char *key, const char *value) {
 
 
 static int timesplice_init (void) {
-	// NO-OP
-	// See note in _shutdown
+         /* NO-OP
+            See note in _shutdown */
 	DEBUG("timesplice plugin: Initialising with store = %s", filename);
 }
 
@@ -78,7 +78,7 @@ static int timesplice_write (const data_set_t *ds, const value_list_t *vl, user_
 	int                 i = 0;	
 	assert (0 == strcmp (ds->type, vl->type));
 
-	// open the store if necessary
+	/*  open the store if necessary */
  	if (stat (filename, &statbuf) == -1) {
 		if (ENOENT == errno) {
 			DEBUG("timesplice plugin: No store at %s already - creating it", filename);
@@ -101,13 +101,13 @@ static int timesplice_write (const data_set_t *ds, const value_list_t *vl, user_
 
     memset (&fl, '\0', sizeof (fl));
     fl.l_start  = 0;
-    fl.l_len    = 0; // till end of file 
+    fl.l_len    = 0; /* till end of file  */
     fl.l_pid    = getpid ();
     fl.l_type   = F_WRLCK;
     fl.l_whence = SEEK_SET;
 
 
-	// get a lock on the store
+        /* get a lock on the store */
 	if (0 != fcntl (metric->fd, F_SETLK, &fl)) {
    		char errbuf[1024];
         ERROR ("timesplice plugin: flock (%s) failed: %s", filename, sstrerror (errno, errbuf, sizeof (errbuf)));
@@ -116,8 +116,8 @@ static int timesplice_write (const data_set_t *ds, const value_list_t *vl, user_
     }
 
 	for (i = 0; i < ds->ds_num; i++) {
-		int insert_time = 0 ; // always current time
-		// TODO do different things for different types?
+      	        int insert_time = 0 ; /* always current time */
+		/* TODO do different things for different types? */
 		switch (ds->ds[i].type) {
 			case DS_TYPE_GAUGE:
 				TSDB_insert(metric, i, insert_time, vl->values[i].gauge);
@@ -139,7 +139,7 @@ static int timesplice_write (const data_set_t *ds, const value_list_t *vl, user_
     }
 
 
-	// unlock the store explicitly
+	/* unlock the store explicitly */
 	if (0 != fcntl (metric->fd, F_SETLK, &fl)) {
         char errbuf[1024];
         ERROR ("timesplice plugin: funlock (%s) failed: %s", filename, sstrerror (errno, errbuf, sizeof (errbuf)));
@@ -153,13 +153,13 @@ static int timesplice_write (const data_set_t *ds, const value_list_t *vl, user_
 }
 
 static int timesplice_shutdown (void) {
-	// NO-OP
+        /* NO-OP */
 	DEBUG("timesplice plugin: Shutting down");
-	// We lock and unlock all in the _write function
-	// The alternative would be to open and close the stor in _init and _shutdown
-	// then have a spin lock on a *metric object
+	/* We lock and unlock all in the _write function
+	   The alternative would be to open and close the stor in _init and _shutdown
+	   then have a spin lock on a *metric object
 	
-	// The problem is that we don't know the column names until we start writing values
+	   The problem is that we don't know the column names until we start writing values */
 }
 
 void module_register (void) {       

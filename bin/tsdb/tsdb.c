@@ -112,13 +112,13 @@ int dispatch(void* handle, char * command, ...) {
   char **argv;	
   char *func_name;	
 
-  // if we're being passed argc and argv then we call <command>_main
+  /* if we're being passed argc and argv then we call <command>_main */
   if ((argc=va_arg(ap, int)) && (argv=va_arg(ap, char **))) {
 	int length = 6+strlen(command);
 	func_name = malloc(length);
 	snprintf(func_name, length, "%s_main", command);	
   } else {
-  // otherwise we're calling <command>_usage
+    /* otherwise we're calling <command>_usage */
 	int length = 7+strlen(command);
 	func_name = malloc(length);
 	snprintf(func_name, length, "%s_usage", command);
