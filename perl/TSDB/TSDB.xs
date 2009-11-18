@@ -108,7 +108,7 @@ TSDB_create(filename, create_time, resolution, columns, name, flags, col_names, 
 	RETVAL
 	
 
-int
+u_int64_t
 TSDB_cell(obj, row, column)
 	struct TSDB_metric_t *	obj
 	int	row

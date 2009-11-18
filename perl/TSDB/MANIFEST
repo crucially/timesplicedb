@@ -13,3 +13,4 @@ lib/TSDB/C.pm
 t/agg.t
 t/oo.t
 t/column.t
+t/64bit.t
