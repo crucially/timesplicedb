@@ -90,7 +90,7 @@ int dump_main(int argc, char * const *argv) {
     int col = 0;
     while(rows--) {
       while(col < columns) {
-	unsigned int value = range->row[(i * columns) + col];
+	u_int64_t value = range->row[(i * columns) + col];
 	
 	if (difference) {
 	  if (value == 0) {
