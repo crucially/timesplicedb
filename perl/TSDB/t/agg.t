@@ -1,29 +1,29 @@
 
 
 use Test::More tests => 40;
-BEGIN { use_ok('NGR') };
+BEGIN { use_ok('TSDB') };
 
 use strict;
 
 my $ct = 1258091219;
 my $it = $ct;
-my $ngr = NGR->new('aggtest.ngrd'
+my $tsdb = TSDB->new('aggtest.ngrd',
     clobber     => 1,
     resolution  => 60,
     columns     => 'test',
     create_time => $ct);
 
 foreach(1..9) {
-  $ngr->insert('test' => $_, $it);
+  $tsdb->insert('test' => $_, $it);
   $it += 60;
 }
 
 
-is($ngr->rows, 9);
+is($tsdb->rows, 9);
 
-my $range = $ngr->timespan($ct, $it - 60);
+my $range = $tsdb->timespan($ct, $it - 60);
 
-isa_ok($range, "NGR::Range");
+isa_ok($range, "TSDB::Range");
 is($range->rows, 9);
 
 for(1..9) {
@@ -44,7 +44,7 @@ for(1..9) {
 
 my $agg = $range->aggregate(interval => 120);
 
-isa_ok($range, "NGR::Range");
+isa_ok($range, "TSDB::Range");
 is($agg->rows, 5);
 
 {
