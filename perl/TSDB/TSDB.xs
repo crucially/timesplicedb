@@ -80,27 +80,30 @@ TSDB_aggregate(range, interval, data_type)
 	int	data_type
 
 struct TSDB_metric_t *
-TSDB_create(filename, create_time, resolution, columns, names, flags)
+TSDB_create(filename, create_time, resolution, columns, name, flags, col_names, col_flags)
 	char *	filename
 	time_t	create_time
 	int	resolution
 	int	columns
-	AV*	names
-	AV*	flags
+	char *  name
+	int     flags
+	AV*	col_names
+	AV*	col_flags
 	CODE:
-	char **names_x;
-	int *flags_x;
 	int i;
 	struct TSDB_create_opts_t *opts = TSDB_create_opts(columns);
-	names_x = malloc(columns + 1);
-	flags_x = malloc(sizeof(int) * (columns + 1));
-	for(i = 0; i < columns + 1; i++) {
-	      names_x[i] = SvPVbyte_nolen(*av_fetch(names, i, 0));
-	      flags_x[i] = SvIV(*av_fetch(flags, i, 0));
+
+	for(i = 0; i < columns; i++) {
+	      opts->col_names[i] = SvPVbyte_nolen(*av_fetch(col_names, i, 0));
+	      opts->col_flags[i] = SvIV(*av_fetch(col_flags, i, 0));
 	}
+	opts->filename = filename;
+	opts->created_time = create_time;
+	opts->resolution = resolution;
+	opts->name = name;
+	opts->flags = flags;
 	RETVAL = TSDB_create(opts);
-	free(names_x);
-	free(flags_x);
+	TSDB_free_opts(opts);
 	OUTPUT:
 	RETVAL
 	

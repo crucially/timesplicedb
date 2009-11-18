@@ -4,20 +4,20 @@
 # change 'tests => 2' to 'tests => last_test_to_print';
 
 use Test::More tests => 2;
-BEGIN { use_ok('NGR::C') };
+BEGIN { use_ok('TSDB::C') };
 
 my $ts = time-3600;
 
-my $ngr = NGR::C::create("test.data", $ts, 60, 1,["foo","bar"],[0,0]);
+my $ngr = TSDB::C::create("test.data", $ts, 60, 1,"foo", 0, ["bar"],[0]);
 
 for(1..60) {
-  NGR::C::insert($ngr, 0, ($ts+($_*60)), int rand(100));
+  TSDB::C::insert($ngr, 0, ($ts+($_*60)), int rand(100));
 }
 ok(1);
 
-my $range = NGR::C::timespan($ngr, $ts, time);
+my $range = TSDB::C::timespan($ngr, $ts, time);
 
-my $agg = NGR::C::aggregate($range, 600, 0);
+my $agg = TSDB::C::aggregate($range, 600, 0);
 
 
 
