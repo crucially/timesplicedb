@@ -62,7 +62,7 @@ struct NGR_create_opts_t * NGR_create_opts(unsigned int columns) {
   struct NGR_create_opts_t *opts = calloc(1, sizeof(struct NGR_create_opts_t));
   opts->magic     = NGR_create_opts_magic;
   opts->columns   = columns;
-  opts->col_names = (char*) calloc(columns, sizeof(char *));
+  opts->col_names = calloc(columns, sizeof(char *));
   opts->col_flags = calloc(columns, sizeof(int));
   return opts;
 }
@@ -112,8 +112,8 @@ struct NGR_metric_t * NGR_create(struct NGR_create_opts_t *opts) {
   assert(write_len == 4);
   write_len = write(fd, &len, 4);
   assert(write_len == 4);
-  write_len = write(fd, opts->name, strlen(opts->name));
-  assert(write_len == strlen(opts->name));
+  write_len = write(fd, opts->name, strlen(opts->name)+1);
+  assert(write_len == strlen(opts->name)+1);
 
 
   int i;
@@ -134,6 +134,7 @@ struct NGR_metric_t * NGR_create(struct NGR_create_opts_t *opts) {
 }
 
 struct NGR_metric_t * NGR_open(const char *filename) {
+  int len;
   size_t read_len;
   struct NGR_metric_t *obj;
 
@@ -168,20 +169,29 @@ struct NGR_metric_t * NGR_open(const char *filename) {
 
   obj->ranges = 0;
 
+  read_len = read(obj->fd, &obj->flags, 4);
+  assert(read_len == 4);
+  obj->base += 4;
+  read_len = read(obj->fd, &len, 4);
+  assert(read_len == 4);
+  obj->base += 4;
+  obj->name = malloc(len);
+  read_len = read(obj->fd, obj->name, len);
+  assert(read_len == len);
+  obj->base += len;
 
+  obj->col_names = malloc(sizeof(char *) * (obj->columns));
+  obj->col_flags = malloc(sizeof(int) * (obj->columns));
   int i;
-  obj->names = malloc(sizeof(char *) * (obj->columns));
-  obj->flags = malloc(sizeof(int) * (obj->columns));
   for(i = 0; i < obj->columns; i++) {
-    int len;
-    read_len = read(obj->fd, &obj->flags[i], 4);
+    read_len = read(obj->fd, &obj->col_flags[i], 4);
     assert(read_len == 4);
     obj->base += 4;
     read_len = read(obj->fd, &len, 4);
     assert(read_len == 4);
     obj->base += 4;
-    obj->names[i] = malloc(len);
-    read_len = read(obj->fd, obj->names[i], len);
+    obj->col_names[i] = malloc(len);
+    read_len = read(obj->fd, obj->col_names[i], len);
     assert(read_len == len);
     obj->base += len;
   }

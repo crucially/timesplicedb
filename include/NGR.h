@@ -53,9 +53,11 @@ struct NGR_metric_t {
   time_t     created;    /* timestamp the first row in the series is */
   int        resolution; /* distance in seconds between each row in the series */
   int        version;    /* storage verson */
+  char       *name;
+  int        flags;
   int        columns;    /* how many columns this store has */
-  int        *flags;     /* first is flag for db, rest is per column */
-  char       **names;    /* first entry is the database name, rest is the column names */
+  int        *col_flags; /* first is flag for db, rest is per column */
+  char       **col_names;/* first entry is the database name, rest is the column names */
   int        ngrerrno;   /* set to non 0 if the latest function recorded an error */
   int        syserrno;   /* underlying errno if result of a syscall */
   int        ranges;     /* refcount off ranges */
