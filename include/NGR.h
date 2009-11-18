@@ -84,8 +84,8 @@ struct NGR_range_t {
 struct NGR_create_opts_t {
   unsigned        magic;
 #define NGR_create_opts_magic 0x7428b5c9
-  char           *filanem;
-  time_t         create_time;
+  char           *filaname;
+  time_t         created_time;
   unsigned int   resolution;
   unsigned int   columns;
   char           *name;
