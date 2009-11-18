@@ -4,35 +4,35 @@
 
 export PATH=$PATH:.
 
-rm file_column.ngr
-ngr create -f file_column.ngr -b 1258091219 -r 60 -c 2
+rm file_column.tsdb
+tsdb create -f file_column.tsdb -b 1258091219 -r 60 -c 2
 
 # insert multiple values
-ngr insert -f file_column.ngr -t 1258091219 -c 0 -v 1
-ngr insert -f file_column.ngr -t 1258091279 -c 0 -v 2
-ngr insert -f file_column.ngr -t 1258091339 -c 0 -v 3
-ngr insert -f file_column.ngr -t 1258091399 -c 0 -v 4
-ngr insert -f file_column.ngr -t 1258091459 -c 0 -v 5
-ngr insert -f file_column.ngr -t 1258091519 -c 0 -v 6
-ngr insert -f file_column.ngr -t 1258091579 -c 0 -v 7
-ngr insert -f file_column.ngr -t 1258091639 -c 0 -v 8
-ngr insert -f file_column.ngr -t 1258091699 -c 0 -v 9
-ngr insert -f file_column.ngr -t 1258091219 -c 1 -v 9
-ngr insert -f file_column.ngr -t 1258091279 -c 1 -v 8
-ngr insert -f file_column.ngr -t 1258091339 -c 1 -v 7
-ngr insert -f file_column.ngr -t 1258091399 -c 1 -v 6
-ngr insert -f file_column.ngr -t 1258091459 -c 1 -v 5
-ngr insert -f file_column.ngr -t 1258091519 -c 1 -v 4
-ngr insert -f file_column.ngr -t 1258091579 -c 1 -v 3
-ngr insert -f file_column.ngr -t 1258091639 -c 1 -v 2
-ngr insert -f file_column.ngr -t 1258091699 -c 1 -v 1
+tsdb insert -f file_column.tsdb -t 1258091219 -c 0 -v 1
+tsdb insert -f file_column.tsdb -t 1258091279 -c 0 -v 2
+tsdb insert -f file_column.tsdb -t 1258091339 -c 0 -v 3
+tsdb insert -f file_column.tsdb -t 1258091399 -c 0 -v 4
+tsdb insert -f file_column.tsdb -t 1258091459 -c 0 -v 5
+tsdb insert -f file_column.tsdb -t 1258091519 -c 0 -v 6
+tsdb insert -f file_column.tsdb -t 1258091579 -c 0 -v 7
+tsdb insert -f file_column.tsdb -t 1258091639 -c 0 -v 8
+tsdb insert -f file_column.tsdb -t 1258091699 -c 0 -v 9
+tsdb insert -f file_column.tsdb -t 1258091219 -c 1 -v 9
+tsdb insert -f file_column.tsdb -t 1258091279 -c 1 -v 8
+tsdb insert -f file_column.tsdb -t 1258091339 -c 1 -v 7
+tsdb insert -f file_column.tsdb -t 1258091399 -c 1 -v 6
+tsdb insert -f file_column.tsdb -t 1258091459 -c 1 -v 5
+tsdb insert -f file_column.tsdb -t 1258091519 -c 1 -v 4
+tsdb insert -f file_column.tsdb -t 1258091579 -c 1 -v 3
+tsdb insert -f file_column.tsdb -t 1258091639 -c 1 -v 2
+tsdb insert -f file_column.tsdb -t 1258091699 -c 1 -v 1
 
 # see raw content
-ngr dump -f file_column.ngr
+tsdb dump -f file_column.tsdb
 
 #see info 
-ngr info -f file_column.ngr
+tsdb info -f file_column.tsdb
 
-ngr agg -f file_column.ngr -s 1258091219 -e 1258091699 -i 120
+tsdb agg -f file_column.tsdb -s 1258091219 -e 1258091699 -i 120
 
 
