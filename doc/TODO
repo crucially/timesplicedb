@@ -1,12 +1,14 @@
 
-* autoconf 
+* autoconf [done]
   buy tfheen lots of alcohol next time I see him
 
-* store db name and column name in the header of the file
+* store db name and column name in the header of the file [done]
 
 * support millisecond resolution?
 
 * floating point support
 
 * switch to pread and pwrite
+
+* create configure script for collectd
 
