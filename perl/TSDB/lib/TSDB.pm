@@ -311,9 +311,9 @@ This should only be called internally.
 =cut
 sub new {
     my $class = shift;
-	my $ctx   = shift;
-	my %opts  = @_;
-	my $self  = bless \%opts, $class;
+    my $ctx   = shift;
+    my %opts  = @_;
+    my $self  = bless \%opts, $class;
     $self->{ctx}  = $ctx;
     $self->{iter} = 0;
     return $self;
