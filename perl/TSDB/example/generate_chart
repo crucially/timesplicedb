@@ -26,7 +26,7 @@ if ($file) {
 	die "No such file\n" unless -f $file;
 	$tsdb = TSDB->new($file);
 } else {
-    $tsdb = TSDB->new('testing.db', 
+    $tsdb = TSDB->new('testing.tsdb', 
 					      columns     => ['New Visits', 'Recurring Visits', 'Returning Visits'], 
 						  name        => 'Count Of Visitors', 
 					      resolution  => $interval,
