@@ -97,23 +97,42 @@ function loadHeaders(table) {
 }
 
 // returns an array of dictionarys, each with a label, a color and a data key
-function loadData(table, columns) {
+function loadData(table, columns, xaxis) {
     var data     = [];
     var headers  = loadHeaders(table);
+    
+    // Theoretically we could use this to make 
+    // The x axis be configurable. There are two problems 
+    // with this - 
+    //
+    // Firstly that the display gets messed
+    // up because we've set the options of the plot to
+    // have a time based x axis although I suspect that 
+    // could be fixed, especially if we stuck an 
+    //   <th is_time="true">Column Name</th>
+    // attribute (and defaulted to it being a time or 
+    // something)
+    //
+    // Secondly we're starting to have a lots of arguments
+    // which could be fixed by switching to named arguments
+    // a la sIFR
+    //
+    if (!xaxis)
+        xaxis='Time';
 
     var t_offset = 0;
     for (var i=0; i<headers.length; i++) {
         var name = headers[i];
-        if ('Time' == name)
-            t_offset=i;
+        if (xaxis == name)
+            x_offset=i;
         else        
             data.push({ label: name, data: [] }); 
         
     }
     
     table.find('tr').each(function() {
-        time   = $(this).find('td:eq('+t_offset+')').text();
-        $(this).find('td:not(:eq('+t_offset+'))').each(function(i) { 
+        time   = $(this).find('td:eq('+x_offset+')').text();
+        $(this).find('td:not(:eq('+x_offset+'))').each(function(i) { 
             data[i]['color'] = i; // give each series a unique colour
             data[i]['data'].push([time, $(this).text()])
         })
@@ -158,7 +177,6 @@ function hide(element) {
 }
 
 function createPlotFunctionFromTable(table, chart, overview, choices, options, columns) {
-        
     var data    = loadData(table, columns); 
     
     var plotFunction = createPlotFunction(data,chart, overview, choices, options, columns);
