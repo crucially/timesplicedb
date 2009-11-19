@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+ <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>TimeSplice Examples</title>
+    <link href="layout.css" rel="stylesheet" type="text/css"></link>
+    <!--[if IE]><script language="javascript" type="text/javascript" src="../excanvas.min.js"></script><![endif]-->
+    <script language="javascript" type="text/javascript" src="jquery.js"></script>
+    <script language="javascript" type="text/javascript" src="jquery.flot.js"></script>
+    <script language="javascript" type="text/javascript" src="jquery.flot.selection.js"></script>
+    <script language="javascript" type="text/javascript" src="timesplice.plot.js"></script>
+
+ </head>
+ <body>
+    <h1>TimeSplice Examples</h1>
+
+    <div id="chart" style="width:600px;height:300px;"></div>
+
+    <p>Visitors per day. Weekends are colored. Try zooming.
+      The plot below shows an overview.</p>
+
+    <div id="overview" class="optional" style="margin-left:50px;margin-top:20px;width:400px;height:50px"></div>
+
+ 	<p id="choices" class="optional">Show:</p>
+
+	<script id="source">
+	$(function () {
+		var table    = $('#data');
+		var overview = $('#overview');	
+		var chart    = $('#chart');
+		var choices  = $('#choices');
+		var options = {
+	        xaxis: { mode: "time" },
+	        selection: { mode: "x" },
+	        grid: { markings: weekendAreas }
+		};
+		var plotFunction = createPlotFunctionFromTable(table, chart, overview, choices, options)
+		plotFunction()
+	})
+	</script>
+	
+	<table id="data" class="data_field">
+		<tr>
+			<th>Time</th>
+			<th>Visits</th>
+			<th>Response</th>
+		</tr>
+		<tr>
+			<td>1196463600000</td>
+			<td>1</td>
+			<td>200</td>
+		</tr>	
+		<tr>
+			<td>1196463700000</td>			
+			<td>2</td>
+			<td>120</td>
+		</tr>	
+		<tr>
+			<td>1196463800000</td>
+			<td>4</td>
+			<td>180</td>
+		</tr>	
+		<tr>
+			<td>1196463900000</td>
+			<td>8</td>
+			<td>230</td>
+		</tr>	
+		<tr>
+			<td>1196464000000</td>
+			<td>16</td>
+			<td>1370</td>
+		</tr>	
+		<tr>
+			<td>1196464100000</td>
+			<td>32</td>
+			<td>212</td>
+		</tr>	
+		<tr>
+			<td>1196464200000</td>
+			<td>64</td>
+			<td>101</td>
+		</tr>	
+	</table>	
+ </body>
+</html>
