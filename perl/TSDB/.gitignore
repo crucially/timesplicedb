@@ -1,0 +1,4 @@
+*.tsdb
+*.old
+const*.inc
+*.c
