@@ -10,5 +10,6 @@ body {
 }
 
 .optional {
-	visibility: collapse;	
+  visibility: collapse;	
+  display: none;	
 }
