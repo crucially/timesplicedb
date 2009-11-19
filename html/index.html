@@ -2,8 +2,8 @@
 <html>
  <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<!-- Force compatibility mode so that excanvas works in IE8. Does this need to remove the DOCTYPE? -->
-	<meta http-equiv="X-UA-Compatible" content="IE=7" />
+    <!-- Force compatibility mode so that excanvas works in IE8. Does this need to remove the DOCTYPE? -->
+    <meta http-equiv="X-UA-Compatible" content="IE=7" />
     <title>TimeSplice Examples</title>
     <link href="layout.css" rel="stylesheet" type="text/css"></link>
     <!--[if IE]><script language="javascript" type="text/javascript" src="excanvas.min.js"></script><![endif]-->
@@ -23,65 +23,65 @@
 
     <div id="overview" class="optional" style="margin-left:50px;margin-top:20px;width:400px;height:50px"></div>
 
- 	<p id="choices" class="optional">Show:</p>
+     <p id="choices" class="optional">Show:</p>
 
-	<script id="source">
-	$(function () {
-		var table    = $('#data');
-		var overview = $('#overview');	
-		var chart    = $('#chart');
-		var choices  = $('#choices');
-		var options = {
-	        xaxis: { mode: "time" },
-	        selection: { mode: "x" },
-	        grid: { markings: weekendAreas }
-		};
-		var plotFunction = createPlotFunctionFromTable(table, chart, overview, choices, options)
-		plotFunction()
-	})
-	</script>
-	
-	<table id="data" class="data_field">
-		<tr>
-			<th>Time</th>
-			<th>Visits</th>
-			<th>Response</th>
-		</tr>
-		<tr>
-			<td>1196463600000</td>
-			<td>1</td>
-			<td>200</td>
-		</tr>	
-		<tr>
-			<td>1196463700000</td>			
-			<td>2</td>
-			<td>120</td>
-		</tr>	
-		<tr>
-			<td>1196463800000</td>
-			<td>4</td>
-			<td>180</td>
-		</tr>	
-		<tr>
-			<td>1196463900000</td>
-			<td>8</td>
-			<td>230</td>
-		</tr>	
-		<tr>
-			<td>1196464000000</td>
-			<td>16</td>
-			<td>1370</td>
-		</tr>	
-		<tr>
-			<td>1196464100000</td>
-			<td>32</td>
-			<td>212</td>
-		</tr>	
-		<tr>
-			<td>1196464200000</td>
-			<td>64</td>
-			<td>101</td>
-		</tr>	
-	</table>	
+    <script id="source">
+    $(function () {
+        var table    = $('#data');
+        var overview = $('#overview');    
+        var chart    = $('#chart');
+        var choices  = $('#choices');
+        var options = {
+            xaxis: { mode: "time" },
+            selection: { mode: "x" },
+            grid: { markings: weekendAreas }
+        };
+        var plotFunction = createPlotFunctionFromTable(table, chart, overview, choices, options)
+        plotFunction()
+    })
+    </script>
+    
+    <table id="data" class="data_field">
+        <tr>
+            <th>Time</th>
+            <th>Visits</th>
+            <th>Response</th>
+        </tr>
+        <tr>
+            <td>1196463600000</td>
+            <td>1</td>
+            <td>200</td>
+        </tr>    
+        <tr>
+            <td>1196463700000</td>            
+            <td>2</td>
+            <td>120</td>
+        </tr>    
+        <tr>
+            <td>1196463800000</td>
+            <td>4</td>
+            <td>180</td>
+        </tr>    
+        <tr>
+            <td>1196463900000</td>
+            <td>8</td>
+            <td>230</td>
+        </tr>    
+        <tr>
+            <td>1196464000000</td>
+            <td>16</td>
+            <td>1370</td>
+        </tr>    
+        <tr>
+            <td>1196464100000</td>
+            <td>32</td>
+            <td>212</td>
+        </tr>    
+        <tr>
+            <td>1196464200000</td>
+            <td>64</td>
+            <td>101</td>
+        </tr>    
+    </table>    
  </body>
 </html>
