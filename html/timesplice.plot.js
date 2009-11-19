@@ -145,6 +145,18 @@ function createCheckBoxes(choices, data) {
 		
 }
 
+function show(element) {
+	element.show();
+	element.css('visibility', 'visible');
+	element.css('display',    'block');	
+}
+
+function hide(element) {
+	element.hide();
+	element.css('visibility', 'collapse');
+	element.css('display',    'none');	
+}
+
 function createPlotFunctionFromTable(table, chart, overview, choices, options, columns) {
 		
 	var data    = loadData(table, columns); 
@@ -154,9 +166,9 @@ function createPlotFunctionFromTable(table, chart, overview, choices, options, c
 		if (data.length>1) {
 			createCheckBoxes(choices, data);
 			choices.find("input").click(plotFunction);
-			choices.css('visibility', 'visible');
+			show(choices);
 		} else {
-			choices.hide();
+			hide(choices);
 		}
 	}
 	
@@ -214,7 +226,7 @@ function createPlotFunction(data, chart, overview, choices, options, columns) {
 				
 				if (overview) {
 					ovplot = createOverviewObject(live_data, chart, overview);
-					overview.css('visibility', 'visible');
+					show(overview);
 				}
 				
 				var plotRangeFunction = function (event, ranges) {
