@@ -117,9 +117,9 @@ TSDB_cell(obj, row, column)
 #if IVSIZE == 8
         RETVAL = newSVuv(TSDB_cell(obj, row, column));
 #else
-	char strval[24];
+	const char strval[24];
 	snprintf((char*)&strval, 24, "%llu", TSDB_cell(obj, row,column));
-	RETVAL = newSVpv(&strval,(STRLEN)0);
+	RETVAL = newSVpv((const char*)&strval,(STRLEN)0);
 #endif
 	OUTPUT:
 	RETVAL	
@@ -166,15 +166,21 @@ TSDB_timespan(obj, start, end)
 	time_t	start
 	time_t	end
 
-int
+SV*
 range_row_value(obj, column, idx)
 	struct TSDB_range_t *	obj
 	int	column
 	int	idx
-	CODE:
-	RETVAL = obj->row[(idx * obj->columns) + column];
-	OUTPUT:
-	RETVAL
+    CODE:
+#if IVSIZE == 8
+        RETVAL = newSVuv((long)obj->row[(idx * obj->columns) + column]);
+#else
+    const char strval[24];
+    snprintf((char*)&strval, 24, "%llu", obj->row[(idx * obj->columns) + column]);
+    RETVAL = newSVpv((const char*)&strval,(STRLEN)0);
+#endif
+    OUTPUT:      
+    RETVAL 
 
 double
 range_row_avg(obj, column, idx)
