@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
 	return usage("You must pass in a command\n");
   }	
 
-  void* handle = dlopen(TSDB_NULL, RTLD_LAZY);
+  void* handle = dlopen(TSDB_NULL, RTLD_NOW);
   if (!handle) {
 	WARN("Couldn't load handle: %s\nSomething has gone seriously wrong.\n", dlerror());
 	return 1;
