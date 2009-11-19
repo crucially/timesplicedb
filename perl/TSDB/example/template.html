@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+ <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <!-- Force compatibility mode so that excanvas works in IE8. Does this need to remove the DOCTYPE? -->
+    <meta http-equiv="X-UA-Compatible" content="IE=7" />
+    <title>%NAME%</title>
+    <link href="layout.css" rel="stylesheet" type="text/css"></link>
+    <!--[if IE]><script language="javascript" type="text/javascript" src="excanvas.min.js"></script><![endif]-->
+    <script language="javascript" type="text/javascript" src="jquery.js"></script>
+    <script language="javascript" type="text/javascript" src="jquery.flot.js"></script>
+    <script language="javascript" type="text/javascript" src="jquery.flot.selection.js"></script>
+    <script language="javascript" type="text/javascript" src="timesplice.plot.js"></script>
+
+ </head>
+ <body>
+    <h1>%NAME%</h1>
+
+    <div id="chart" style="width:600px;height:300px;"></div>
+
+    <p>%DESCRIPTION% Weekends are colored. Try zooming.
+      The plot below shows an overview.</p>
+
+    <div id="overview" class="optional" style="margin-left:50px;margin-top:20px;width:400px;height:50px"></div>
+
+     <p id="choices" class="optional">Show:</p>
+
+    <script id="source">
+    $(function () {
+        var table    = $('#data');
+        var overview = $('#overview');    
+        var chart    = $('#chart');
+        var choices  = $('#choices');
+        var options = {
+            xaxis: { mode: "time" },
+            selection: { mode: "x" },
+            grid: { markings: weekendAreas }
+        };
+        var plotFunction = createPlotFunctionFromTable(table, chart, overview, choices, options)
+        plotFunction()
+    })
+    </script>
+    
+	%TABLE%
+
+ </body>
+</html>
