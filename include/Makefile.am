@@ -1,3 +1,3 @@
 
-pkginclude_HEADERS = \
+include_HEADERS = \
 	TSDB.h

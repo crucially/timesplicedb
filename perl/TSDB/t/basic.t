@@ -5,6 +5,7 @@
 
 use Test::More tests => 2;
 BEGIN { use_ok('TSDB::C') };
+unlink("test.tsdb");
 
 my $ts = time-3600;
 
@@ -17,9 +18,6 @@ ok(1);
 
 my $range = TSDB::C::timespan($tsdb, $ts, time);
 
-my $agg = TSDB::C::aggregate($tsdb, 600, 0);
-
-
+my $agg = TSDB::C::aggregate($range, 600, 0);
 
 unlink("test.tsdb");
-
