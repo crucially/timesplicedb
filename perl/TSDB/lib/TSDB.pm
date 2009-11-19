@@ -45,7 +45,6 @@ Defaults to the filename without file extension.
 
 A bit pack of flags for the database.
 
-
 =item resolution 
 
 Takes a number, in milliseconds, of the interval between rows.
@@ -58,7 +57,7 @@ Takes a Unix time stamp which allows you to set the creation time of the db.
 
 Defaults to the current time. 
 
-=items columns <required>
+=item columns <required>
 
 The column definitions. Can be in multiple formats:
 
@@ -77,12 +76,19 @@ The column definitions. Can be in multiple formats:
 
 sub new {
     my $class   = shift;
-	my $file    = shift || croak "You must pass in a filename";
+    my $file    = shift || croak "You must pass in a filename";
     my %options = @_;
 
 
-	my $open    = ( -f $file && !$options{clobber} );
-
+    my $open    = 1;
+    if ( -f $file ) {
+        if ($options{clobber}) {
+            unlink($file);
+            $open = 0;
+        }
+    } else { 
+        $open = 0;
+    }
 
     my $self    = bless {}, $class;
     my ($name)  = ($options{name}) || ($file =~ m!([^./]+)(?:\..*)?$!);  
@@ -96,35 +102,35 @@ sub new {
     my $i = 0;
     if ('HASH' eq ref($options{columns})) {
         while (my ($k,$v) = each %{$options{columns}}) {
-	    push @col_names, $k;
-	    push @col_flags, $v;
-	    $self->{_columns}->{$k} = $i++;
+        push @col_names, $k;
+        push @col_flags, $v;
+        $self->{_columns}->{$k} = $i++;
         }
     } elsif ('ARRAY' eq ref($options{columns})) {
         foreach my $k (@{$options{columns}}) {
-	    push @col_names, $k;
-	    push @col_flags, 0;
-	    $self->{_columns}->{$k} = $i++;
+        push @col_names, $k;
+        push @col_flags, 0;
+        $self->{_columns}->{$k} = $i++;
         }
     } elsif (defined $options{columns}) {
-	push @col_names, $options{columns};
-	push @col_flags, 0;
-	$self->{_columns}->{$options{columns}} = 0;
+        push @col_names, $options{columns};
+        push @col_flags, 0;
+        $self->{_columns}->{$options{columns}} = 0;
     } elsif (!$open) {
         croak "You must pass in a columns definition";
     }
 
 
-	$self->{ctx} = ($open) ? TSDB::C::open( $file) :    
-        					 TSDB::C::create( $file,
-                        		$options{create_time},
-                        		$options{resolution},
-					scalar(@col_names),
-                        		$name,
-                        		$flags,
-					\@col_names,
-					\@col_flags,
-						 );
+    $self->{ctx} = ($open) ? TSDB::C::open($file) :    
+                             TSDB::C::create($file,
+                                $options{create_time} || 0,
+                                $options{resolution}  || 0,
+                                scalar(@col_names),
+                                $name,
+                                $flags || 0,
+                                \@col_names,
+                                \@col_flags,
+                         );
 
     return $self;
 
@@ -268,6 +274,19 @@ sub cell {
     return TSDB::C::cell($self->{ctx}, $row, TSDB::_fix_col($self,$column));
 }
 
+=head2 range <start> <end>
+
+Get all the values between the I<start> row and I<end> row.
+
+Returns a C<TSDB::Range>
+
+=cut
+sub range {
+    my $self = shift;
+    my ($start, $end) = @_;
+    return TSDB::Range->new(TSDB::C::range($self->{ctx}, $start, $end), _columns => $self->{_columns});
+}
+
 =head2 timespan <start> <end>
 
 Get all values between the unix time stamps I<start> and I<end>.
@@ -286,8 +305,8 @@ sub _fix_col {
     my $self = shift;
     my $col  = shift;
     {
-	no warnings;
-	return $col if(int($col) eq $col);
+    no warnings;
+    return $col if(int($col) eq $col);
     }
     return $self->{_columns}->{$col} if (exists $self->{_columns}->{$col});
     die "Unknown column '$col'";
