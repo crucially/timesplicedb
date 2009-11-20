@@ -13,8 +13,14 @@ if test "x$ac_cv_prog_cc_c99" = xno; then
 fi
 AC_PROG_LIBTOOL
 
+AC_CHECK_PROG([HAVE_GNUMAKE], [gnumake], "yes", "no")
+AM_CONDITIONAL(HAVE_GNUMAKE, [ test "yes" = "$HAVE_GNUMAKE" ])
+
 AC_SUBST(LIBDL)
 AC_CHECK_LIB(dl, dlopen, [LIBDL="$LIBDL -ldl" ac_cv_func_dlopen_ldl=yes], ac_cv_func_dlopen_ldl=no)
+
+
+
 
 dnl Check pod2man for creating man pages
 AC_CHECK_PROG([HAVE_POD2MAN], [pod2man], "yes", "no")
