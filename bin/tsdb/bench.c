@@ -32,6 +32,8 @@
 #include "TSDB.h"
 #include <sys/time.h>
 #include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 int bench_usage() {
 	WARN("no options\n");
@@ -40,56 +42,71 @@ int bench_usage() {
 int bench_main(int argc, char **argv) {
   struct timeval how_fast_start;
   struct timeval how_fast_stop;
-    
-/*
-  struct NGR_metric_t *metric= NGR_create("host", "metric_c", time(NGR_NULL) - 3600, 1);
+  int columns = 1;  
+  char filename[1024];
+  sprintf(filename, "bench_%d.tsdb", getpid());  
+  int j;
 
-  return;
-    struct NGR_metric_t *metric = NGR_open("host", "metric_year");
+  struct TSDB_create_opts_t *opts = TSDB_create_opts(columns);
+  opts->filename     = filename;
+  opts->name         = "Metric tests";
+  opts->flags        = 0;
+  opts->created_time = time(TSDB_NULL) - 3600;
+  opts->resolution   = 1;
+  for(j = 0; j < columns; j++) {
+    opts->col_flags[j] = 0;
+    opts->col_names[j] = "Column";
+  }
+
+
+  struct TSDB_metric_t *metric = TSDB_create(opts);
+  TSDB_free_opts(opts);
+	
   printf("width: %d; created: %d\n", metric->width, metric->created);
-  int idx = NGR_last_row_idx(metric);
-  printf("row: %d\n", NGR_entry(metric,NGR_last_row_idx(metric),0));
+  int idx = TSDB_last_row_idx(metric, 0);
+  printf("row: %d\n", TSDB_cell(metric,TSDB_last_row_idx(metric, 0),0));
 
   {
 
-    struct NGR_range_t *range = NGR_range(metric, 0, idx);
-    gettimeofday(&how_fast_start, NGR_NULL);
-    int items = range->items;
+    struct TSDB_range_t *range = TSDB_range(metric, 0, idx);
+    gettimeofday(&how_fast_start, TSDB_NULL);
+    int items = range->rows;
     int i = 0;
     int total = 0;
-    struct NGR_range_t *aggregate = NGR_aggregate(range, 86400,0);
-    gettimeofday(&how_fast_stop, NGR_NULL);
-    printf("Items:%d   Total: %d   Avg: %d\n", range->items, total, total/range->items);
+    struct TSDB_range_t *aggregate = TSDB_aggregate(range, 86400,0);
+    gettimeofday(&how_fast_stop, TSDB_NULL);
+    printf("Items:%d   Total: %d   Avg: %d\n", range->rows, total, total/range->rows);
     printf("%d.%d\n", how_fast_start.tv_sec, how_fast_start.tv_usec);
     printf("%d.%d\n", how_fast_stop.tv_sec, how_fast_stop.tv_usec);
 
-    items = aggregate->items;
+    items = aggregate->rows;
     i = 0;
     while(items--) {
             printf("AVG: %d      MAX: %d      MIN: %d      STDDEV: %d\n", aggregate->agg[i].avg, aggregate->agg[i].max, aggregate->agg[i].min, aggregate->agg[i].stddev);
       i++;
     }
 
-    NGR_range_free(range);
+    TSDB_range_free(range);
   }
   {
-    gettimeofday(&how_fast_start, NGR_NULL);
-    struct NGR_range_t *range = NGR_timespan(metric, time(NGR_NULL)-36000, time(NGR_NULL)-35000);
-    int items = range->items;
+    gettimeofday(&how_fast_start, TSDB_NULL);
+    struct TSDB_range_t *range = TSDB_timespan(metric, time(TSDB_NULL)-36000, time(TSDB_NULL)-35000);
+    int items = range->rows;
     int i = 0;
     while(items--) {
       int foo = range->row[i++];
            printf("%d\n", range->row[i++]);
     }
-    gettimeofday(&how_fast_stop, NGR_NULL);
+    gettimeofday(&how_fast_stop, TSDB_NULL);
     printf("%d.%d\n", how_fast_start.tv_sec, how_fast_start.tv_usec);
     printf("%d.%d\n", how_fast_stop.tv_sec, how_fast_stop.tv_usec);
-    printf("entries: %d\n", range->items);
+    printf("entries: %d\n", range->rows);
 
 
-    NGR_range_free(range);
+    TSDB_range_free(range);
   }
-*/
+  TSDB_close(metric);	
+  unlink(filename);
   return 0;
 }
 
