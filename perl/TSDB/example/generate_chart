@@ -17,7 +17,8 @@ use Data::Dumper;
 #
 
 my $interval = 60;
-my $time     = time() - 3600;
+my $iters    = 1000;
+my $time     = time() - ($interval*$iters);
 my $file     = shift @ARGV;
 
 my $tsdb;
@@ -42,11 +43,11 @@ my $cols     = $#keys;
 
 goto TEMPLATE unless $make;
 
-for my $i (0 .. $interval-1) {
+for my $i (0 .. $iters) {
 	my $t    = $time + ($i*$interval);
 
 	for my $col (0 .. $cols) { 
-		my $v   = (log($i**2+1)   + rand(1.5)) * 10000 ;
+		my $v   = $i*($col+1);
 		$tsdb->insert($col, $v, $t);
 	}
 } 
@@ -75,7 +76,7 @@ for my $i (0..$range->rows) {
 	$data .= "\t<tr>\n\t\t";
 	$data .= "<td>".($time + ($i*$interval))."</td>";
 	for my $col (0..$cols) {
-		my $cell = $range->cell($col, $i);
+		my $cell = $range->cell($i, $col);
 		$data .= "<td>".$cell->{value}."</td>";
 	}
 	$data .= "\n\t</tr>\n";
