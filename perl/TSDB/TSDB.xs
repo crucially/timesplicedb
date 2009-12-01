@@ -21,12 +21,14 @@ char* metric_name(obj);
 HV* metric_meta(obj);
     	struct TSDB_metric_t *	obj
 	CODE:
+	{	
 	int i; 
 	RETVAL = newHV();
 	for(i = 0; i < obj->columns; i++) {
 	      SV* flags = newSViv(obj->col_flags[i]);
 	      hv_store(RETVAL, (char*) obj->col_names[i], strlen(obj->col_names[i]), flags, 0);
-	}	
+	}
+	}
 	OUTPUT:
 	RETVAL      
 
@@ -74,10 +76,11 @@ int range_rows(obj);
 
 
 struct TSDB_range_t *
-TSDB_aggregate(range, interval, data_type)
+TSDB_aggregate(range, interval, data_type,unit)
 	struct TSDB_range_t *	range
 	int	interval
 	int	data_type
+	int     unit
 
 struct TSDB_metric_t *
 TSDB_create(filename, create_time, resolution, columns, name, flags, col_names, col_flags)

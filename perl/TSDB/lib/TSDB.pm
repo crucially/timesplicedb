@@ -373,7 +373,7 @@ sub aggregate {
     my $self     = shift;
     my $interval = shift;
 
-    return TSDB::Range->new(TSDB::C::aggregate($self->{ctx}, $interval, 0), _columns => $self->{_columns});
+    return TSDB::Range->new(TSDB::C::aggregate($self->{ctx}, $interval, 0, 1), _columns => $self->{_columns});
 }
 
 =head2 cell <row> <column> 
