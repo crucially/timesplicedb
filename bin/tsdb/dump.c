@@ -82,8 +82,11 @@ int dump_main(int argc, char * const *argv) {
   int rows = range->rows;
   int columns = range->columns;
   int i = 0;
-  int *last_value = calloc(sizeof(int), columns);
-  int *last_diff  = calloc(sizeof(int), columns);
+  u_int64_t wrap64 = -1;
+  u_int32_t wrap32 = -1;
+
+  u_int64_t *last_value = calloc(sizeof(u_int64_t), columns);
+  u_int64_t *last_diff  = calloc(sizeof(u_int64_t), columns);
   if(column_set) {
     while(rows--) {
       printf("%llu\n", range->row[(i++ * columns) + column]);
@@ -93,15 +96,22 @@ int dump_main(int argc, char * const *argv) {
     while(rows--) {
       while(col < columns) {
 	u_int64_t value = range->row[(i * columns) + col];
-	
+ 
 	if (difference) {
 	  if (value == 0) {
 	    printf("%llu\t", last_diff[col++]);
 	    continue;
 	  }
+	  
 	  if (last_value[col] > value) {
-	    /* wrap around */
-	    last_diff[col] = 4294967295 - last_value[col] + value;
+	    if (last_value[col] < wrap32) {
+	      last_diff[col] = wrap32 - last_value[col] + value;
+	    } else {
+	      last_diff[col] = wrap64 - last_value[col] + value;
+	    }
+	  } else if(last_value[col] == 0) {
+	    last_value[col++] = value;
+	    continue;
 	  } else {
 	    last_diff[col] = value - last_value[col];
 	  }
@@ -109,6 +119,7 @@ int dump_main(int argc, char * const *argv) {
 
 	} else
 	  printf("%llu\t", value);
+
 	if (value)
 	  last_value[col] = value;
 	col++;
