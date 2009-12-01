@@ -365,6 +365,7 @@ struct TSDB_agg_counters_t {
   u_int64_t max;            /* maximum value seen */
   double sum_sqr;
   u_int64_t last_value;
+  u_int64_t last_raw_value;
 };
 
 
@@ -385,7 +386,7 @@ struct TSDB_range_t * TSDB_aggregate (struct TSDB_range_t *range, int interval, 
 
   int i = 0;
   while(i < range->columns) {
-    counters[i].last_value = counters[i].cells_counted = counters[i].sum = counters[i].max = counters[i].sum_sqr = 0;
+    counters[i].last_raw_value = counters[i].last_value = counters[i].cells_counted = counters[i].sum = counters[i].max = counters[i].sum_sqr = 0;
     counters[i].min = 4294967295; /** broken on 64bit, i know, and I haven't how to deal with signed or unsigned yet probably counters
 			are unsigned and gauge signed?**/
 
@@ -407,6 +408,9 @@ struct TSDB_range_t * TSDB_aggregate (struct TSDB_range_t *range, int interval, 
   int rows_per_bucket = ((interval/range->resolution));
   int cells_seen = 0;
 
+  u_int64_t wrap64 = -1;
+  u_int32_t wrap32 = -1;
+
   while(src_cells--) {
     u_int64_t value = 0;
     struct TSDB_agg_counters_t *counter = (counters + (curr_cell % range->columns));
@@ -415,36 +419,55 @@ struct TSDB_range_t * TSDB_aggregate (struct TSDB_range_t *range, int interval, 
       value = range->row[curr_cell] / unit;
     else  {
       u_int64_t new_value = range->row[curr_cell];
-      u_int64_t old_value = range->row[curr_cell - range->columns];
+      u_int64_t old_value = counter->last_raw_value;
 
-      if (range->row[curr_cell] == 0 || range->row[curr_cell - range->columns] == 0) {
-	value = counter->last_value;;
+      if(new_value == 0) {
+	value = 0;
+      } else if (counter->last_raw_value == 0) {
+	/* should only happen on the first row */
+	value = 0;
+	counter->last_raw_value = new_value;
       } else {
+	/* we have a value, store it for later use */
+	counter->last_raw_value = new_value;
+	/* if we recorded 0 it means the value is empty */
 	if (old_value > new_value)
 	  value = 4294967295 - old_value + new_value;
 	else 
 	  value = new_value - old_value;
       }
+    /* this doesn't work if the transfer rate is less than 1 of the given unit
+       should use floating point */
+
       value = value /  range->resolution / unit;
     }
 
 
-    counter->sum += value;
-    counter->cells_counted++;
-
-    counter->sum_sqr += (double)value * (double)value;
-
-    if (counter->min > value)
-      counter->min = value;
-    if (counter->max < value)
-      counter->max = value;
+    if(value) {
+      
+      counter->sum += value;
+      counter->cells_counted++;
+      
+      counter->sum_sqr += (double)value * (double)value;
+      
+      if (counter->min > value)
+	counter->min = value;
+      if (counter->max < value)
+	counter->max = value;
+    }
 
     if(cells_seen++ == rows_per_bucket * range->columns - 1) {
       int i = 0;
       while(i < range->columns) {
-	struct TSDB_agg_counters_t *column = counters + i;
-	double avg = (double)column->sum / (double)column->cells_counted;
+	struct TSDB_agg_counters_t *column = counters + i++;
+	
+	if(!column->cells_counted) {
+	  trg_cell++;
+	  continue;
+	}
 
+	double avg = (double)column->sum / (double)column->cells_counted;
+	  
 	aggregate->agg[trg_cell].rows_averaged = column->cells_counted;
 	aggregate->row[trg_cell] = column->sum / column->cells_counted;
 	aggregate->agg[trg_cell].max = column->max;
@@ -461,11 +484,12 @@ struct TSDB_range_t * TSDB_aggregate (struct TSDB_range_t *range, int interval, 
 	column->min = 4294967295; /** broken on 64bit, i know, and I haven't how to deal with signed or unsigned yet probably counters
 			are unsigned and gauge signed?**/
 
-	i++;
+
       }
       cells_seen = 0;
     }
-    counter->last_value = value;
+    if(value)
+      counter->last_value = value;
     curr_cell++;
   }
   
@@ -473,7 +497,13 @@ struct TSDB_range_t * TSDB_aggregate (struct TSDB_range_t *range, int interval, 
 
     int i = 0;
     while(i < range->columns) {
-      struct TSDB_agg_counters_t *column = counters + i;
+      struct TSDB_agg_counters_t *column = counters + i++;
+
+      if(!column->cells_counted) {
+	trg_cell++;
+	continue;
+      }
+
       double avg = (double)column->sum / (double)column->cells_counted;
       
       aggregate->agg[trg_cell].rows_averaged = column->cells_counted;
@@ -488,7 +518,7 @@ struct TSDB_range_t * TSDB_aggregate (struct TSDB_range_t *range, int interval, 
       
       aggregate->agg[trg_cell++].avg = avg;
       
-      i++;
+
     }
     
     /* XXX SSHOULD SET THE RESOLUTION ON AGGREGATE */
