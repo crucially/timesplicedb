@@ -85,8 +85,8 @@ int agg_main(int argc, char * const *argv) {
       break;      
     }
   }
-  
-  if(!filename || !start || !end || !interval) {
+
+  if(!filename || !interval) {
     return agg_usage();
   }
 
@@ -97,6 +97,13 @@ int agg_main(int argc, char * const *argv) {
     flags = TSDB_GAUGE;
 
   struct TSDB_metric_t *metric    = TSDB_open(filename);
+
+  if(!start)
+    start = metric->created;
+
+  if(!end) 
+    end = time(NULL);
+
   struct TSDB_range_t  *range     = TSDB_timespan(metric, start, end);
   struct TSDB_range_t  *aggregate = TSDB_aggregate(range, interval, flags);
 
