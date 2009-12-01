@@ -36,6 +36,7 @@ while(1) {
     my $time = time;
     my $interfaces = $info->interfaces;
     my $names      = $info->i_name;
+    my $sname      = $info->name;
     my $up         = $info->i_up;
     my $speed      = $info->i_speed_raw;
     my $in         = $info->i_octet_in64;
@@ -64,7 +65,7 @@ while(1) {
 				 'err_in',
 				 'err_out',
 		],
-                name  => "Network traffic $host $port ($name)",
+                name  => "Network traffic $host -- $sname -- $port ($name)",
                 create_time => time());
         };
         $metric->insert(0, $in->{$iid});
