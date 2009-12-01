@@ -5,7 +5,7 @@
 export PATH=$PATH:.
 
 rm file_column.tsdb
-tsdb create -f file_column.tsdb -b 1258091219 -r 60 -c 2
+tsdb create -f file_column.tsdb -b 1258091219 -r 60 -c one,two
 
 # insert multiple values
 tsdb insert -f file_column.tsdb -t 1258091219 -c 0 -v 1

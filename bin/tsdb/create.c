@@ -71,10 +71,16 @@ int create_main(int argc, char * const *argv) {
     switch(o) {
     case 'c':
        tmp = optarg;
-       while(*optarg!='\0') 
-         columns += (','==*optarg++);
+       while(*optarg!='\0') {
+
+	 if (!columns) 
+	   columns = 1; //if we see anything we have a column
+	 
+	 columns += (','==*optarg++);
+       }
+
        optarg=tmp;
-       col_names = (char **) malloc(sizeof(char*)*(columns + 1));
+       col_names = (char **) malloc(sizeof(char*)*(columns));
        for (i=0; i<=columns; i++) {
          col_names[i] = strtok((i)? NULL : optarg, ",");
        }
