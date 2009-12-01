@@ -421,7 +421,9 @@ struct TSDB_range_t * TSDB_aggregate (struct TSDB_range_t *range, int interval, 
       u_int64_t new_value = range->row[curr_cell];
       u_int64_t old_value = counter->last_raw_value;
 
-      if(new_value == 0) {
+
+      if(new_value == 0) {  
+	/* value not recorded */
 	value = 0;
       } else if (counter->last_raw_value == 0) {
 	/* should only happen on the first row */
@@ -430,10 +432,20 @@ struct TSDB_range_t * TSDB_aggregate (struct TSDB_range_t *range, int interval, 
       } else {
 	/* we have a value, store it for later use */
 	counter->last_raw_value = new_value;
-	/* if we recorded 0 it means the value is empty */
-	if (old_value > new_value)
-	  value = 4294967295 - old_value + new_value;
-	else 
+	if (old_value > new_value) {
+	  
+	  /* wrapped at a low counter assume 32 bit platform */
+	  if (old_value < wrap32) {
+	    value = wrap32 - old_value + new_value;
+	  } else {
+	    value = wrap64 - old_value + new_value;
+	  }
+
+	  /* discard ridiculous values, I just made the formula up it is probably wrong */
+	  if (value > counter->sum * unit)
+	    value = 0;
+	}
+	  else 
 	  value = new_value - old_value;
       }
     /* this doesn't work if the transfer rate is less than 1 of the given unit
