@@ -9,7 +9,7 @@ use warnings;
 
 use SNMP::Info;
 
-use BigInt;
+
 use bigint;
 
 my $host = shift;
