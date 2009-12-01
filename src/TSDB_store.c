@@ -405,16 +405,17 @@ struct TSDB_range_t * TSDB_aggregate (struct TSDB_range_t *range, int interval, 
   int cells_seen = 0;
 
   while(src_cells--) {
-    u_int64_t value;
+    u_int64_t value = 0;
     struct TSDB_agg_counters_t *counter = (counters + (curr_cell % range->columns));
 
     if (data_type == TSDB_GAUGE)
       value = range->row[curr_cell];
     else  {
-      int new_value = range->row[curr_cell];
-      int old_value = range->row[curr_cell - range->columns];
+      u_int64_t new_value = range->row[curr_cell];
+      u_int64_t old_value = range->row[curr_cell - range->columns];
+
       if (range->row[curr_cell] == 0 || range->row[curr_cell - range->columns] == 0) {
-	value = counters->last_value;
+	value = counter->last_value;
       } else {
 	if (old_value > new_value)
 	  value = 4294967295 - old_value + new_value;
@@ -453,7 +454,7 @@ struct TSDB_range_t * TSDB_aggregate (struct TSDB_range_t *range, int interval, 
 	aggregate->agg[trg_cell++].avg = avg;
 
 	column->sum_sqr = column->cells_counted = column->sum = column->max = 0;
-	column->min = 2147483647; /** broken on 64bit, i know, and I haven't how to deal with signed or unsigned yet probably counters
+	column->min = 4294967295; /** broken on 64bit, i know, and I haven't how to deal with signed or unsigned yet probably counters
 			are unsigned and gauge signed?**/
 
 	i++;
