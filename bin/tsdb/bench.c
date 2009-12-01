@@ -73,7 +73,7 @@ int bench_main(int argc, char **argv) {
     int items = range->rows;
     int i = 0;
     int total = 0;
-    struct TSDB_range_t *aggregate = TSDB_aggregate(range, 86400,0);
+    struct TSDB_range_t *aggregate = TSDB_aggregate(range, 86400,0,1);
     gettimeofday(&how_fast_stop, TSDB_NULL);
     printf("Items:%d   Total: %d   Avg: %d\n", range->rows, total, total/range->rows);
     printf("%d.%d\n", how_fast_start.tv_sec, how_fast_start.tv_usec);

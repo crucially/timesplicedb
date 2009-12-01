@@ -38,7 +38,7 @@
 
 #include <stdlib.h>
 #include <unistd.h>
-
+#include <assert.h>
 
 extern char *optarg;
 
@@ -55,13 +55,14 @@ int agg_usage () {
 }
 
 int agg_main(int argc, char * const *argv) {
-  int o, start, end, interval, column, difference;
+  int o, start, end, interval, column, difference, unit, unit_set;
   char *filename = 0;
-  
-  difference = column = start = end = interval = 0;
+  char *unit_name = 0;
+
+  difference = column = start = end = interval = unit = unit_set = 0;
 
   while ((o = getopt(argc, argv,
-		     "f:s:e:i:h:c:d")) != -1) {
+		     "f:s:e:i:h:c:du:")) != -1) {
 
     switch(o) {
     case 'd':
@@ -73,6 +74,11 @@ int agg_main(int argc, char * const *argv) {
     case 'f':
       filename = malloc(strlen(optarg)+1);
       memcpy(filename, optarg, strlen(optarg)+1);
+      break;
+    case 'u':
+      unit_name = malloc(strlen(optarg)+1);
+      memcpy(unit_name, optarg, strlen(optarg)+1);
+      unit_set++;
       break;
     case 's':
       start = atoi(optarg);
@@ -90,6 +96,19 @@ int agg_main(int argc, char * const *argv) {
     return agg_usage();
   }
 
+  if(unit_set) {
+    if(!memcmp(unit_name, "Mibit", 4)) {
+      unit = 1024*1024/8;
+    } else if (!memcmp(unit_name, "Kibit", 4)) {
+      unit = 1024/8;
+    } else {
+      printf("Unknown unit name\n");
+    }
+  } else {
+    unit = 1;
+  }
+  
+
   int flags;
   if (difference)
     flags = TSDB_COUNTER;
@@ -105,7 +124,7 @@ int agg_main(int argc, char * const *argv) {
     end = time(NULL);
 
   struct TSDB_range_t  *range     = TSDB_timespan(metric, start, end);
-  struct TSDB_range_t  *aggregate = TSDB_aggregate(range, interval, flags);
+  struct TSDB_range_t  *aggregate = TSDB_aggregate(range, interval, flags, unit);
 
   int rows = aggregate->rows;
   int i = 0;

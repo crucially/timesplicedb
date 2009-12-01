@@ -368,12 +368,15 @@ struct TSDB_agg_counters_t {
 };
 
 
-struct TSDB_range_t * TSDB_aggregate (struct TSDB_range_t *range, int interval, int data_type) {
+struct TSDB_range_t * TSDB_aggregate (struct TSDB_range_t *range, int interval, int data_type, int unit) {
   struct TSDB_range_t *aggregate;
   struct TSDB_agg_counters_t *counters;
   assert(range->magic == TSDB_range_magic);
   int src_rows, src_cells, curr_cell, trg_cell;
   src_rows = src_cells = curr_cell = trg_cell = 0;
+  
+  if (unit == 0) 
+    unit = 1;
 
   counters = calloc(range->columns, sizeof(struct TSDB_agg_counters_t));
 
@@ -409,19 +412,20 @@ struct TSDB_range_t * TSDB_aggregate (struct TSDB_range_t *range, int interval, 
     struct TSDB_agg_counters_t *counter = (counters + (curr_cell % range->columns));
 
     if (data_type == TSDB_GAUGE)
-      value = range->row[curr_cell];
+      value = range->row[curr_cell] / unit;
     else  {
       u_int64_t new_value = range->row[curr_cell];
       u_int64_t old_value = range->row[curr_cell - range->columns];
 
       if (range->row[curr_cell] == 0 || range->row[curr_cell - range->columns] == 0) {
-	value = counter->last_value;
+	value = counter->last_value;;
       } else {
 	if (old_value > new_value)
 	  value = 4294967295 - old_value + new_value;
 	else 
 	  value = new_value - old_value;
       }
+      value = value /  range->resolution / unit;
     }
 
 
