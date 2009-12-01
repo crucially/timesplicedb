@@ -47,10 +47,10 @@ int create_usage () {
   WARN(" -f filename  db to get info about\n");
   WARN(" -r resolution for each row in the time series (seconds)\n");
   WARN(" -b the time of the first row in the time series (unix timestamp)\n");
-  WARN(" -c the number of columns per row");
+  WARN(" -c list of column names\n");
   WARN(" -h this help\n\n");
   WARN("Create a database starting at a given time with a storage interval of every 10 minutes\n");
-  WARN("\ttsdb create -f data.tsdb -c 1258096151 -r 600\n");
+  WARN("\ttsdb create -f data.tsdb -b 1258096151 -r 600 -c foo,bar\n");
   return 1;
 }
 
