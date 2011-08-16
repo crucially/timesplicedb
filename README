@@ -19,6 +19,14 @@ WARNING
 
 None of the aggregation functions have been tested extensively, getting floating point exceptions and bad data back is still very possible
 
+***
+NOTE
+***
+$ cd timesplicedb
+$ aclocal && autoreconf -i && autoconf && automake -a
+$ ./configure && make && make install
+
+
 ****
 
 I hange out on freenode #timesplicedb
