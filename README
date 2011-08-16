@@ -24,7 +24,8 @@ NOTE
 ***
 $ cd timesplicedb
 $ aclocal && autoreconf -i && autoconf && automake -a
-$ ./configure && make && make install
+$ ./configure && make
+$ sudo make install
 
 
 ****
